@@ -26,7 +26,7 @@ function AppRouter() {
           <Route path="/planner" element={<AIPlanner />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/itineraries" element={<Itineraries />} />
-        <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
