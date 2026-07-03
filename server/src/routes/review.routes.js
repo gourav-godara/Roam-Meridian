@@ -2,11 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "Review API Working",
-  });
-});
+const reviewController = require("../controllers/review.controller");
+
+router.get("/", reviewController.getReviews);
+
+router.post("/", reviewController.createReview);
 
 module.exports = router;
