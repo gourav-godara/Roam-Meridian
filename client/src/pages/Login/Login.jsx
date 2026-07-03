@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -94,6 +95,14 @@ const Login = () => {
             </div>
         </div>
     );
+=======
+const Login = () => {
+  return (
+    <div>
+      Login Page
+    </div>
+  );
+>>>>>>> 6edfe898133d2cd94b8807c9ddec59063f67f3b8
 };
 
 export default Login;
