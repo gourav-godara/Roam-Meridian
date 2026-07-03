@@ -52,7 +52,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
             <ExpenseSummary
-              summary={dashboard?.expenseSummary}
+              expenseSummary={dashboard?.expenseSummary}
             />
 
             <TravelHistory

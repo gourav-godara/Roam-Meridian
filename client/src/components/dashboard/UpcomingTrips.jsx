@@ -1,20 +1,34 @@
-const UpcomingTrips = ({ trips = [] }) => {
-  if (!trips.length) {
-    return (
-        <div className="bg-white rounded-2xl p-6 shadow">
-            <h2 className="text-xl font-semibold mb-4">
-                Upcoming Trips
-            </h2>
+import TripCard from "./TripCard";
 
-            <p className="text-gray-500">
-                No upcoming trips yet.
-            </p>
-        </div>
-    );
-}
+const UpcomingTrips = ({ trips = [] }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow">
-      Upcoming Trips
+    <div className="bg-white rounded-2xl p-6 shadow-sm">
+      <div className="flex justify-between items-center mb-5">
+        <h2 className="text-2xl font-semibold">
+          Upcoming Trips
+        </h2>
+
+        {trips.length > 0 && (
+          <button className="text-teal-600 font-medium hover:underline">
+            View All
+          </button>
+        )}
+      </div>
+
+      {trips.length === 0 ? (
+        <p className="text-gray-500">
+          No upcoming trips yet.
+        </p>
+      ) : (
+        <div className="space-y-5">
+          {trips.map((trip) => (
+            <TripCard
+              key={trip._id}
+              trip={trip}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
