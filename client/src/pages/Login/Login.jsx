@@ -50,7 +50,7 @@ const Login = () => {
 
                     <PasswordInput
                         label="Password"
-                        placeholer="Enter your password"
+                        placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
@@ -75,7 +75,7 @@ const Login = () => {
                         text-white
                         transition-all
                         duration-200
-                        hover:ng-[#24483D]
+                        hover:bg-[#24483D]
                         "
                     >
                         Sign In
@@ -84,7 +84,7 @@ const Login = () => {
                     <p className="text-center text-sm text-stone-600">
                         Don't have an account?{" "}
                         <Link
-                            to="signup"
+                            to="/signup"
                             className="font-semibold text-[#2F5D50] hover:text-[#8A5B34]"
                         >
                             Sign Up
