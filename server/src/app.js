@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -10,6 +11,7 @@ const plannerRoutes = require("./routes/planner.routes");
 const reviewRoutes = require("./routes/review.routes");
 const expenseRoutes = require("./routes/expense.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
+
 const app = express();
 
 // ================= Middleware =================
@@ -33,5 +35,6 @@ app.use("/api/planner", plannerRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/expenses", expenseRoutes);
 // Export App
 module.exports = app;
