@@ -13,7 +13,6 @@ const reviewSchema = new mongoose.Schema(
     destination: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Destination",
-      required: true,
     },
 
     // Itinerary from which the review was created
@@ -46,7 +45,17 @@ const reviewSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    isEdited: {
+  type: Boolean,
+  default: false,
+},
+
+likes: {
+  type: Number,
+  default: 0,
+},
   },
+  
   {
     timestamps: true,
   }
