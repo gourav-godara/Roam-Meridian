@@ -35,6 +35,5 @@ app.use("/api/planner", plannerRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/expenses", expenseRoutes);
 // Export App
 module.exports = app;

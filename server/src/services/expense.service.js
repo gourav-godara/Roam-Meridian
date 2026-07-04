@@ -9,7 +9,7 @@ const createExpense = async (expenseData) => {
 const getAllExpenses = async () => {
   return await Expense.find()
     .populate("paidBy", "name email")
-    .populate("participants.user", "name email")
+    .populate("participants", "name email")
     .sort({ createdAt: -1 });
 };
 
@@ -17,7 +17,7 @@ const getAllExpenses = async () => {
 const getExpenseById = async (id) => {
   return await Expense.findById(id)
     .populate("paidBy", "name email")
-    .populate("participants.user", "name email");
+    .populate("participants", "name email");
 };
 
 // Update Expense

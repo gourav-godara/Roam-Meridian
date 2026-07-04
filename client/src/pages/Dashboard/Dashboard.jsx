@@ -10,7 +10,7 @@ import RecentReviews from "../../components/dashboard/RecentReviews";
 import ExpenseSummary from "../../components/dashboard/ExpenseSummary";
 import TravelHistory from "../../components/dashboard/TravelHistory";
 import QuickActions from "../../components/dashboard/QuickActions";
-
+import TravelBackground from "../../components/dashboard/TravelBackground";
 const Dashboard = () => {
   const { dashboard, loading, error } = useDashboard();
 
@@ -36,7 +36,7 @@ const Dashboard = () => {
 <div className="dashboard-bg">
 
 <div className="flex">
-
+<TravelBackground />
 <div className="z-20 p-6">
   <div className="absolute left-20 top-20 h-80 w-80 rounded-full bg-cyan-400/20 blur-[140px]" />
 
