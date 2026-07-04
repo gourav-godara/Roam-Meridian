@@ -1,77 +1,70 @@
-import {
-  FaPlane,
-  FaCalendarAlt,
-  FaHeart,
-  FaStar,
-  FaWallet,
-} from "react-icons/fa";
-
+import { motion } from "framer-motion";
 import StatCard from "./StatCard";
 
 const StatsGrid = ({ stats }) => {
-  const statCards = [
+  const cards = [
     {
-      title: "Total Trips",
-      value: stats?.totalTrips ?? 0,
-      icon: FaPlane,
-      color: "bg-blue-500",
+      title: "Trips",
+      value: stats?.totalTrips || 5,
+      icon: "✈️",
+      trend: "+12%",
+      subtitle: "Last Trip • Bali",
     },
     {
-      title: "Upcoming Trips",
-      value: stats?.upcomingTrips ?? 0,
-      icon: FaCalendarAlt,
-      color: "bg-orange-500",
-    },
-    {
-      title: "Saved Trips",
-      value: stats?.savedTrips ?? 0,
-      icon: FaHeart,
-      color: "bg-pink-500",
-    },
-    {
-      title: "Reviews",
-      value: stats?.reviews ?? 0,
-      icon: FaStar,
-      color: "bg-yellow-500",
+      title: "Countries",
+      value: stats?.countries || 8,
+      icon: "🌍",
+      trend: "+4%",
+      subtitle: "Across Asia",
     },
     {
       title: "Expenses",
-      value: `₹${stats?.totalExpenses ?? 0}`,
-      icon: FaWallet,
-      color: "bg-green-500",
+      value: stats?.totalSpent || 25000,
+      icon: "💰",
+      trend: "+9%",
+      subtitle: "This Year",
+    },
+    {
+      title: "Reviews",
+      value: stats?.reviews || 8,
+      icon: "⭐",
+      trend: "+18%",
+      subtitle: "Community Shared",
     },
   ];
 
   return (
-    <section>
-
-      <div className="mb-8">
-
-        <h1 className="text-4xl font-bold text-gray-800">
-          Welcome Back 👋
-        </h1>
-
-        <p className="text-gray-500 mt-2">
-          Here's a quick overview of your travel activity.
-        </p>
-
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-        {statCards.map((stat) => (
-          <StatCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            color={stat.color}
-          />
-        ))}
-
-      </div>
-
-    </section>
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: {},
+        show: {
+          transition: {
+            staggerChildren: 0.15,
+          },
+        },
+      }}
+      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+    >
+      {cards.map((card) => (
+        <motion.div
+          key={card.title}
+          variants={{
+            hidden: {
+              opacity: 0,
+              y: 30,
+            },
+            show: {
+              opacity: 1,
+              y: 0,
+            },
+          }}
+        >
+          <StatCard {...card} />
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
 

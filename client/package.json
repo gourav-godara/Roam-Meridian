@@ -16,6 +16,7 @@
     "framer-motion": "^12.42.2",
     "leaflet": "^1.9.4",
     "react": "^19.2.7",
+    "react-countup": "^6.5.3",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.80.0",
     "react-hot-toast": "^2.6.0",

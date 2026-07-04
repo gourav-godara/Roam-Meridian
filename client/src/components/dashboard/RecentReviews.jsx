@@ -2,7 +2,11 @@ import ReviewCard from "./ReviewCard";
 
 const RecentReviews = ({ reviews = [] }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    
+    <div className="bg-white/10
+backdrop-blur-xl
+border border-white/10 rounded-2xl p-6 shadow-sm">
+  
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">
           Recent Reviews
