@@ -1,0 +1,58 @@
+const mockDestinations = [
+  {
+    id: 1,
+    name: "Manali",
+    country: "India",
+    category: "Mountains",
+    duration: "5 days",
+    budget: 12000,
+    rating: 4.8,
+  },
+  {
+    id: 2,
+    name: "Goa",
+    country: "India",
+    category: "Beach",
+    duration: "4 days",
+    budget: 10500,
+    rating: 4.7,
+  },
+  {
+    id: 3,
+    name: "Jaipur",
+    country: "India",
+    category: "Heritage",
+    duration: "3 days",
+    budget: 9800,
+    rating: 4.6,
+  },
+  {
+    id: 4,
+    name: "Rishikesh",
+    country: "India",
+    category: "Adventure",
+    duration: "4 days",
+    budget: 8500,
+    rating: 4.5,
+  },
+  {
+    id: 5,
+    name: "Udaipur",
+    country: "India",
+    category: "Heritage",
+    duration: "3 days",
+    budget: 11200,
+    rating: 4.9,
+  },
+  {
+    id: 6,
+    name: "Coorg",
+    country: "India",
+    category: "Mountains",
+    duration: "5 days",
+    budget: 9200,
+    rating: 4.6,
+  },
+];
+
+export default mockDestinations;
