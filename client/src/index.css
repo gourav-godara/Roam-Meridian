@@ -43,8 +43,6 @@
   --shadow-hover: 0 8px 20px rgba(44,70,58,0.12);
 }
 
-/* Tokens without auto-generated Tailwind utilities —
-   used via arbitrary value syntax, e.g. duration-[var(--duration-fast)] */
 :root {
   --duration-fast: 150ms;
   --duration-normal: 250ms;
