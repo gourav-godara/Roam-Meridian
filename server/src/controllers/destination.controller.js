@@ -1,15 +1,90 @@
 const Destination = require("../models/Destination");
+const mongoose = require("mongoose");
 
 const getAllDestinations = async (req, res) => {
     try {
-        const destinations = await Destination.find();
+
+        const {
+            search,
+            city,
+            country,
+            category,
+            page = 1,
+            limit = 10,
+            sort,
+        } = req.query;
+
+        const filter = {};
+
+        // Search by destination name
+        if (search) {
+            filter.name = {
+                $regex: search,
+                $options: "i",
+            };
+        }
+
+        // Filters
+        if (city) {
+            filter.city = city;
+        }
+
+        if (country) {
+            filter.country = country;
+        }
+
+        if (category) {
+            filter.category = category;
+        }
+        
+        // If parsing succeeds, use the parsed number.
+        const pageNumber = parseInt(page) || 1;
+        const limitNumber = parseInt(limit) || 10;
+
+        // Calculate how many documents to skip
+        const skip = (pageNumber - 1) * limitNumber;
+
+        // Object to store sorting option
+        let sortOption = {};
+
+        if (sort === "name") {
+            sortOption.name = 1;
+        }
+        else if (sort === "rating") {
+            sortOption["rating.average"] = -1;
+        }
+        else if (sort === "budget") {
+            sortOption["budget.min"] = 1;
+        }
+        else if (sort === "newest") {
+            sortOption.createdAt = -1;
+        }
+
+        // Fetch paginated data
+        const destinations = await Destination.find(filter)
+            .sort(sortOption)
+            .skip(skip)
+            .limit(limitNumber);
+
+        // Total matching documents
+        const total = await Destination.countDocuments(filter);
 
         res.status(200).json({
             success: true,
             message: "Destinations fetched successfully",
+
+            currentPage: pageNumber,
+            totalPages: Math.ceil(total / limitNumber),
+            totalDestinations: total,
+
+            count: destinations.length,
             data: destinations,
         });
+
     } catch (error) {
+
+        console.error(error);
+
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -18,9 +93,16 @@ const getAllDestinations = async (req, res) => {
 };
 
 
-
 const getDestinationById = async (req, res) => {
     try {
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid destination ID",
+            });
+        }
+
         const destination = await Destination.findById(req.params.id);
 
         if (!destination) {
@@ -67,6 +149,14 @@ const createDestination = async (req, res) => {
 
 const updateDestination = async (req, res) => {
     try {
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid destination ID",
+            });
+        }
+
         const destination = await Destination.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -102,6 +192,14 @@ const updateDestination = async (req, res) => {
 
 const deleteDestination = async (req, res) => {
     try {
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid destination ID",
+            });
+        }
+        
         const destination = await Destination.findByIdAndDelete(req.params.id);
 
         if (!destination) {
