@@ -15,7 +15,7 @@ import Profile from "../pages/Profile/Profile";
 import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
-
+import Expenses from "../pages/Expenses/Expenses";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -29,12 +29,14 @@ function AppRouter() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-
+          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+  
             <Route path="/itineraries" element={<Itineraries />} />
             <Route path="/profile" element={<Profile />} />
+
           </Route>
         </Route>
 

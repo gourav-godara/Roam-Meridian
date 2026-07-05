@@ -1,15 +1,55 @@
 const Review = require("../models/review.model");
 
-const getAllReviews = async () => {
-  return await Review.find().sort({ createdAt: -1 });
+// Create Review
+const createReview = async (reviewData) => {
+
+    const existingReview = await Review.findOne({
+        user: reviewData.user,
+        itinerary: reviewData.itinerary,
+    });
+
+    if (existingReview) {
+        throw new Error(
+            "You have already reviewed this itinerary."
+        );
+    }
+
+    return await Review.create(reviewData);
 };
 
-const createReview = async (reviewData) => {
-  const review = await Review.create(reviewData);
-  return review;
+// Get All Reviews
+const getAllReviews = async () => {
+  return await Review.find()
+    .populate("user", "name")
+    .populate("destination", "name")
+    .populate("itinerary");
+};
+
+// Get Review By ID
+const getReviewById = async (id) => {
+  return await Review.findById(id)
+    .populate("user", "name")
+    .populate("destination", "name")
+    .populate("itinerary");
+};
+
+// Update Review
+const updateReview = async (id, reviewData) => {
+  return await Review.findByIdAndUpdate(id, reviewData, {
+    new: true,
+    runValidators: true,
+  });
+};
+
+// Delete Review
+const deleteReview = async (id) => {
+  return await Review.findByIdAndDelete(id);
 };
 
 module.exports = {
-  getAllReviews,
   createReview,
+  getAllReviews,
+  getReviewById,
+  updateReview,
+  deleteReview,
 };
