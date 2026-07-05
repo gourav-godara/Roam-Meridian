@@ -4,5 +4,7 @@ const { getAllTrips } = require("../controllers/trip.controller");
 
 const router = express.Router();
 
-router.get("/", getAllTrips);
+const authMiddleware = require("../middleware/auth.middleware");
+
+router.get("/", authMiddleware, getAllTrips);
 module.exports = router;
