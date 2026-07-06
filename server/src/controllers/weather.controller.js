@@ -1,5 +1,27 @@
 const axios = require("axios");
 
+const fetchWeather = async (city) => {
+    const response = await axios.get(
+        "https://api.openweathermap.org/data/2.5/weather",
+        {
+            params: {
+                q: city,
+                appid: process.env.WEATHER_API_KEY,
+                units: "metric",
+            },
+        }
+    );
+
+    return {
+        city: response.data.name,
+        country: response.data.sys.country,
+        temperature: response.data.main.temp,
+        description: response.data.weather[0].description,
+        humidity: response.data.main.humidity,
+        windSpeed: response.data.wind.speed,
+    };
+};
+
 const getWeather = async (req, res) => {
     try {
 
@@ -13,26 +35,7 @@ const getWeather = async (req, res) => {
     }
     
     //API call to OpenWeather
-    const response = await axios.get(
-    "https://api.openweathermap.org/data/2.5/weather",
-    {
-        params: {
-            q: city,
-            appid: process.env.WEATHER_API_KEY,
-            units: "metric",
-        },
-    }
-);
-
-    // ⬇️ Add the weather object here
-    const weather = {
-        city: response.data.name,
-        country: response.data.sys.country,
-        temperature: response.data.main.temp,
-        description: response.data.weather[0].description,
-        humidity: response.data.main.humidity,
-        windSpeed: response.data.wind.speed,
-    };
+    const weather = await fetchWeather(city);
 
     // ⬇️ Then return it here
     return res.status(200).json({
@@ -52,4 +55,5 @@ const getWeather = async (req, res) => {
 
 module.exports = {
     getWeather,
+    fetchWeather,
 };

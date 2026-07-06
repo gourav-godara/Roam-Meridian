@@ -1,5 +1,6 @@
 const Destination = require("../models/Destination");
 const mongoose = require("mongoose");
+const { fetchWeather } = require("./weather.controller");
 
 const getAllDestinations = async (req, res) => {
     try {
@@ -112,11 +113,19 @@ const getDestinationById = async (req, res) => {
             });
         }
 
-        res.status(200).json({
-            success: true,
-            message: "Destination fetched successfully",
-            data: destination,
-        });
+        let weather = null;
+
+        try {
+            weather = await fetchWeather(destination.city);
+        } catch (error) {
+            console.log("Weather service unavailable");
+        }
+                res.status(200).json({
+                    success: true,
+                    message: "Destination fetched successfully",
+                    destination,
+                    weather,
+        }); 
 
     } catch (error) {
         console.error(error);
