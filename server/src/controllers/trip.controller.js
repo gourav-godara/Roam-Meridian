@@ -77,6 +77,7 @@ const createTrip = async (req, res) => {
     }
 }
 
+
 const getTripById = async (req, res) => {
     const { id } = req.params;
 
@@ -190,4 +191,5 @@ module.exports = {
     getTripById,
     updateTrip,
     deleteTrip,
+
 };

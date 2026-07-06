@@ -1,9 +1,15 @@
-const Home = () => {
+import Hero from "../../components/home/Hero";
+import PopularDestinations from "../../components/home/PopularDestinations";
+import AIPlannerCTA from "../../components/home/AIPlannerCTA";
+
+function Home() {
   return (
     <div>
-      Home Page
+      <Hero />
+      <PopularDestinations />
+      <AIPlannerCTA />
     </div>
   );
-};
+}
 
 export default Home;

@@ -2,6 +2,7 @@ const Destination = require("../models/Destination");
 const mongoose = require("mongoose");
 const { fetchWeather } = require("./weather.controller");
 
+
 const getAllDestinations = async (req, res) => {
     try {
 
@@ -112,6 +113,7 @@ const getDestinationById = async (req, res) => {
                 message: "Destination not found",
             });
         }
+
 
         let weather = null;
 

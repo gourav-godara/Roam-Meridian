@@ -7,9 +7,11 @@ const router = express.Router();
 const authMiddleware = require("../middleware/auth.middleware");
 
 router.get("/", authMiddleware, getAllTrips);
+
 router.post("/", authMiddleware, createTrip);
 router.get("/:id", authMiddleware, getTripById);
 router.put("/:id", authMiddleware, updateTrip);
 router.delete("/:id", authMiddleware, deleteTrip);
+
 
 module.exports = router;
