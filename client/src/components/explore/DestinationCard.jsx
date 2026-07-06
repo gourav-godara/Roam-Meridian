@@ -1,44 +1,55 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiHeart } from "react-icons/fi";
-import { FiStar } from "react-icons/fi";
-import Card from "../common/Card";
+import { FiHeart, FiStar } from "react-icons/fi";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-function DestinationCard({ destination }) {
-  const [saved, setSaved] = useState(false);
+function DestinationCard({ destination, onToggleFavorite }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleFavoriteClick = (e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    onToggleFavorite(destination.id);
+  };
 
   return (
-    <Link to={`/destination/${destination.id}`} className="block group">
-      <Card>
-        <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-100">
-          <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">
-            photo
-          </div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              setSaved(!saved);
-            }}
-            className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/85 flex items-center justify-center"
-          >
-            <FiHeart size={15} className={saved ? "fill-ink text-ink" : "text-ink"} />
-          </button>
-        </div>
+    <article className="group bg-white rounded-[20px] shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 overflow-hidden cursor-pointer">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-[20px] bg-mist">
+        <img
+          src={destination.image}
+          alt={destination.name}
+          onLoad={() => setImgLoaded(true)}
+          className={`w-full h-full object-cover transition-transform duration-200 group-hover:scale-105 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+        />
+        <button
+          type="button"
+          onClick={handleFavoriteClick}
+          aria-label={destination.isFavorite ? "Remove from wishlist" : "Add to wishlist"}
+          aria-pressed={destination.isFavorite}
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/60 backdrop-blur-md flex items-center justify-center hover:bg-white/80 transition-colors"
+        >
+          <FiHeart size={16} className={destination.isFavorite ? "fill-red-500 text-red-500" : "text-ink"} />
+        </button>
+      </div>
 
-        <div className="pt-3.5">
-          <p className="text-sm font-medium text-ink">{destination.name}, {destination.country}</p>
-          <p className="text-[13px] text-slate-500 mt-0.5 mb-2">
-            {destination.category} &middot; {destination.duration}
-          </p>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-forest">₹{destination.budget.toLocaleString()}</span>
-            <span className="text-[13px] text-slate-500 flex items-center gap-1">
-              <FiStar size={13} /> {destination.rating}
-            </span>
-          </div>
+      <div className="p-4">
+        <h3 className="text-sm font-semibold text-ink truncate">{destination.name}</h3>
+        <p className="text-xs text-gray-500 mt-0.5 truncate">{destination.location}</p>
+        <div className="flex items-center justify-between mt-2.5">
+          <span className="flex items-center gap-1 text-xs font-medium text-ink">
+            <FiStar size={13} className="fill-gold text-gold" />
+            {destination.rating.toFixed(1)}
+          </span>
+          <span className="text-sm font-semibold text-forest">₹{destination.price.toLocaleString("en-IN")}</span>
         </div>
-      </Card>
-    </Link>
+      </div>
+    </article>
   );
 }
 
