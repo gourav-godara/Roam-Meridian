@@ -16,6 +16,7 @@ import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import Expenses from "../pages/Expenses/Expenses";
+import ReviewPage from "../pages/Reviews/ReviewPage";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -31,6 +32,7 @@ function AppRouter() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reviews" element={<ReviewPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
   

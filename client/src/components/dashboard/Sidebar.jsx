@@ -10,44 +10,52 @@ import {
   FaCog,
   FaQuestionCircle,
 } from "react-icons/fa";
-
+import { NavLink } from "react-router-dom";
 const menuItems = [
   {
     title: "Dashboard",
     icon: FaHome,
-    active: true,
+    path: "/dashboard",
   },
   {
     title: "Saved Trips",
     icon: FaHeart,
+    path: "/saved-trips",
   },
   {
     title: "Upcoming Trips",
     icon: FaCalendarAlt,
+    path: "/upcoming-trips",
   },
   {
     title: "Reviews",
     icon: FaStar,
+    path: "/reviews",
   },
   {
     title: "Expenses",
     icon: FaWallet,
+    path: "/expenses",
   },
   {
     title: "Travel History",
     icon: FaHistory,
+    path: "/history",
   },
   {
     title: "Profile",
     icon: FaUser,
+    path: "/profile",
   },
   {
     title: "Settings",
     icon: FaCog,
+    path: "/settings",
   },
   {
     title: "Help & Support",
     icon: FaQuestionCircle,
+    path: "/help",
   },
 ];
 
@@ -89,22 +97,23 @@ const Sidebar = () => {
             const Icon = item.icon;
 
             return (
-              <button
-                key={item.title}
-                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl mb-2 transition-all duration-300
-
-                ${
-                  item.active
-                    ? "bg-teal-500 text-white shadow-lg"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
+              <NavLink
+  key={item.title}
+  to={item.path}
+  className={({ isActive }) =>
+    `w-full flex items-center gap-4 px-4 py-3 rounded-xl mb-2 transition-all duration-300 ${
+      isActive
+        ? "bg-teal-500 text-white shadow-lg"
+        : "text-gray-600 hover:bg-gray-100"
+    }`
+  }
+>
                 <Icon className="text-lg" />
 
                 <span className="font-medium">
                   {item.title}
                 </span>
-              </button>
+              </NavLink>
             );
           })}
         </nav>

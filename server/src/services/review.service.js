@@ -21,16 +21,13 @@ const createReview = async (reviewData) => {
 const getAllReviews = async () => {
   return await Review.find()
     .populate("user", "name")
-    .populate("destination", "name")
-    .populate("itinerary");
 };
 
 // Get Review By ID
 const getReviewById = async (id) => {
   return await Review.findById(id)
     .populate("user", "name")
-    .populate("destination", "name")
-    .populate("itinerary");
+    
 };
 
 // Update Review
