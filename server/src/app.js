@@ -13,6 +13,7 @@ const expenseRoutes = require("./routes/expense.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const tripRoutes = require("./routes/trip.routes");
 const app = express();
+const weatherRoutes = require("./routes/weather.routes");
 
 // ================= Middleware =================
 
@@ -36,5 +37,6 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/trips", tripRoutes);
+app.use("/api/weather", weatherRoutes);
 // Export App
 module.exports = app;

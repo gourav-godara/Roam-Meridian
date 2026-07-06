@@ -17,6 +17,7 @@ import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import Expenses from "../pages/Expenses/Expenses";
+import ReviewPage from "../pages/Reviews/ReviewPage";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -30,6 +31,7 @@ function AppRouter() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reviews" element={<ReviewPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
 

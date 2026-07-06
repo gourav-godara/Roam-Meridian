@@ -77,7 +77,119 @@ const createTrip = async (req, res) => {
     }
 }
 
+
+const getTripById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        console.log("Trip ID:", id);
+        console.log("User ID:", req.user.id);
+
+        const trip = await Trip.findOne({
+            _id: id,
+            createdBy: req.user.id,
+        });
+        
+        console.log("Trip:", trip);
+
+        if(!trip) {
+            return res.status(404).json({
+                success: false,
+                message: "Trip not found.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: trip,
+        });
+    } catch (error) {
+        console.error("Error fetching trip:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch trip.",
+        });
+    }
+};
+
+const updateTrip = async (req, res)  => {
+    const { id } = req.params;
+
+    try {
+        const updates = req.body;
+
+        const updatedTrip = await Trip.findOneAndUpdate(
+            {
+                _id: id,
+                createdBy: req.user.id,
+            },
+            updates,
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+
+        if(!updatedTrip) {
+            return res.status(404).json({
+                success: false,
+                message: "trip not found.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Trip updated successfully.",
+            data: updatedTrip,
+        });
+
+    } catch (error) {
+        console.error("Error updating trip:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update trip.",
+        });
+    }
+};
+
+const deleteTrip = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deleteTrip = await Trip.findOneAndDelete({
+            _id: id,
+            createdBy: req.user.id,
+        });
+
+        if(!deleteTrip) {
+            return res.status(404).json({
+                success: false,
+                message: "Trip not found.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Trip deleted successfully.",
+        });
+
+    } catch (error) {
+        console.error("Error deleting trip:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete trip.",
+        });
+    }
+};
+
 module.exports = {
     getAllTrips,
     createTrip,
+    getTripById,
+    updateTrip,
+    deleteTrip,
+
 };
