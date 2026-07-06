@@ -1,8 +1,8 @@
 // backend/src/services/dashboard.service.js
 
-const getDashboardData = async () => {
-  return {
-    stats: {
+const getDashboardData = async () => { // An async function that will later fetch data from MongoDB.
+  return { // Returns a massive object full of data arrays.
+    stats: { // Object containing counter statistics for the top cards.
       totalTrips: 5,
       upcomingTrips: 2,
       savedTrips: 10,
@@ -11,7 +11,7 @@ const getDashboardData = async () => {
       groupTrips: 4,
     },
 
-    upcomingTrips: [
+    upcomingTrips: [ // Array of objects representing future vacation bookings.
   {
     _id: "1",
     destination: "Manali Getaway",
@@ -47,7 +47,7 @@ const getDashboardData = async () => {
   },
 ],
 
-    recentReviews: [
+    recentReviews: [ // Array of objects containing user trip logs and ratings.
   {
     _id: "1",
     destination: "Goa",
@@ -70,7 +70,7 @@ const getDashboardData = async () => {
   },
 ],
 
-    expenseSummary: {
+    expenseSummary: {  // Financial statistics and transaction lists.
   totalSpent: 25000,
   youOwe: 1500,
   youAreOwed: 500,
