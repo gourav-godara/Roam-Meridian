@@ -14,13 +14,13 @@ import Signup from "../pages/Signup/Signup";
 import Profile from "../pages/Profile/Profile";
 import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
-import AuthLayout from "../layouts/AuthLayout";
 import ProtectedRoute from "./ProtectedRoute";
-import Expenses from "../pages/Expenses/Expenses";
-import ReviewPage from "../pages/Reviews/ReviewPage";
+import ScrollToTop from "../components/common/ScrollToTop";
+
 function AppRouter() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
@@ -29,20 +29,15 @@ function AppRouter() {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/expenses" element={<Expenses />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reviews" element={<ReviewPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
-
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/itineraries" element={<Itineraries />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
-        </Route>
-
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

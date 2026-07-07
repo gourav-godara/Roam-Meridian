@@ -24,7 +24,7 @@ function Navbar() {
 
   return (
     <div className="fixed top-4 left-4 right-4 lg:left-0 lg:right-0 z-[var(--z-navbar)]">
-      <header className="max-w-[1440px] mx-auto bg-white/20 backdrop-blur-md rounded-3xl shadow-lg border border-border/60">
+      <header className="max-w-[1440px] mx-auto bg-white/10 backdrop-blur-md rounded-3xl shadow-lg border border-border/60">
         <div className="flex items-center justify-between h-[72px] px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img src={logo} alt="Roam Meridian" className="w-18 h-auto object-contain" />
