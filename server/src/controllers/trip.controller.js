@@ -27,6 +27,7 @@ const createTrip = async (req, res) => {
         destinationId,
         startDate,
         endDate,
+        travelers,
         budget,
         itinerary,
         collaborators,
@@ -39,6 +40,7 @@ const createTrip = async (req, res) => {
         !destinationId ||
         !startDate ||
         !endDate ||
+        travelers === undefined ||
         budget === undefined
     ) {
         return res.status(400).json({
@@ -56,6 +58,7 @@ const createTrip = async (req, res) => {
             coverImage,
             startDate,
             endDate,
+            travelers,
             budget,
             itinerary,
             isPublic,
@@ -82,9 +85,6 @@ const getTripById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        console.log("Trip ID:", id);
-        console.log("User ID:", req.user.id);
-
         const trip = await Trip.findOne({
             _id: id,
             createdBy: req.user.id,
@@ -143,7 +143,6 @@ const updateTrip = async (req, res)  => {
             message: "Trip updated successfully.",
             data: updatedTrip,
         });
-
     } catch (error) {
         console.error("Error updating trip:", error);
 
@@ -158,12 +157,12 @@ const deleteTrip = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deleteTrip = await Trip.findOneAndDelete({
+        const deletedTrip = await Trip.findOneAndDelete({
             _id: id,
             createdBy: req.user.id,
         });
 
-        if(!deleteTrip) {
+        if(!deletedTrip) {
             return res.status(404).json({
                 success: false,
                 message: "Trip not found.",

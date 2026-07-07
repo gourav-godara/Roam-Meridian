@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { FiUser, FiMail } from "react-icons/fi";
@@ -34,11 +35,19 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      // TODO: replace with real API call once Astha's /register endpoint exists
-      login({ name: fullName, email }, "temp-token");
-      navigate("/", { replace: true });
+      const response = await api.post("/auth/register", {
+        name: fullName,
+        email,
+        password,
+      });
+
+      if(response.data.success) {
+        navigate("/login", { replace: true });
+      }
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
