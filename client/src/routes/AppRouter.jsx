@@ -31,10 +31,10 @@ function AppRouter() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+
             <Route path="/itineraries" element={<Itineraries />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
