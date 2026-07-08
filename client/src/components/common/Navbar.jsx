@@ -1,7 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import { FiMenu, FiX, FiUser } from "react-icons/fi";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 import Button from "./Button";
 import Avatar from "./Avatar";
 import logo from "../../assets/logo.png";

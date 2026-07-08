@@ -3,35 +3,35 @@ import StatCard from "./StatCard";
 
 const StatsGrid = ({ stats }) => {
   const cards = [
-    {
-      title: "Trips",
-      value: stats?.totalTrips || 5,
-      icon: "✈️",
-      trend: "+12%",
-      subtitle: "Last Trip • Bali",
-    },
-    {
-      title: "Countries",
-      value: stats?.countries || 8,
-      icon: "🌍",
-      trend: "+4%",
-      subtitle: "Across Asia",
-    },
-    {
-      title: "Expenses",
-      value: stats?.totalSpent || 25000,
-      icon: "💰",
-      trend: "+9%",
-      subtitle: "This Year",
-    },
-    {
-      title: "Reviews",
-      value: stats?.reviews || 8,
-      icon: "⭐",
-      trend: "+18%",
-      subtitle: "Community Shared",
-    },
-  ];
+  {
+    title: "Trips",
+    value: stats?.totalTrips ?? 0,
+    icon: "✈️",
+    trend: "+12%",
+    subtitle: "Last Trip",
+  },
+  {
+    title: "Countries",
+    value: stats?.countries ?? 0,
+    icon: "🌍",
+    trend: "+4%",
+    subtitle: "Across Asia",
+  },
+  {
+    title: "Expenses",
+    value: stats?.totalExpenses ?? 0,
+    icon: "💰",
+    trend: "+9%",
+    subtitle: "This Year",
+  },
+  {
+    title: "Reviews",
+    value: stats?.reviews ?? 0,
+    icon: "⭐",
+    trend: "+18%",
+    subtitle: "Community Shared",
+  },
+];
 
   return (
     <motion.div
