@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -10,23 +9,15 @@ const destinationRoutes = require("./routes/destination.routes");
 const plannerRoutes = require("./routes/planner.routes");
 const reviewRoutes = require("./routes/review.routes");
 const expenseRoutes = require("./routes/expense.routes");
-const dashboardRoutes = require("./routes/dashboard.routes");
-const tripRoutes = require("./routes/trip.routes");
+
 const app = express();
-const weatherRoutes = require("./routes/weather.routes");
 
 // ================= Middleware =================
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors());
 
 // ================= Routes =================
 app.use("/api/auth", authRoutes);
@@ -35,8 +26,6 @@ app.use("/api/destinations", destinationRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/expenses", expenseRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/trips", tripRoutes);
-app.use("/api/weather", weatherRoutes);
+
 // Export App
 module.exports = app;
