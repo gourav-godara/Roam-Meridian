@@ -1,7 +1,9 @@
+const authMiddleware = require("../middleware/auth.middleware");
 const express = require("express");
 
-//imports registerUser function from auth.controller.js
-const { registerUser, loginUser } = require("../controllers/auth.controller");
+const { registerUser, loginUser, getProfile, updateProfile, logoutUser } = require("../controllers/auth.controller");
+
+const { validateRegister, validateLogin, validateUpdateProfile } = require("../middleware/validation.middleware");
 
 const router = express.Router();
 
@@ -13,7 +15,20 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+//router.METHOD(PATH, FUNCTION)
+router.post("/register", validateRegister, registerUser);
+
+router.post("/login", validateLogin, loginUser);
+
+router.get("/profile", authMiddleware, getProfile);
+
+router.put(
+  "/profile",
+  authMiddleware,
+  validateUpdateProfile,
+  updateProfile
+);
+
+router.post("/logout", logoutUser);
 
 module.exports = router;
