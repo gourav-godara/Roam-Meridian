@@ -6,11 +6,9 @@ function MainLayout() {
   return (
     <>
       <Navbar />
-
-      <main className="min-h-screen">
+      <main className="bg-bg min-h-screen pt-24">
         <Outlet />
       </main>
-
       <Footer />
     </>
   );
