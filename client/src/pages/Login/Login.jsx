@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { FiMail } from "react-icons/fi";
@@ -27,12 +28,22 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
-      // TODO: replace with real API call once Astha's /login endpoint exists
-      login({ name: "Gourav", email }, "temp-token");
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
+
+      const { token, user } = response.data;
+
+      login(user, token);
+
       redirectAfterLogin();
     } catch (err) {
-      setError("Invalid email or password.");
+      setError(
+        err.response?.data?.message || "Invalid email or password."
+      );
     } finally {
       setLoading(false);
     }
