@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiHeart } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 import Button from "../common/Button";
 
 function ActionButtons({ destinationId }) {

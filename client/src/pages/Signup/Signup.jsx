@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
@@ -17,7 +16,7 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
