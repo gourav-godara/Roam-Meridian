@@ -33,7 +33,8 @@ function AppRouter() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/reviews" element={<Reviews />} />
-<Route path="/expenses" element={<Expenses />} />
+          <Route path="/expenses" element={<Expenses />} />
+          
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
             <Route path="/dashboard" element={<Dashboard />} />
