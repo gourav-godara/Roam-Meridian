@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiHeart, FiStar } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 
 function DestinationCard({ destination, onToggleFavorite }) {
   const [imgLoaded, setImgLoaded] = useState(false);
