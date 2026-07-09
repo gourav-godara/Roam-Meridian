@@ -127,26 +127,12 @@ const getDestinationById = async (req, res) => {
             console.log("Weather service unavailable");
         }
 
-        // Fetch location
-        let location = null;
-
-        if (destination.location) {
-            location = destination.location;
-        } else {
-            try {
-                location = await fetchLocation(destination.city);
-            } catch (error) {
-                console.log("Location service unavailable");
-            }
-        }
-
         // Send final response
         return res.status(200).json({
             success: true,
             message: "Destination fetched successfully",
             destination,
             weather,
-            location,
         });
 
     } catch (error) {
@@ -161,17 +147,32 @@ const getDestinationById = async (req, res) => {
 
 const createDestination = async (req, res) => {
     try {
-        const destination = await Destination.create(req.body);
 
-        res.status(201).json({
+        const { city } = req.body;
+
+        const location = await fetchLocation(city);
+
+        const destinationData = {
+            ...req.body,
+
+            location: {
+                latitude: Number(location.latitude),
+                longitude: Number(location.longitude),
+            },
+        };
+
+        const destination = await Destination.create(destinationData);
+
+        return res.status(201).json({
             success: true,
             message: "Destination created successfully",
             data: destination,
         });
+
     } catch (error) {
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error",
         });
