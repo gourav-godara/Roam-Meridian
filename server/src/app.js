@@ -41,4 +41,7 @@ app.use("/api/trips", tripRoutes);
 app.use("/api/weather", weatherRoutes);
 app.use("/api/maps", mapsRoutes);
 // Export App
+app.get("/", (req, res) => {
+  res.send("Server is working!");
+});
 module.exports = app;

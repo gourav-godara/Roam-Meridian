@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const itineraryItemSchema = new mongoose.Schema(
+const activitySchema = new mongoose.Schema(
     {
-        day: {
-            type: Number,
-            required: true,
+        time: {
+            type: String,
+            trim: true,
         },
 
         title: {
@@ -13,38 +13,33 @@ const itineraryItemSchema = new mongoose.Schema(
             trim: true,
         },
 
-        description: {
-            type: String,
-            trim: true,
-        },
-
-        time: {
-            type: String,
-            trim: true,
-        },
-
         location: {
             type: String,
             trim: true,
         },
 
-        category: {
+        notes: {
             type: String,
-            enum: [
-                "Sightseeing",
-                "Food",
-                "Hotel",
-                "Transport",
-                "Adventure",
-                "Shopping",
-                "Custom",
-            ],
-            default: "Custom",
+            trim: true,
         },
     },
-
     { _id: false }
 );
+
+const itineraryDaySchema = new mongoose.Schema(
+    {
+        day: {
+            type: Number,
+            required: true,
+        },
+
+        activities: {
+            type: [activitySchema],
+            default: [],
+        },
+    },
+    { _id: false }
+)
 
 const tripSchema = new mongoose.Schema(
     {
@@ -88,12 +83,21 @@ const tripSchema = new mongoose.Schema(
             required: true,
         },
 
+        travelers: {
+            type: Number,
+            required: true,
+            default: 1,
+        },
+
         budget: {
             type: Number,
             required: true,
         },
 
-        itinerary: [itineraryItemSchema],
+        itinerary: {
+            type: [itineraryDaySchema],
+            default: [],
+        },
 
         status: {
             type: String,
@@ -111,6 +115,8 @@ const tripSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
+
 
 const Trip = mongoose.model("Trip", tripSchema);
 

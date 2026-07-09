@@ -6,7 +6,7 @@ import plannerLogo from "../../assets/planner-logo.png";
 function AIPlannerCTA() {
   return (
     <section className="max-w-[1440px] mx-auto px-6 lg:px-12 pb-16">
-      <div className="bg-bg rounded-3xl p-8 flex items-center justify-between gap-6 flex-wrap">
+      <div className="bg-white  rounded-3xl p-8 flex items-center justify-between gap-6 flex-wrap">
         <div className="flex items-center gap-5">
           <img
             src={plannerLogo}

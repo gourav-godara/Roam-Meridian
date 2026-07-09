@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiHeart, FiStar } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 
 function DestinationCard({ destination, onToggleFavorite }) {
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -18,8 +18,15 @@ function DestinationCard({ destination, onToggleFavorite }) {
     onToggleFavorite(destination.id);
   };
 
+  const handleCardClick = () => {
+    navigate(`/destination/${destination.id}`);
+  };
+
   return (
-    <article className="group bg-white rounded-[20px] shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 overflow-hidden cursor-pointer">
+    <article
+      onClick={handleCardClick}
+      className="group bg-white rounded-[20px] shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 overflow-hidden cursor-pointer"
+    >
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-[20px] bg-mist">
         <img
           src={destination.image}
