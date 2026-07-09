@@ -14,6 +14,7 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const tripRoutes = require("./routes/trip.routes");
 const app = express();
 const weatherRoutes = require("./routes/weather.routes");
+const errorMiddleware = require("./middleware/errorMiddleware"); // ← added
 
 // ================= Middleware =================
 
@@ -38,8 +39,11 @@ app.use("/api/expenses", expenseRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/weather", weatherRoutes);
-// Export App
+
 app.get("/", (req, res) => {
   res.send("Server is working!");
 });
+
+app.use(errorMiddleware); // ← added, must be LAST — after all routes
+
 module.exports = app;
