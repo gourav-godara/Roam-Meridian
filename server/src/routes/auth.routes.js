@@ -1,7 +1,7 @@
 const authMiddleware = require("../middleware/auth.middleware");
 const express = require("express");
 
-const { registerUser, loginUser, getProfile, updateProfile, logoutUser } = require("../controllers/auth.controller");
+const { registerUser, loginUser, getProfile, updateProfile, logoutUser, forgotPassword, verifyForgotOTP, resetPassword } = require("../controllers/auth.controller");
 
 const { validateRegister, validateLogin, validateUpdateProfile } = require("../middleware/validation.middleware");
 
@@ -30,5 +30,11 @@ router.put(
 );
 
 router.post("/logout", logoutUser);
+
+router.post("/forgot-password", forgotPassword);
+
+router.post("/verify-forgot-otp", verifyForgotOTP);
+
+router.post("/reset-password", resetPassword);
 
 module.exports = router;
