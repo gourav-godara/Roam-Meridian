@@ -96,9 +96,15 @@ function Dashboard() {
                 </button>
               </div>
               <div className="flex flex-col gap-4">
-                {(recommendations || []).map((item) => (
-                  <RecommendationCard key={item.id} item={item} />
-                ))}
+               {recommendations.length === 0 ? (
+  <p className="text-center text-muted py-8">
+    No recommendations available.
+  </p>
+) : (
+  recommendations.map((item) => (
+    <RecommendationCard key={item.id} item={item} />
+  ))
+)}
               </div>
             </div>
 
