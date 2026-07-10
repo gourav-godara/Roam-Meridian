@@ -16,8 +16,13 @@ function RecentBookings({ bookings }) {
         <Link to="/dashboard/bookings" className="text-sm font-medium text-forest-light hover:text-forest">View All</Link>
       </div>
 
-      <div className="flex flex-col overflow-x-auto">
-        {bookings.map((b) => (
+      {bookings.length === 0 ? (
+  <div className="py-10 text-center text-muted">
+    No bookings found.
+  </div>
+) : (
+  <div className="flex flex-col overflow-x-auto">
+    {bookings.map((b) => (
           <div key={b.id} className="flex items-center gap-4 py-3 border-b last:border-b-0 border-border/70">
             <img src={b.image} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
             <div className="min-w-0 flex-1">
@@ -35,6 +40,7 @@ function RecentBookings({ bookings }) {
           </div>
         ))}
       </div>
+)}
     </div>
   );
 }

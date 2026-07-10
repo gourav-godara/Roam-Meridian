@@ -3,6 +3,19 @@ import { Link } from "react-router-dom";
 import Button from "../common/Button";
 
 function UpcomingTripCard({ trip }) {
+   if (!trip) {
+    return (
+      <div className="bg-surface rounded-3xl border border-border p-8 text-center">
+        <h3 className="text-base font-semibold text-ink mb-2">
+          Upcoming Trip
+        </h3>
+
+        <p className="text-muted">
+          You don't have any upcoming trips yet.
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="bg-surface rounded-3xl border border-border p-5">
       <div className="flex items-center justify-between mb-4">
