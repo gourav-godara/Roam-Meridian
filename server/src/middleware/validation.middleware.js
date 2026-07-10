@@ -12,7 +12,7 @@ const validateRegister = async (req, res, next) => {
 };
 
 const validateLogin = (req, res, next) => {
-    const { email, pssword } = req.body;
+    const { email, password } = req.body;
 
     if(!email || !password) {
         return res.status(400).json({

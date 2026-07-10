@@ -1,6 +1,7 @@
 const Destination = require("../models/Destination");
 const mongoose = require("mongoose");
 const { fetchWeather } = require("./weather.controller");
+const { fetchLocation } = require("./maps.controller");
 
 
 const getAllDestinations = async (req, res) => {
@@ -98,6 +99,7 @@ const getAllDestinations = async (req, res) => {
 const getDestinationById = async (req, res) => {
     try {
 
+        // Check if the provided ID is a valid MongoDB ObjectId
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({
                 success: false,
@@ -105,8 +107,10 @@ const getDestinationById = async (req, res) => {
             });
         }
 
+        // Find destination by ID
         const destination = await Destination.findById(req.params.id);
 
+        // Destination not found
         if (!destination) {
             return res.status(404).json({
                 success: false,
@@ -114,7 +118,7 @@ const getDestinationById = async (req, res) => {
             });
         }
 
-
+        // Fetch weather
         let weather = null;
 
         try {
@@ -122,17 +126,19 @@ const getDestinationById = async (req, res) => {
         } catch (error) {
             console.log("Weather service unavailable");
         }
-                res.status(200).json({
-                    success: true,
-                    message: "Destination fetched successfully",
-                    destination,
-                    weather,
-        }); 
+
+        // Send final response
+        return res.status(200).json({
+            success: true,
+            message: "Destination fetched successfully",
+            destination,
+            weather,
+        });
 
     } catch (error) {
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error",
         });
@@ -141,17 +147,32 @@ const getDestinationById = async (req, res) => {
 
 const createDestination = async (req, res) => {
     try {
-        const destination = await Destination.create(req.body);
 
-        res.status(201).json({
+        const { city } = req.body;
+
+        const location = await fetchLocation(city);
+
+        const destinationData = {
+            ...req.body,
+
+            location: {
+                latitude: Number(location.latitude),
+                longitude: Number(location.longitude),
+            },
+        };
+
+        const destination = await Destination.create(destinationData);
+
+        return res.status(201).json({
             success: true,
             message: "Destination created successfully",
             data: destination,
         });
+
     } catch (error) {
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error",
         });
