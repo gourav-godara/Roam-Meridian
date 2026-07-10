@@ -9,7 +9,7 @@ function TravelMap({ pins }) {
       </div>
 
       <div className="relative aspect-[16/10] rounded-2xl bg-gray-50 overflow-hidden">
-        {pins.map((pin) => (
+        {(pins || []).map((pin) => (
           <span
             key={pin.id}
             className={`absolute w-3 h-3 rounded-full border-2 border-white shadow-sm ${PIN_COLOR[pin.type]}`}

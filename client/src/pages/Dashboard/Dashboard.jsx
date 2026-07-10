@@ -24,9 +24,12 @@ function Dashboard() {
     mapPins,
     activityTimeline,
     travelTip,
+    loading
   } = useDashboard();
-
-  const firstName = user.name.split(" ")[0];
+  if (loading) {
+  return <div>Loading...</div>;
+}
+  const firstName = user?.name?.split(" ")[0] || "Traveler";
 
   return (
     <div className="min-h-screen bg-bg flex flex-col lg:flex-row">
@@ -93,7 +96,7 @@ function Dashboard() {
                 </button>
               </div>
               <div className="flex flex-col gap-4">
-                {recommendations.map((item) => (
+                {(recommendations || []).map((item) => (
                   <RecommendationCard key={item.id} item={item} />
                 ))}
               </div>

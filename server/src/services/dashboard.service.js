@@ -1,4 +1,6 @@
 // backend/src/services/dashboard.service.js
+const Destination = require("../models/Destination");
+const User = require("../models/user.model");
 const Trip = require("../models/trip.model");
 const Review = require("../models/review.model");
 const Expense = require("../models/expense.model");
@@ -37,20 +39,114 @@ const totalSpent = expenses.reduce(
   (sum, expense) => sum + expense.amount,
   0
 );
+const user = await User.findById(userId);
+const destinations = await Destination.find().limit(4);
+const upcomingTripData = upcomingTrips[0]
+  ? {
+      name: upcomingTrips[0].title,
+      location:
+        `${upcomingTrips[0].destinationId.city}, ${upcomingTrips[0].destinationId.country}`,
+      dates:
+        new Date(upcomingTrips[0].startDate).toLocaleDateString() +
+        " - " +
+        new Date(upcomingTrips[0].endDate).toLocaleDateString(),
+      image: upcomingTrips[0].coverImage,
+      companions: [],
+      extraCompanions: upcomingTrips[0].collaborators.length,
+      status: upcomingTrips[0].status,
+    }
+  : null;
+  const calculateProgress = (trip) => {
+  let progress = 20; // Trip exists
+
+  if (trip.startDate && trip.endDate) progress += 20;
+  if (trip.budget > 0) progress += 20;
+  if (trip.itinerary && trip.itinerary.length > 0) progress += 40;
+
+  return progress;
+};
+  const continuePlanning = trips
+  .filter((trip) => trip.status === "planning")
+  .map((trip) => ({
+    id: trip._id,
+    name: trip.title,
+    location: `${trip.destinationId?.city}, ${trip.destinationId?.country}`,
+    progress: calculateProgress(trip),
+    image: trip.coverImage || "https://placehold.co/400x300",
+  }));
+  const recentBookings = trips
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  .slice(0, 5)
+  .map((trip) => ({
+    id: trip._id,
+    name: trip.title,
+    location: `${trip.destinationId?.city}, ${trip.destinationId?.country}`,
+    date: `Start: ${new Date(trip.startDate).toLocaleDateString()}`,
+    status:
+      trip.status.charAt(0).toUpperCase() + trip.status.slice(1),
+    amount: `₹${trip.budget}`,
+    image: trip.coverImage || "https://placehold.co/100x100",
+  }));
+  const recommendations = destinations.map((destination) => ({
+  id: destination._id,
+  name: destination.name,
+  location: `${destination.city}, ${destination.country}`,
+  rating: destination.rating.average,
+  budget: `₹${destination.budget.min} - ₹${destination.budget.max}`,
+  image:
+    destination.images?.[0] || "https://placehold.co/300x200",
+}));
   return { // Returns a massive object full of data arrays.
-    stats: {
-  totalTrips,
-  upcomingTrips: upcomingTrips.length,
-  countries: countries.size,
-  savedTrips: 0,
-  reviews: recentReviews.length,
-  totalExpenses: totalSpent,
-  groupTrips: trips.filter(t => t.collaborators.length > 0).length,
+    user: {
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  avatar: user.avatar || null,
 },
+    stats: [
+  {
+    key: "trips",
+    label: "Total Trips",
+    value: totalTrips,
+    sub: `${upcomingTrips.length} upcoming`,
+    icon: "briefcase",
+  },
+  {
+    key: "places",
+    label: "Places Visited",
+    value: countries.size,
+    sub: `${countries.size} countries`,
+    icon: "mapPin",
+  },
+  {
+    key: "spent",
+    label: "Total Spent",
+    value: `₹${totalSpent}`,
+    sub: "All Time",
+    icon: "wallet",
+  },
+  {
+    key: "reviews",
+    label: "Reviews Given",
+    value: recentReviews.length,
+    sub: "Helped others",
+    icon: "star",
+  },
+],
 
-    upcomingTrips,
   
+    upcomingTrip: upcomingTripData,
+continuePlanning,
+recentBookings,
+recommendations,
 
+mapPins: [],
+
+activityTimeline: [],
+
+travelTip: {
+  text: "Visit popular attractions early in the morning to avoid crowds.",
+  },
     recentReviews,
 
     expenseSummary: {
