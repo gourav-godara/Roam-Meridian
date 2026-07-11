@@ -4,7 +4,7 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const saveOTP = async (email, otp, purpose) => {
+const saveOTP = async (email, otp, purpose, name = null) => {
     //delete any previous otp for the same email and purpose
     await OTP.deleteMany({
         email,
@@ -16,6 +16,7 @@ const saveOTP = async (email, otp, purpose) => {
 
     const otpRecord = await OTP.create({
         email,
+        name,
         otp,
         purpose,
         expiresAt,
