@@ -1,118 +1,219 @@
 import { useState } from "react";
-import { FiHeart, FiCopy, FiSave, FiPrinter } from "react-icons/fi";
+import { FiCopy, FiHeart, FiRefreshCw, FiSave } from "react-icons/fi";
 import DayAccordion from "./DayAccordion";
 import Button from "../common/Button";
 
-function ItineraryCard({ plan, onRegenerateDay, onSave, onFavorite, onDuplicate }) {
+function ItineraryCard({
+  plan,
+  onRegenerateDay,
+  onSave,
+  onFavorite,
+  onDuplicate,
+}) {
   const [regeneratingDay, setRegeneratingDay] = useState(null);
 
-  const handleRegenerate = async (dayNumber) => {
+  const handleRegenerateDay = async (dayNumber) => {
     setRegeneratingDay(dayNumber);
+
     await onRegenerateDay(plan._id, dayNumber);
+
     setRegeneratingDay(null);
   };
 
-  const handlePrint = () => window.print();
+  const handleCopy = async () => {
+    const itineraryText = [
+      plan.response.title,
+      `${plan.days} days · ₹${plan.budget.toLocaleString("en-IN")}`,
+      "",
+      ...plan.response.days.map((day) => `Day ${day.day}: ${day.title}`),
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(itineraryText);
+    } catch {
+      // Copy may be unavailable in some browsers.
+    }
+  };
 
   return (
-    <div className="bg-white border border-border rounded-3xl p-5 max-w-2xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="font-display text-xl text-ink">{plan.response.title}</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            {plan.days} Days · ₹{plan.budget.toLocaleString("en-IN")} · {plan.travelers} Traveler{plan.travelers > 1 ? "s" : ""}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => onFavorite(plan._id)}
-          aria-label="Favorite"
-          className="shrink-0 w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-mist transition-colors"
-        >
-          <FiHeart size={15} className={plan.favorite ? "fill-red-500 text-red-500" : "text-ink"} />
-        </button>
-      </div>
+    <article className="max-w-3xl overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
+      <header className="bg-forest p-5 text-white sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+              Your curated journey
+            </p>
 
-      <div className="flex flex-col gap-2 mt-4">
-        {plan.response.days.map((day) => (
-          <DayAccordion
-            key={day.day}
-            day={day}
-            onRegenerate={handleRegenerate}
-            regenerating={regeneratingDay === day.day}
-          />
-        ))}
-      </div>
+            <h3 className="mt-1 font-display text-2xl sm:text-3xl">
+              {plan.response.title}
+            </h3>
 
-      <div className="grid sm:grid-cols-2 gap-3 mt-5 pt-5 border-t border-border">
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Budget</p>
-          <p className="text-sm font-semibold text-forest mt-0.5">₹{plan.response.totalBudget?.toLocaleString("en-IN")}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Best Time</p>
-          <p className="text-sm text-ink mt-0.5">{plan.response.bestTime}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Weather</p>
-          <p className="text-sm text-ink mt-0.5">{plan.response.weather}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Budget Breakdown</p>
-          <p className="text-sm text-ink mt-0.5">
-            Stay ₹{plan.response.budgetBreakdown?.stay} · Food ₹{plan.response.budgetBreakdown?.food} · Transport ₹{plan.response.budgetBreakdown?.transport} · Activities ₹{plan.response.budgetBreakdown?.activities}
-          </p>
-        </div>
-      </div>
+            <p className="mt-2 text-sm text-white/75">
+              {plan.destination} · {plan.days} days · {plan.travelers} traveler
+              {plan.travelers > 1 ? "s" : ""}
+            </p>
+          </div>
 
-      {plan.response.packingChecklist?.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Packing Checklist</p>
-          <div className="flex flex-wrap gap-1.5">
-            {plan.response.packingChecklist.map((item, i) => (
-              <span key={i} className="text-xs bg-mist/60 text-ink rounded-full px-2.5 py-1">{item}</span>
-            ))}
+          <button
+            type="button"
+            onClick={() => onFavorite(plan._id)}
+            aria-label="Favorite trip"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+          >
+            <FiHeart
+              size={17}
+              className={plan.favorite ? "fill-white text-white" : "text-white"}
+            />
+          </button>
+        </div>
+
+        <div className="mt-6 grid grid-cols-3 gap-2">
+          <div className="rounded-xl bg-white/10 px-3 py-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-white/60">
+              Budget
+            </p>
+            <p className="mt-0.5 text-sm font-semibold">
+              ₹{plan.budget.toLocaleString("en-IN")}
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-white/10 px-3 py-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-white/60">
+              Weather
+            </p>
+            <p className="mt-0.5 truncate text-sm font-semibold">
+              {plan.response.weather || "—"}
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-white/10 px-3 py-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-white/60">
+              Best time
+            </p>
+            <p className="mt-0.5 truncate text-sm font-semibold">
+              {plan.response.bestTime || "—"}
+            </p>
           </div>
         </div>
-      )}
+      </header>
 
-      {plan.response.localTips?.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Local Tips</p>
-          <ul className="flex flex-col gap-1">
-            {plan.response.localTips.map((tip, i) => (
-              <li key={i} className="text-sm text-ink flex gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-forest shrink-0 mt-1.5" />
-                {tip}
-              </li>
-            ))}
-          </ul>
+      <div className="p-5 sm:p-7">
+        <div className="mb-6 flex flex-wrap gap-2">
+          <Button variant="primary" size="sm" onClick={() => onSave(plan._id)}>
+            <FiSave size={14} />
+            Save trip
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onDuplicate(plan._id)}
+          >
+            <FiCopy size={14} />
+            Duplicate
+          </Button>
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="rounded-xl px-3 py-2 text-xs font-medium text-muted transition-colors hover:bg-mist hover:text-forest"
+          >
+            Copy itinerary
+          </button>
         </div>
-      )}
 
-      {plan.response.emergencyNumbers?.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Emergency Numbers</p>
-          <div className="flex flex-wrap gap-3">
-            {plan.response.emergencyNumbers.map((e) => (
-              <span key={e.label} className="text-xs text-ink">{e.label}: <strong>{e.number}</strong></span>
-            ))}
+        <div className="flex flex-col gap-2">
+          {plan.response.days.map((day) => (
+            <DayAccordion
+              key={day.day}
+              day={day}
+              onRegenerate={handleRegenerateDay}
+              regenerating={regeneratingDay === day.day}
+            />
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2">
+          <div className="rounded-2xl bg-bg p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+              Budget breakdown
+            </p>
+
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink">
+              <span>Stay: ₹{plan.response.budgetBreakdown?.stay || 0}</span>
+              <span>Food: ₹{plan.response.budgetBreakdown?.food || 0}</span>
+              <span>
+                Transport: ₹{plan.response.budgetBreakdown?.transport || 0}
+              </span>
+              <span>
+                Activities: ₹{plan.response.budgetBreakdown?.activities || 0}
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-forest/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-forest">
+              Local wisdom
+            </p>
+
+            <ul className="mt-3 space-y-2">
+              {plan.response.localTips?.slice(0, 3).map((tip) => (
+                <li
+                  key={tip}
+                  className="flex gap-2 text-xs leading-relaxed text-ink"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-forest" />
+                  {tip}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      )}
 
-      <div className="flex flex-wrap gap-2 mt-5 pt-5 border-t border-border">
-        <Button variant="primary" onClick={() => onSave(plan._id)} className="!text-xs !py-2 !px-4 flex items-center gap-1.5">
-          <FiSave size={13} /> Save Plan
-        </Button>
-        <Button variant="ghost" onClick={() => onDuplicate(plan._id)} className="!text-xs !py-2 !px-4 flex items-center gap-1.5">
-          <FiCopy size={13} /> Duplicate
-        </Button>
-        <Button variant="ghost" onClick={handlePrint} className="!text-xs !py-2 !px-4 flex items-center gap-1.5">
-          <FiPrinter size={13} /> Export PDF
-        </Button>
+        {plan.response.packingChecklist?.length > 0 && (
+          <section className="mt-5">
+            <p className="text-xs font-semibold text-ink">
+              Pack for the journey
+            </p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {plan.response.packingChecklist.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-border bg-white px-3 py-1.5 text-xs text-muted"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {plan.response.nearbyAttractions?.length > 0 && (
+          <section className="mt-5 rounded-2xl bg-mist/50 p-4">
+            <p className="text-xs font-semibold text-ink">
+              Worth adding nearby
+            </p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {plan.response.nearbyAttractions.map((place) => (
+                <span
+                  key={place}
+                  className="rounded-full bg-white px-3 py-1.5 text-xs text-forest shadow-sm"
+                >
+                  {place}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="mt-6 flex items-center gap-2 border-t border-border pt-4 text-xs text-gray-400">
+          <FiRefreshCw size={13} />
+          Open a day to regenerate it with a different idea.
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 
