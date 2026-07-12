@@ -9,19 +9,27 @@ import Itineraries from "../pages/Itineraries/Itineraries";
 import Blogs from "../pages/Blogs/Blogs";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
+
 import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup/Signup";
+import VerifyOtp from "../pages/VerifyOtp/VerifyOtp";
+import CreateAccount from "../pages/CreateAccount/CreateAccount";
+
 import Profile from "../pages/Profile/Profile";
 import NotFound from "../pages/NotFound/NotFound";
+
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
+
 import Reviews from "../pages/Reviews/ReviewPage";
 import Expenses from "../pages/Expenses/Expenses";
+
 function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
@@ -30,11 +38,16 @@ function AppRouter() {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+
+          {/* Authentication */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/create-account" element={<CreateAccount />} />
+
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/expenses" element={<Expenses />} />
-          
+
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
             <Route path="/dashboard" element={<Dashboard />} />

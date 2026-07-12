@@ -1,10 +1,15 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { verifyGoogleToken } = require("../services/google.service");
+
+const { sendOTPEmail } = require("../services/email.service");
+const { generateOTP, saveOTP, verifyOTP } = require("../services/otp.service");
+const OTP = require("../models/otp.model");
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email } = req.body;
 
         const existingUser = await User.findOne({ email });
 
@@ -14,23 +19,16 @@ const registerUser = async (req, res) => {
                 message: "Email already registered. Please use a different email.",
             });
         }
-    
-        const hashedPassword = await bcrypt.hash(password, 8);
 
-        const user = await User.create({
-            name, 
-            email,
-            password: hashedPassword,
-        });
+        const otp = generateOTP();
 
-        return res.status(201).json({
+        await saveOTP(email, otp, "signup", name);
+
+        await sendOTPEmail(email, otp);
+
+        return res.status(200).json({
             success: true,
-            message: "User registered successfully.",
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-            },
+            message: "OTP sent successfully.",
         });
     } catch (error) {
         console.error("Register Error:", error);
@@ -42,11 +40,162 @@ const registerUser = async (req, res) => {
     }
 };
 
+const verifySignupOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if(!email || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and OTP are required.",
+            });
+        }
+
+        await verifyOTP(email, otp, "signup");
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully.",
+        });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const createAccount = async (req, res) => {
+    try {
+        const { email, password, confirmPassword } = req.body;
+
+        if(password !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Passwords do not match.",
+            });
+        }
+
+        const otpRecord = await OTP.findOne({
+            email,
+            purpose: "signup",
+            isVerified: true,
+        });
+
+        if(!otpRecord) {
+            return res.status(400).json({
+                success: false,
+                message: "Please verify your OTP first.",
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 8);
+
+        const user = await User.create({
+            name: otpRecord.name,
+            email: otpRecord.email,
+            password: hashedPassword,
+        });
+
+        await OTP.deleteMany({
+            email,
+            purpose: "signup",
+        });
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+            },
+
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d",
+            }
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Account created successfully.",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+
+    } catch (error) {
+        console.error("Create Account Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
+    }
+};
+
+const resendSignupOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if(!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is required.",
+            });
+        }
+
+        const existingUser = await User.findOne({ email });
+
+        if(existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: "Email is already registered.",
+            });
+        }
+
+        const otpRecord = await OTP.findOne({
+            email,
+            purpose: "signup",
+        });
+
+        if(!otpRecord) {
+            return res.status(404).json({
+                success: false,
+                message: "Signup request not found. Please register again.",
+            });
+        }
+
+        const otp = generateOTP();
+
+        await saveOTP(email, otp, "signup", otpRecord.name);
+
+        await sendOTPEmail(email, otp);
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP resent successfully.",
+        });
+
+    } catch (error) {
+        console.error("Resend Signup OTP Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
+    }
+};
+
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log("Request Body:", req.body);
 
         const user = await User.findOne({ email }).select("+password");
+        console.log("User Found:", user);
 
         if(!user) {
             return res.status(401).json({
@@ -56,6 +205,7 @@ const loginUser = async (req, res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log("Password Match:", isMatch);
 
         if(!isMatch) {
             return res.status(401).json({
@@ -92,6 +242,65 @@ const loginUser = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Internal server error.",
+        });
+    }
+};
+
+const googleLogin = async (req, res) => {
+    try {
+        const { idToken } = req.body;
+
+        if(!idToken) {
+            res.status(400).json({
+                success: false,
+                message: "Google ID Token is required.",
+            });
+        }
+
+        const googleUser = await verifyGoogleToken(idToken);
+
+        let user = await User.findOne({
+            email: googleUser.email,
+        });
+
+        if(!user) {
+            user = await User.create({
+                name: googleUser.name,
+                email: googleUser.email,
+                authProvider: "google",
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+            },
+
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d",
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Google login successful.",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+
+    } catch (error) {
+        console.error("Google Login Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Google login failed.",
         });
     }
 };
@@ -184,12 +393,137 @@ const logoutUser = async (req, res) => {
         success: true,
         message: "Logout successfull."
     });
-}
+};
+
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if(!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is required.",
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if(!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            });
+        }
+
+        const otp = generateOTP();
+
+        await saveOTP(email, otp, "forgot-password");
+
+        await sendOTPEmail(email, otp);
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP sent successfully.",
+        });
+
+    } catch (error) {
+        console.error("Forgot Password Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
+    }
+};
+
+const verifyForgotOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if(!email || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and OTP are required.",
+            });
+        }
+
+        await verifyOTP(email, otp, "forgot-password");
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully.",
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        if(!email || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and new password are required."
+            });
+        }
+
+        const otpRecord = await OTP.findOne({
+            email,
+            purpose: "forgot-password",
+            isVerified: true,
+        });
+
+        if(!otpRecord) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP verification required.",
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 8);
+
+        await User.findOneAndUpdate(
+            { email },
+            { password: hashedPassword }
+        );
+
+        await OTP.deleteMany({
+            email,
+            purpose: "forgot-password",
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Password reset successfully.",
+        });
+
+    } catch (error) {
+        console.error("Reset Password Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
+    }
+};
 
 module.exports = {
     registerUser,
+    verifySignupOTP,
+    createAccount,
+    resendSignupOTP,
     loginUser,
+    googleLogin,
     getProfile,
     updateProfile,
     logoutUser,
+    forgotPassword,
+    verifyForgotOTP,
+    resetPassword,
 };
