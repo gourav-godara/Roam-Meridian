@@ -39,12 +39,6 @@ function AppRouter() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
 
-          {/* Authentication */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/create-account" element={<CreateAccount />} />
-
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/expenses" element={<Expenses />} />
 
@@ -55,6 +49,12 @@ function AppRouter() {
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>
+
+        {/* Authentication */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/create-account" element={<CreateAccount />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

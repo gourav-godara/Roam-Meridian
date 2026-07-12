@@ -1,14 +1,18 @@
-const { OAuth2Client } = require("google-auth-library");
+const verifyGoogleAccessToken = async (accessToken) => {
+    const response = await fetch(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        }
+    );
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    if (!response.ok) {
+        throw new Error("Invalid Google Access Token");
+    }
 
-const verifyGoogleToken = async (idToken) => {
-    const ticket = await client.verifyIdToken({
-        idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
+    const payload = await response.json();
 
     return {
         googleId: payload.sub,
@@ -20,5 +24,5 @@ const verifyGoogleToken = async (idToken) => {
 };
 
 module.exports = {
-    verifyGoogleToken,
+    verifyGoogleAccessToken,
 };
