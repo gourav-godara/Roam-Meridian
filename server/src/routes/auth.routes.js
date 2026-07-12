@@ -1,12 +1,11 @@
 const authMiddleware = require("../middleware/auth.middleware");
 const express = require("express");
 
-const { registerUser, loginUser, getProfile, updateProfile, logoutUser, forgotPassword, verifyForgotOTP, resetPassword } = require("../controllers/auth.controller");
+const { registerUser, verifySignupOTP, createAccount, resendSignupOTP, loginUser, googleLogin, getProfile, updateProfile, logoutUser, forgotPassword, verifyForgotOTP, resetPassword } = require("../controllers/auth.controller");
 
-const { validateRegister, validateLogin, validateUpdateProfile } = require("../middleware/validation.middleware");
+const { validateRegister, validateCreateAccount, validateLogin, validateUpdateProfile } = require("../middleware/validation.middleware");
 
 const router = express.Router();
-
 
 router.get("/", (req, res) => {
   res.json({
@@ -18,7 +17,17 @@ router.get("/", (req, res) => {
 //router.METHOD(PATH, FUNCTION)
 router.post("/register", validateRegister, registerUser);
 
+router.post("/verify-signup-otp", verifySignupOTP);
+
+router.post(
+  "/create-account",
+  validateCreateAccount,
+  createAccount
+);
+
 router.post("/login", validateLogin, loginUser);
+
+router.post("/google", googleLogin);
 
 router.get("/profile", authMiddleware, getProfile);
 
@@ -36,5 +45,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/verify-forgot-otp", verifyForgotOTP);
 
 router.post("/reset-password", resetPassword);
+
+router.post("/resend-signup-otp", resendSignupOTP);
 
 module.exports = router;

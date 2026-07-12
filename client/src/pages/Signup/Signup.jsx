@@ -9,43 +9,34 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 
 const Signup = () => {
-  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-
     setLoading(true);
+
     try {
       const response = await api.post("/auth/register", {
-        name: fullName,
+        name: username,
         email,
-        password,
       });
 
-      if(response.data.success) {
-        navigate("/login", { replace: true });
+      if (response.data.success) {
+        navigate("/verify-otp", {
+          state: { email },
+        });
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Something went wrong. Please try again."
+        err.response?.data?.message ||
+          "Something went wrong. Please try again."
       );
     } finally {
       setLoading(false);
@@ -53,12 +44,10 @@ const Signup = () => {
   };
 
   const handleGoogleSignup = () => {
-    // TODO: wire to real OAuth flow once Astha's backend supports it
     console.log("Google signup clicked");
   };
 
   const handleAppleSignup = () => {
-    // TODO: wire to real OAuth flow once Astha's backend supports it
     console.log("Apple signup clicked");
   };
 
@@ -66,35 +55,57 @@ const Signup = () => {
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md rounded-3xl bg-surface shadow-lg border border-border p-8">
         <div className="flex flex-col items-center">
-          <img src={logo} alt="Roam Meridian" className="h-16 w-auto mb-3" />
-          <h1 className="font-display text-h4 text-ink">Create Your Account</h1>
+          <img
+            src={logo}
+            alt="Roam Meridian"
+            className="h-16 w-auto mb-3"
+          />
+
+          <h1 className="font-display text-h4 text-ink">
+            Create Your Account
+          </h1>
+
           <p className="mt-2 text-center text-muted">
             Join Roam Meridian and start planning your amazing adventure.
           </p>
         </div>
 
         <div className="mt-8 flex flex-col gap-3">
-          <Button variant="secondary" leftIcon={FcGoogle} className="w-full" onClick={handleGoogleSignup}>
+          <Button
+            variant="secondary"
+            leftIcon={FcGoogle}
+            className="w-full"
+            onClick={handleGoogleSignup}
+          >
             Continue with Google
           </Button>
-          <Button variant="secondary" leftIcon={FaApple} className="w-full" onClick={handleAppleSignup}>
+
+          <Button
+            variant="secondary"
+            leftIcon={FaApple}
+            className="w-full"
+            onClick={handleAppleSignup}
+          >
             Continue with Apple
           </Button>
         </div>
 
         <div className="flex items-center gap-3 my-6">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-xs text-muted">or sign up with email</span>
+          <span className="text-xs text-muted">
+            or sign up with email
+          </span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+
           <Input
-            label="Full Name"
+            label="Username"
             type="text"
-            placeholder="Enter your full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Choose a username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             iconLeft={FiUser}
             fullWidth
           />
@@ -109,35 +120,31 @@ const Signup = () => {
             fullWidth
           />
 
-          <Input
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-          />
+          {error && (
+            <p className="text-sm text-error text-center">
+              {error}
+            </p>
+          )}
 
-          <Input
-            label="Confirm Password"
-            type="password"
-            placeholder="Confirm your password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            error={error}
-            fullWidth
-          />
-
-          <Button type="submit" variant="primary" loading={loading} className="w-full">
-            Create Account
+          <Button
+            type="submit"
+            variant="primary"
+            loading={loading}
+            className="w-full"
+          >
+            Continue
           </Button>
 
           <p className="text-center text-sm text-muted">
             Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-forest hover:text-forest-hover">
+            <Link
+              to="/login"
+              className="font-semibold text-forest hover:text-forest-hover"
+            >
               Login
             </Link>
           </p>
+
         </form>
       </div>
     </div>
