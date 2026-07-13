@@ -96,6 +96,58 @@ const upcomingTripData = upcomingTrips[0]
   image:
     destination.images?.[0] || "https://placehold.co/300x200",
 }));
+const activityTimeline = [];
+
+// Recent reviews
+recentReviews.forEach((review) => {
+  activityTimeline.push({
+    id: review._id,
+    icon: "star",
+    text: `You reviewed ${
+      review.destination?.name || "a destination"
+    }`,
+    time: new Date(review.createdAt).toLocaleDateString(),
+  });
+});
+
+// Recent trips
+trips.slice(0, 3).forEach((trip) => {
+  activityTimeline.push({
+    id: `trip-${trip._id}`,
+    icon: "calendar",
+    text: `Created trip "${trip.title}"`,
+    time: new Date(trip.createdAt).toLocaleDateString(),
+  });
+});
+
+// Recent expenses
+expenses.slice(0, 3).forEach((expense) => {
+  activityTimeline.push({
+    id: `expense-${expense._id}`,
+    icon: "sparkles",
+    text: `Added expense of ₹${expense.amount}`,
+    time: new Date(expense.createdAt).toLocaleDateString(),
+  });
+});
+
+// Latest first
+activityTimeline.sort(
+  (a, b) => new Date(b.time) - new Date(a.time)
+);
+const positions = [
+  { top: "25%", left: "45%" },
+  { top: "35%", left: "60%" },
+  { top: "50%", left: "30%" },
+  { top: "65%", left: "70%" },
+  { top: "20%", left: "80%" },
+];
+
+const mapPins = trips.map((trip, index) => ({
+  id: trip._id,
+  top: positions[index % positions.length].top,
+  left: positions[index % positions.length].left,
+  type: trip.status === "completed" ? "visited" : "wishlist",
+}));
   return { // Returns a massive object full of data arrays.
     user: {
   name: user.name,
@@ -140,9 +192,9 @@ continuePlanning,
 recentBookings,
 recommendations,
 
-mapPins: [],
+mapPins,
 
-activityTimeline: [],
+activityTimeline,
 
 travelTip: {
   text: "Visit popular attractions early in the morning to avoid crowds.",
