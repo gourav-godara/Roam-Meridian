@@ -2,9 +2,18 @@ import ChatBubble from "./ChatBubble";
 import LoadingMessage from "./LoadingMessage";
 import EmptyState from "./EmptyState";
 
-function ChatWindow({ messages, generating, messagesEndRef, onRegenerateDay, onSave, onFavorite, onDuplicate }) {
+function ChatWindow({
+  messages,
+  generating,
+  messagesEndRef,
+  onRegenerateDay,
+  onSave,
+  onFavorite,
+  onDuplicate,
+  onPromptSelect,
+}) {
   if (messages.length === 0 && !generating) {
-    return <EmptyState />;
+    return <EmptyState onPromptSelect={onPromptSelect} />;
   }
 
   return (
@@ -19,7 +28,9 @@ function ChatWindow({ messages, generating, messagesEndRef, onRegenerateDay, onS
           onDuplicate={onDuplicate}
         />
       ))}
+
       {generating && <LoadingMessage />}
+
       <div ref={messagesEndRef} />
     </div>
   );
