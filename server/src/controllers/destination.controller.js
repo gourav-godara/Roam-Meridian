@@ -10,8 +10,12 @@ const getAllDestinations = async (req, res) => {
         const {
             search,
             city,
+            state,
             country,
             category,
+            minBudget,
+            maxBudget,
+            rating,
             page = 1,
             limit = 10,
             sort,
@@ -31,6 +35,10 @@ const getAllDestinations = async (req, res) => {
         if (city) {
             filter.city = city;
         }
+        
+        if (state) {
+            filter.state = state;
+        }
 
         if (country) {
             filter.country = country;
@@ -38,6 +46,28 @@ const getAllDestinations = async (req, res) => {
 
         if (category) {
             filter.category = category;
+        }
+
+        // Budget Filter
+        // Budget Filter
+
+        if (maxBudget) {
+            filter["budget.min"] = {
+                $lte: Number(maxBudget),
+            };
+        }
+
+        if (minBudget) {
+            filter["budget.max"] = {
+                $gte: Number(minBudget),
+            };
+        }
+
+        // Rating Filter
+        if (rating) {
+            filter["rating.average"] = {
+                $gte: Number(rating),
+            };
         }
         
         // If parsing succeeds, use the parsed number.
@@ -62,6 +92,8 @@ const getAllDestinations = async (req, res) => {
         else if (sort === "newest") {
             sortOption.createdAt = -1;
         }
+
+        console.log(filter);
 
         // Fetch paginated data
         const destinations = await Destination.find(filter)
