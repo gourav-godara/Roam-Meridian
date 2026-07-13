@@ -18,9 +18,16 @@ const createReview = async (reviewData) => {
 };
 
 // Get All Reviews
-const getAllReviews = async () => {
-  return await Review.find()
+const getAllReviews = async (destinationId) => {
+  const filter = {};
+
+  if (destinationId) {
+    filter.destination = destinationId;
+  }
+
+  return await Review.find(filter)
     .populate("user", "name")
+    .populate("destination", "name city country");
 };
 
 // Get Review By ID
@@ -32,6 +39,7 @@ const getReviewById = async (id) => {
 
 // Update Review
 const updateReview = async (id, reviewData) => {
+  reviewData.isEdited = true;
   return await Review.findByIdAndUpdate(id, reviewData, {
     new: true,
     runValidators: true,
