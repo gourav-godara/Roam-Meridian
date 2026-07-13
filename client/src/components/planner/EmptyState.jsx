@@ -1,5 +1,5 @@
 import { FiCompass } from "react-icons/fi";
-import heroBalloons from "../../assets/hero-balloons.jpg";
+import kmmerer from "../../assets/Gemini_Generated_Image_cyjzm0cyjzm0cyjz.png";
 
 const TRAVEL_MOODS = [
   {
@@ -23,7 +23,7 @@ function EmptyState({ onPromptSelect = () => {} }) {
   return (
     <div className="relative flex min-h-[560px] flex-1 overflow-hidden">
       <img
-        src={heroBalloons}
+        src={kmmerer}
         alt="Hot air balloons floating over a landscape"
         className="absolute inset-0 h-full w-full object-cover"
       />
