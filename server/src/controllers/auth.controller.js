@@ -1,7 +1,9 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { verifyGoogleToken } = require("../services/google.service");
+const {
+    verifyGoogleAccessToken,
+} = require("../services/google.service");
 
 const { sendOTPEmail } = require("../services/email.service");
 const { generateOTP, saveOTP, verifyOTP } = require("../services/otp.service");
@@ -248,16 +250,23 @@ const loginUser = async (req, res) => {
 
 const googleLogin = async (req, res) => {
     try {
-        const { idToken } = req.body;
+        const { accessToken } = req.body;
 
-        if(!idToken) {
-            res.status(400).json({
+        if(!accessToken) {
+            return res.status(400).json({
                 success: false,
                 message: "Google ID Token is required.",
             });
         }
 
-        const googleUser = await verifyGoogleToken(idToken);
+        const googleUser = await verifyGoogleAccessToken(accessToken);
+
+        if(!googleUser.emailVerified) {
+            return res.status(400).json({
+                success: false,
+                message: "Google email is not verified.",
+            });
+        }
 
         let user = await User.findOne({
             email: googleUser.email,
@@ -267,6 +276,7 @@ const googleLogin = async (req, res) => {
             user = await User.create({
                 name: googleUser.name,
                 email: googleUser.email,
+                googleId: googleUser.googleId,
                 authProvider: "google",
             });
         }

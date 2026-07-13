@@ -1,3 +1,4 @@
+import { useGoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
@@ -18,6 +19,29 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await api.post("/auth/google", {
+          accessToken: tokenResponse.access_token,
+        });
+
+        login(response.data.user, response.data.token);
+
+        navigate("/");
+      } catch (error) {
+        setError(
+          error.response?.data?.message ||
+          "Google login failed."
+        );
+      }
+    },
+
+    onError: () => {
+      setError("Google login failed.");
+    },
+  });
 
   const redirectAfterLogin = () => {
     const redirectTo = location.state?.from?.pathname || "/";
@@ -50,8 +74,8 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // TODO: wire to real OAuth flow once Astha's backend supports it
-    console.log("Google login clicked");
+    setError("");
+    googleLogin();
   };
 
   const handleAppleLogin = () => {

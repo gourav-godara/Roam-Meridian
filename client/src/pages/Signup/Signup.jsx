@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
@@ -15,6 +18,36 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const { login } = useContext(AuthContext);
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await api.post("/auth/google", {
+          accessToken: tokenResponse.access_token,
+        });
+
+        login(response.data.user, response.data.token);
+
+        navigate("/");
+
+      } catch (error) {
+        console.error(error);
+        console.log("response:", error.response);
+        console.log("Data:", error.response?.data);
+
+        setError(
+          error.response?.data?.message ||
+          "Google login failed."
+        );
+      }
+    },
+    
+    onError: () => {
+      setError("Google login failed.");
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +77,7 @@ const Signup = () => {
   };
 
   const handleGoogleSignup = () => {
-    console.log("Google signup clicked");
+    googleLogin();
   };
 
   const handleAppleSignup = () => {
