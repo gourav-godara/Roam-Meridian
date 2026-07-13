@@ -1,20 +1,42 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FiChevronDown, FiRefreshCw } from "react-icons/fi";
 
 function DayAccordion({ day, onRegenerate, regenerating }) {
   const [open, setOpen] = useState(day.day === 1);
 
   return (
-    <div className="border border-border rounded-2xl overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-border bg-white">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((isOpen) => !isOpen)}
         aria-expanded={open}
-        className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-mist/40 transition-colors"
+        className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors hover:bg-bg sm:px-5"
       >
-        <span className="text-sm font-semibold text-ink">Day {day.day}: {day.title}</span>
-        <FiChevronDown size={16} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-forest text-xs font-bold text-white">
+            {day.day}
+          </span>
+
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+              Day {day.day}
+            </p>
+
+            <h4 className="truncate text-sm font-semibold text-ink">
+              {day.title}
+            </h4>
+          </div>
+        </div>
+
+        <FiChevronDown
+          size={17}
+          className={
+            open
+              ? "shrink-0 rotate-180 text-forest transition-transform"
+              : "shrink-0 text-muted transition-transform"
+          }
+        />
       </button>
 
       <AnimatePresence>
@@ -26,48 +48,83 @@ function DayAccordion({ day, onRegenerate, regenerating }) {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 pt-1 flex flex-col gap-3 text-sm">
+            <div className="border-t border-border px-4 pb-5 pt-4 sm:px-5">
               {day.arrival && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Arrival</p>
-                  <p className="text-ink mt-0.5">{day.arrival}</p>
+                <div className="mb-4 rounded-xl bg-bg px-3 py-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+                    Arrival note
+                  </p>
+
+                  <p className="mt-1 text-sm text-ink">{day.arrival}</p>
                 </div>
               )}
+
               {day.activities?.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Activities</p>
-                  <ul className="mt-1 flex flex-col gap-1">
-                    {day.activities.map((a, i) => (
-                      <li key={i} className="flex items-center gap-2 text-ink">
-                        <span className="w-1.5 h-1.5 rounded-full bg-forest shrink-0" />
-                        {a}
-                      </li>
+                <div className="border-l-2 border-forest/20 pl-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+                    Today’s journey
+                  </p>
+
+                  <div className="mt-3 space-y-4">
+                    {day.activities.map((activity, index) => (
+                      <div key={`${activity}-${index}`} className="relative">
+                        <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-forest" />
+
+                        <p className="text-sm font-medium text-ink">
+                          {activity}
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-muted">
+                          Take your time and enjoy the experience.
+                        </p>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
-              {day.restaurants?.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Restaurants</p>
-                  <p className="text-ink mt-0.5">{day.restaurants.join(", ")}</p>
-                </div>
-              )}
-              {day.stay && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Stay</p>
-                  <p className="text-ink mt-0.5">{day.stay}</p>
-                </div>
-              )}
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-sm font-semibold text-forest">₹{day.estimatedCost?.toLocaleString("en-IN")}</span>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {day.restaurants?.length > 0 && (
+                  <div className="rounded-xl bg-mist/50 p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+                      Eat local
+                    </p>
+
+                    <p className="mt-1 text-xs leading-relaxed text-ink">
+                      {day.restaurants.join(" · ")}
+                    </p>
+                  </div>
+                )}
+
+                {day.stay && (
+                  <div className="rounded-xl bg-mist/50 p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+                      Stay
+                    </p>
+
+                    <p className="mt-1 text-xs leading-relaxed text-ink">
+                      {day.stay}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
+                <p className="text-sm font-semibold text-forest">
+                  Estimated: ₹{day.estimatedCost?.toLocaleString("en-IN") || 0}
+                </p>
+
                 <button
                   type="button"
                   onClick={() => onRegenerate(day.day)}
                   disabled={regenerating}
-                  className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-forest transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-forest disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <FiRefreshCw size={12} className={regenerating ? "animate-spin" : ""} />
-                  Regenerate this day
+                  <FiRefreshCw
+                    size={13}
+                    className={regenerating ? "animate-spin" : ""}
+                  />
+                  Try another version
                 </button>
               </div>
             </div>

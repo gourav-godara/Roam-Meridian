@@ -1,9 +1,12 @@
 const reviewService = require("../services/review.service");
-
+const Review = require("../models/review.model");
 // Create Review
 const createReview = async (req, res, next) => {
   try {
-    const review = await reviewService.createReview(req.body);
+    const review = await reviewService.createReview({
+  ...req.body,
+  user: req.user.id,
+});
 
     res.status(201).json({
       success: true,
@@ -18,7 +21,9 @@ const createReview = async (req, res, next) => {
 // Get All Reviews
 const getAllReviews = async (req, res, next) => {
   try {
-    const reviews = await reviewService.getAllReviews();
+    const reviews = await reviewService.getAllReviews(
+  req.query.destinationId
+);
 
     res.status(200).json({
       success: true,
@@ -52,19 +57,29 @@ const getReviewById = async (req, res, next) => {
 };
 
 // Update Review
+
 const updateReview = async (req, res, next) => {
   try {
-    const review = await reviewService.updateReview(
-      req.params.id,
-      req.body
-    );
+    const existingReview = await Review.findById(req.params.id);
 
-    if (!review) {
+    if (!existingReview) {
       return res.status(404).json({
         success: false,
         message: "Review not found.",
       });
     }
+
+    if (existingReview.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only edit your own review.",
+      });
+    }
+
+    const review = await reviewService.updateReview(
+      req.params.id,
+      req.body
+    );
 
     res.status(200).json({
       success: true,
@@ -75,18 +90,26 @@ const updateReview = async (req, res, next) => {
     next(error);
   }
 };
-
 // Delete Review
 const deleteReview = async (req, res, next) => {
   try {
-    const review = await reviewService.deleteReview(req.params.id);
+    const existingReview = await Review.findById(req.params.id);
 
-    if (!review) {
+    if (!existingReview) {
       return res.status(404).json({
         success: false,
         message: "Review not found.",
       });
     }
+
+    if (existingReview.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own review.",
+      });
+    }
+
+    await reviewService.deleteReview(req.params.id);
 
     res.status(200).json({
       success: true,
