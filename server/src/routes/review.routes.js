@@ -15,7 +15,7 @@ router.post(
 
 // Get All Reviews
 router.get("/", reviewController.getAllReviews);
-
+router.get("/average", reviewController.getAverageRating);
 // Get Review By ID
 router.get("/:id", reviewController.getReviewById);
 

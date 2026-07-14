@@ -26,15 +26,15 @@ const getAllReviews = async (destinationId) => {
   }
 
   return await Review.find(filter)
-    .populate("user", "name")
+    .populate("user", "name avatar")
     .populate("destination", "name city country");
 };
 
 // Get Review By ID
 const getReviewById = async (id) => {
   return await Review.findById(id)
-    .populate("user", "name")
-    
+    .populate("user", "name avatar")
+    .populate("destination", "name city country");
 };
 
 // Update Review
@@ -50,11 +50,36 @@ const updateReview = async (id, reviewData) => {
 const deleteReview = async (id) => {
   return await Review.findByIdAndDelete(id);
 };
+const getAverageRating = async (destinationId) => {
+  const match = {};
 
+  if (destinationId) {
+    match.destination = destinationId;
+  }
+
+  const result = await Review.aggregate([
+    { $match: match },
+    {
+      $group: {
+        _id: null,
+        averageRating: { $avg: "$rating" },
+        totalReviews: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return (
+    result[0] || {
+      averageRating: 0,
+      totalReviews: 0,
+    }
+  );
+};
 module.exports = {
   createReview,
   getAllReviews,
   getReviewById,
   updateReview,
   deleteReview,
+  getAverageRating,
 };

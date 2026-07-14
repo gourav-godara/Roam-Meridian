@@ -108,7 +108,6 @@ const deleteReview = async (req, res, next) => {
         message: "You can only delete your own review.",
       });
     }
-
     await reviewService.deleteReview(req.params.id);
 
     res.status(200).json({
@@ -119,11 +118,26 @@ const deleteReview = async (req, res, next) => {
     next(error);
   }
 };
+// Get Average Rating
+const getAverageRating = async (req, res, next) => {
+  try {
+    const result = await reviewService.getAverageRating(
+      req.query.destinationId
+    );
 
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   createReview,
   getAllReviews,
   getReviewById,
   updateReview,
   deleteReview,
+  getAverageRating,
 };
