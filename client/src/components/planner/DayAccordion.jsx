@@ -62,21 +62,36 @@ function DayAccordion({ day, onRegenerate, regenerating }) {
               {day.activities?.length > 0 && (
                 <div className="border-l-2 border-forest/20 pl-4">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
-                    Today’s journey
+                    Today's journey
                   </p>
 
                   <div className="mt-3 space-y-4">
-                    {day.activities.map((activity, index) => (
-                      <div key={`${activity}-${index}`} className="relative">
+                    {day.activities.map((activity) => (
+                      <div key={activity.id} className="relative">
                         <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-forest" />
 
-                        <p className="text-sm font-medium text-ink">
-                          {activity}
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium text-ink">
+                            {activity.title}
+                          </p>
+                          {activity.estimatedCost > 0 && (
+                            <span className="text-xs font-semibold text-forest shrink-0">
+                              ₹{activity.estimatedCost}
+                            </span>
+                          )}
+                        </div>
 
                         <p className="mt-0.5 text-xs text-muted">
-                          Take your time and enjoy the experience.
+                          {activity.startTime && `${activity.startTime} · `}
+                          {activity.duration}
+                          {activity.category && ` · ${activity.category}`}
                         </p>
+
+                        {activity.description && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {activity.description}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -34,6 +34,13 @@ Trip object shape (used when type is "generate"):
   "destination": "string",
   "summary": "string",
   "budget": number,
+  "bestTime": "string, e.g. October - March",
+  "budgetBreakdown": {
+    "stay": number,
+    "food": number,
+    "transport": number,
+    "activities": number
+  },
   "weather": null,
   "packingChecklist": ["string"],
   "travelTips": ["string"],
@@ -107,7 +114,23 @@ Latest user message: "${latestMessage}"
 Task: The user wants to change something about the existing trip above. Identify which dayNumber is affected and return type "edit", scope "day", with ONLY that day's complete updated object in "day". Do not return the full trip.`;
 }
 
-function buildPrompt({ tripContext, currentTrip, recentMessages, latestMessage }) {
+function buildPrompt(input) {
+  if (input && input.destination && input.days !== undefined && !input.tripContext && !input.latestMessage) {
+    const { destination, budget, days, travelers, travelStyle, preferences = [], mustVisitPlaces = [], foodPreference, transport, accommodation } = input;
+    const lines = [
+      `Plan a ${days}-day trip to ${destination}.`,
+      `Budget: ₹${budget} for ${travelers} traveler${travelers > 1 ? "s" : ""}.`,
+      `Travel style: ${travelStyle || "Balanced"}.`,
+    ];
+    if (preferences.length) lines.push(`Preferences: ${preferences.join(", ")}.`);
+    if (mustVisitPlaces.length) lines.push(`Must-visit places: ${mustVisitPlaces.join(", ")}.`);
+    if (foodPreference) lines.push(`Food preference: ${foodPreference}.`);
+    if (transport) lines.push(`Preferred transport: ${transport}.`);
+    if (accommodation) lines.push(`Preferred accommodation: ${accommodation}.`);
+    return lines.join(" ");
+  }
+
+  const { tripContext, currentTrip, recentMessages, latestMessage } = input;
   const userPrompt = currentTrip
     ? buildEditPrompt({ currentTrip, recentMessages, latestMessage })
     : buildGenerationPrompt({ tripContext, recentMessages, latestMessage });
