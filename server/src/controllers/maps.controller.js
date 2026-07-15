@@ -1,11 +1,13 @@
 const axios = require("axios");
+const { getRoute } = require("../services/route.service");
+const { getNearbyPlaces } = require("../services/nearby.service");
 
-const fetchLocation = async (city) => {
+const fetchLocation = async (city, state, country) => {
     const response = await axios.get(
         "https://nominatim.openstreetmap.org/search",
         {
             params: {
-                q: city,
+                q: `${city}, ${state}, ${country}`,
                 format: "json",
                 limit: 1,
             },
@@ -25,6 +27,32 @@ const fetchLocation = async (city) => {
         latitude: location.lat,
         longitude: location.lon,
         address: location.display_name,
+    };
+};
+
+const reverseGeocode = async (latitude, longitude) => {
+
+    const response = await axios.get(
+        "https://nominatim.openstreetmap.org/reverse",
+        {
+            params: {
+                lat: latitude,
+                lon: longitude,
+                format: "json",
+            },
+            headers: {
+                "User-Agent": "RoamMeridian/1.0",
+            },
+        }
+    );
+
+    const address = response.data.address;
+
+    return {
+        address: response.data.display_name,
+        city: address.city || address.town || address.village || "",
+        state: address.state || "",
+        country: address.country || "",
     };
 };
 
@@ -56,7 +84,123 @@ const getLocation = async (req, res) => {
     }
 };
 
+const getReverseLocation = async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+
+        if (!lat || !lng) {
+            return res.status(400).json({
+                success: false,
+                message: "Latitude and Longitude are required",
+            });
+        }
+
+        const location = await reverseGeocode(lat, lng);
+
+        res.status(200).json({
+            success: true,
+            data: location,
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const getRouteDetails = async (req, res) => {
+    try {
+        const {
+            startLat,
+            startLng,
+            endLat,
+            endLng,
+        } = req.query;
+
+        if (
+            !startLat ||
+            !startLng ||
+            !endLat ||
+            !endLng
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Start and End coordinates are required",
+            });
+        }
+
+        const route = await getRoute(
+            startLat,
+            startLng,
+            endLat,
+            endLng
+        );
+
+        res.status(200).json({
+            success: true,
+            data: route,
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+const getNearby = async (req, res) => {
+    try {
+
+        const {
+            lat,
+            lng,
+            type,
+            radius,
+        } = req.query;
+
+        if (!lat || !lng || !type) {
+            return res.status(400).json({
+                success: false,
+                message: "Latitude, Longitude and Type are required",
+            });
+        }
+
+        const places = await getNearbyPlaces(
+            lat,
+            lng,
+            type,
+            radius
+        );
+
+        res.status(200).json({
+            success: true,
+            data: places,
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     getLocation,
     fetchLocation,
+    reverseGeocode,
+    getReverseLocation,
+    getRouteDetails,
+    getNearby,
 };
