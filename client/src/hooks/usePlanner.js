@@ -2,22 +2,76 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { plannerApi } from "../services/plannerApi";
 import { useToast } from "../context/ToastContext";
 
+function buildPlanFromConversation(conversation) {
+  const trip = conversation.currentTrip;
+  if (!trip) return null;
+
+  const budgetBreakdown = trip.budgetBreakdown || {
+    stay: 0,
+    food: 0,
+    transport: 0,
+    activities: 0,
+  };
+
+  return {
+    _id: null,
+    destination: conversation.tripContext?.destination,
+    days: conversation.tripContext?.duration,
+    budget: conversation.tripContext?.budget ?? trip.budget,
+    travelers: conversation.tripContext?.travelers,
+    travelStyle: conversation.tripContext?.travelStyle,
+    favorite: false,
+    response: {
+      title:
+        trip.summary ||
+        `${conversation.tripContext?.destination || "Your"} Trip`,
+      weather: trip.weather,
+      bestTime: trip.bestTime || null,
+      budgetBreakdown,
+      localTips: trip.travelTips || [],
+      packingChecklist: trip.packingChecklist || [],
+      nearbyAttractions: trip.nearbyPlaces || [],
+      days: (trip.days || []).map((d, index) => {
+        const activities = d.activities || [];
+
+        return {
+          day: d.dayNumber ?? d.day ?? index + 1,
+          title: d.title,
+          arrival: null,
+          activities,
+          restaurants: activities
+            .filter((a) => a.category === "restaurant")
+            .map((a) => a.title),
+          stay: activities.find((a) => a.category === "stay")?.title ?? null,
+          estimatedCost: d.estimatedCost,
+        };
+      }),
+    },
+  };
+}
+
 function usePlanner() {
   const [messages, setMessages] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [currentPlan, setCurrentPlan] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
   const { showToast } = useToast();
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    if (!generating) {
+      scrollToBottom();
+    }
+  }, [messages, generating, scrollToBottom]);
 
   const loadHistory = useCallback(
     async (search = "") => {
@@ -31,7 +85,7 @@ function usePlanner() {
         setHistoryLoading(false);
       }
     },
-    [showToast]
+    [showToast],
   );
 
   useEffect(() => {
@@ -40,47 +94,86 @@ function usePlanner() {
 
   const sendMessage = useCallback(
     async (text, tripParams) => {
-      const userMessage = { id: Date.now(), role: "user", text, timestamp: new Date() };
+      const userMessage = {
+        id: Date.now(),
+        role: "user",
+        text,
+        timestamp: new Date(),
+      };
       setMessages((prev) => [...prev, userMessage]);
       setGenerating(true);
 
       try {
-        const plan = await plannerApi.generate({ prompt: text, ...tripParams });
+        const conversation = await plannerApi.sendMessage(
+          conversationId,
+          text,
+          tripParams,
+        );
+        setConversationId(conversation._id);
+
+        const plan = buildPlanFromConversation(conversation);
         setCurrentPlan(plan);
+
+        const latestAssistantMessage =
+          conversation.messages[conversation.messages.length - 1];
+
         setMessages((prev) => [
           ...prev,
-          { id: Date.now() + 1, role: "ai", plan, timestamp: new Date() },
+          {
+            id: Date.now() + 1,
+            role: "ai",
+            plan: plan || undefined,
+            text: !plan ? latestAssistantMessage?.content : undefined,
+            timestamp: new Date(),
+          },
         ]);
-        setHistory((prev) => [plan, ...prev]);
       } catch (err) {
-        showToast(err?.response?.data?.message || "Couldn't generate your plan. Try again.", "error");
+        showToast(
+          err?.response?.data?.message ||
+            "Couldn't generate your plan. Try again.",
+          "error",
+        );
         setMessages((prev) => [
           ...prev,
-          { id: Date.now() + 1, role: "ai", error: true, timestamp: new Date() },
+          {
+            id: Date.now() + 1,
+            role: "ai",
+            error: true,
+            timestamp: new Date(),
+          },
         ]);
       } finally {
         setGenerating(false);
       }
     },
-    [showToast]
+    [conversationId, showToast],
   );
 
   const regenerateDay = useCallback(
     async (planId, dayNumber) => {
+      if (!conversationId) return;
       try {
-        const updatedPlan = await plannerApi.regenerateDay(planId, dayNumber);
-        setCurrentPlan(updatedPlan);
-        setMessages((prev) => prev.map((m) => (m.plan?._id === planId ? { ...m, plan: updatedPlan } : m)));
+        const conversation = await plannerApi.regenerateConversation(
+          conversationId,
+          { scope: "day", dayNumber },
+        );
+        const plan = buildPlanFromConversation(conversation);
+        setCurrentPlan(plan);
+        setMessages((prev) => prev.map((m) => (m.plan ? { ...m, plan } : m)));
         showToast(`Day ${dayNumber} regenerated.`, "success");
       } catch {
         showToast("Couldn't regenerate that day.", "error");
       }
     },
-    [showToast]
+    [conversationId, showToast],
   );
 
   const savePlan = useCallback(
     async (planId) => {
+      if (!planId) {
+        showToast("Save this plan once it's ready — coming soon.", "info");
+        return;
+      }
       try {
         const updated = await plannerApi.save(planId);
         setHistory((prev) => prev.map((p) => (p._id === planId ? updated : p)));
@@ -89,11 +182,15 @@ function usePlanner() {
         showToast("Couldn't save this plan.", "error");
       }
     },
-    [showToast]
+    [showToast],
   );
 
   const toggleFavorite = useCallback(
     async (planId) => {
+      if (!planId) {
+        showToast("Favorite this plan once it's saved — coming soon.", "info");
+        return;
+      }
       try {
         const updated = await plannerApi.favorite(planId);
         setHistory((prev) => prev.map((p) => (p._id === planId ? updated : p)));
@@ -101,11 +198,15 @@ function usePlanner() {
         showToast("Couldn't update favorite.", "error");
       }
     },
-    [showToast]
+    [showToast],
   );
 
   const duplicatePlan = useCallback(
     async (planId) => {
+      if (!planId) {
+        showToast("Duplicate this plan once it's saved — coming soon.", "info");
+        return;
+      }
       try {
         const copy = await plannerApi.duplicate(planId);
         setHistory((prev) => [copy, ...prev]);
@@ -114,11 +215,16 @@ function usePlanner() {
         showToast("Couldn't duplicate this plan.", "error");
       }
     },
-    [showToast]
+    [showToast],
   );
 
   const deletePlan = useCallback(
     async (planId) => {
+      if (!planId) {
+        showToast("Nothing to delete yet.", "info");
+        return;
+      }
+
       try {
         await plannerApi.remove(planId);
         setHistory((prev) => prev.filter((p) => p._id !== planId));
@@ -127,7 +233,7 @@ function usePlanner() {
         showToast("Couldn't delete this plan.", "error");
       }
     },
-    [showToast]
+    [showToast],
   );
 
   return {

@@ -17,7 +17,7 @@ function ChatWindow({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-5">
+    <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-5 min-h-0">
       {messages.map((message) => (
         <ChatBubble
           key={message.id}
