@@ -14,6 +14,7 @@ import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup/Signup";
 import VerifyOtp from "../pages/VerifyOtp/VerifyOtp";
 import CreateAccount from "../pages/CreateAccount/CreateAccount";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 
 import Profile from "../pages/Profile/Profile";
 import NotFound from "../pages/NotFound/NotFound";
@@ -55,6 +56,7 @@ function AppRouter() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
