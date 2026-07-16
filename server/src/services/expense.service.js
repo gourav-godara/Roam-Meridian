@@ -6,10 +6,16 @@ const createExpense = async (expenseData) => {
 };
 
 // Get All Expenses
-const getAllExpenses = async () => {
-  return await Expense.find()
+const getAllExpenses = async (userId) => {
+  return await Expense.find({
+    $or: [
+      { paidBy: userId },
+      { participants: userId },
+    ],
+  })
     .populate("paidBy", "name email")
     .populate("participants", "name email")
+    .populate("itinerary", "title")
     .sort({ createdAt: -1 });
 };
 
