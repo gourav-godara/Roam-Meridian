@@ -9,7 +9,6 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { FiUser, FiMail } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -80,10 +79,6 @@ const Signup = () => {
     googleLogin();
   };
 
-  const handleAppleSignup = () => {
-    console.log("Apple signup clicked");
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md rounded-3xl bg-surface shadow-lg border border-border p-8">
@@ -112,15 +107,7 @@ const Signup = () => {
           >
             Continue with Google
           </Button>
-
-          <Button
-            variant="secondary"
-            leftIcon={FaApple}
-            className="w-full"
-            onClick={handleAppleSignup}
-          >
-            Continue with Apple
-          </Button>
+          
         </div>
 
         <div className="flex items-center gap-3 my-6">

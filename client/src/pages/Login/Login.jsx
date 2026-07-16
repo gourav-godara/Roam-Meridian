@@ -8,7 +8,6 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { FiMail } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -78,11 +77,6 @@ const Login = () => {
     googleLogin();
   };
 
-  const handleAppleLogin = () => {
-    // TODO: wire to real OAuth flow once Astha's backend supports it
-    console.log("Apple login clicked");
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md rounded-3xl bg-surface shadow-lg border border-border p-8">
@@ -103,14 +97,7 @@ const Login = () => {
           >
             Continue with Google
           </Button>
-          <Button
-            variant="secondary"
-            leftIcon={FaApple}
-            className="w-full"
-            onClick={handleAppleLogin}
-          >
-            Continue with Apple
-          </Button>
+
         </div>
 
         <div className="flex items-center gap-3 my-6">
