@@ -1,7 +1,10 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const model = genAI.getGenerativeModel({
+  model: process.env.GEMINI_MODEL || "gemini-2.0-flash-lite",
+});
 
 const FALLBACK_RESPONSE = {
   type: "chat",
@@ -13,7 +16,6 @@ const FALLBACK_RESPONSE = {
 };
 
 function extractJson(rawText) {
-  // Gemini sometimes wraps JSON in ```json fences despite instructions — strip them defensively.
   const cleaned = rawText.replace(/```json|```/g, "").trim();
   return JSON.parse(cleaned);
 }
@@ -27,31 +29,60 @@ function isValidEnvelope(obj) {
 }
 
 async function callGemini(systemPrompt, userPrompt) {
+  console.log("Calling Gemini...");
+
   const result = await model.generateContent([
     { text: systemPrompt },
     { text: userPrompt },
   ]);
+
+  console.log("Gemini responded.");
+
   const rawText = result.response.text();
+
+  console.log("RAW RESPONSE:");
+  console.log(rawText);
+
   return extractJson(rawText);
 }
 
 async function generateResponse(systemPrompt, userPrompt) {
   try {
     const parsed = await callGemini(systemPrompt, userPrompt);
+
     if (isValidEnvelope(parsed)) return parsed;
+
+    console.error(
+      "[geminiClient] Invalid envelope on first attempt:",
+      JSON.stringify(parsed),
+    );
   } catch (err) {
-    // fall through to retry
+    console.error("[geminiClient] First attempt threw:", err.message);
+
+    if (err.message.includes("503")) {
+      console.log("Gemini busy. Waiting 2 seconds...");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
   }
 
-  // Retry once with a stricter reminder appended
   try {
-    const retryPrompt = `${userPrompt}\n\nReminder: your last response was not valid JSON. Return ONLY the JSON object, nothing else — no markdown, no explanation.`;
+    const retryPrompt = `${userPrompt}
+
+Reminder: Return ONLY a valid JSON object matching the required schema. No markdown. No explanation.`;
+
     const parsed = await callGemini(systemPrompt, retryPrompt);
+
     if (isValidEnvelope(parsed)) return parsed;
+
+    console.error(
+      "[geminiClient] Invalid envelope on retry:",
+      JSON.stringify(parsed),
+    );
   } catch (err) {
-    // fall through to fallback
+    console.error("[geminiClient] Retry threw:", err.message);
   }
 
+  console.error("[geminiClient] Both attempts failed — returning fallback.");
   return FALLBACK_RESPONSE;
 }
 

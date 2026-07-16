@@ -1,22 +1,12 @@
 const Planner = require("../models/Planner");
 const conversationManager = require("./conversationManager");
 
-async function sendMessage(userId, { conversationId, message }) {
-  return conversationManager.handleUserMessage(userId, {
-    conversationId,
-    message,
-  });
+async function sendMessage(userId, { conversationId, message, tripParams }) {
+  return conversationManager.handleUserMessage(userId, { conversationId, message, tripParams });
 }
 
-async function regenerateConversation(
-  userId,
-  conversationId,
-  { scope, dayNumber },
-) {
-  return conversationManager.regenerate(userId, conversationId, {
-    scope,
-    dayNumber,
-  });
+async function regenerateConversation(userId,conversationId, { scope, dayNumber },) {
+  return conversationManager.regenerate(userId, conversationId, { scope, dayNumber,});
 }
 
 async function getActiveConversation(userId) {

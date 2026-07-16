@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/planner`,
+  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:5001/api"}/planner`,
   withCredentials: true,
 });
 
@@ -12,8 +12,10 @@ api.interceptors.request.use((config) => {
 });
 
 export const plannerApi = {
-  sendMessage: (conversationId, message) =>
-    api.post("/message", { conversationId, message }).then((r) => r.data.data),
+  sendMessage: (conversationId, message, tripParams) =>
+  api.post("/message", { conversationId, message, tripParams }).then((r) => r.data.data),
+  regenerateConversation: (conversationId, { scope, dayNumber }) =>
+    api.post(`/conversation/${conversationId}/regenerate`, { scope, dayNumber }).then((r) => r.data.data),
   getActiveConversation: () =>
     api.get("/conversation/active").then((r) => r.data.data),
 

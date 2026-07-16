@@ -19,17 +19,31 @@ function getRecentMessages(conversation) {
   }));
 }
 
+function mergeUserTripParams(existing, tripParams) {
+  const base = existing.toObject?.() ?? existing;
+  if (!tripParams) return base;
+
+  const merged = { ...base };
+  if (tripParams.destination !== undefined) merged.destination = tripParams.destination;
+  if (tripParams.days !== undefined) merged.duration = tripParams.days;
+  if (tripParams.budget !== undefined) merged.budget = tripParams.budget;
+  if (tripParams.travelers !== undefined) merged.travelers = tripParams.travelers;
+  if (tripParams.travelStyle !== undefined) merged.travelStyle = tripParams.travelStyle;
+
+  return merged;
+}
+
 function mergeTripContext(existing, aiTrip) {
   const base = existing.toObject?.() ?? existing;
   if (!aiTrip) return base;
 
   return {
     ...base,
-    destination: aiTrip.destination ?? base.destination,
-    duration: aiTrip.days?.length ?? base.duration,
-    budget: aiTrip.budget ?? base.budget,
-    travelers: base.travelers, // not part of Gemini's trip object, preserved as-is
-    travelStyle: base.travelStyle, // same — user-provided, not AI-derived
+    destination: base.destination ?? aiTrip.destination,
+    duration: base.duration ?? aiTrip.days?.length,
+    budget: base.budget ?? aiTrip.budget,
+    travelers: base.travelers,
+    travelStyle: base.travelStyle,
   };
 }
 
@@ -55,10 +69,19 @@ function nextPlanningStage(currentStage, responseType) {
   }
 }
 
-async function handleUserMessage(userId, { conversationId, message }) {
+async function handleUserMessage(userId, { conversationId, message, tripParams }) {
+  console.log("========== NEW MESSAGE ==========");
+  console.log("User:", message);
+
   const conversation = conversationId
-    ? await Conversation.findOne({ _id: conversationId, user: userId, status: "active" })
+    ? await Conversation.findOne({
+        _id: conversationId,
+        user: userId,
+        status: "active",
+      })
     : await getOrCreateActiveConversation(userId);
+
+  console.log("Conversation loaded");
 
   if (!conversation) {
     const err = new Error("Active conversation not found");
@@ -66,7 +89,19 @@ async function handleUserMessage(userId, { conversationId, message }) {
     throw err;
   }
 
-  conversation.messages.push({ role: "user", content: message });
+  if (tripParams) {
+    conversation.tripContext = mergeUserTripParams(
+      conversation.tripContext,
+      tripParams
+    );
+  }
+
+  conversation.messages.push({
+    role: "user",
+    content: message,
+  });
+
+  console.log("Building prompt...");
 
   const { systemPrompt, userPrompt } = buildPrompt({
     tripContext: conversation.tripContext,
@@ -75,25 +110,55 @@ async function handleUserMessage(userId, { conversationId, message }) {
     latestMessage: message,
   });
 
+  console.log("Calling Gemini...");
+
   const aiResponse = await generateResponse(systemPrompt, userPrompt);
 
+  console.log("Gemini replied:");
+  console.log(aiResponse);
+
   if (aiResponse.type === "generate" && aiResponse.trip) {
+    console.log("Updating trip...");
     conversation.currentTrip = aiResponse.trip;
-    conversation.tripContext = mergeTripContext(conversation.tripContext, aiResponse.trip);
-  } else if (aiResponse.type === "edit" && aiResponse.scope === "day" && aiResponse.day) {
-    conversation.currentTrip = applyItineraryUpdate(conversation.currentTrip, aiResponse.dayNumber, aiResponse.day);
+    conversation.tripContext = mergeTripContext(
+      conversation.tripContext,
+      aiResponse.trip
+    );
+  } else if (
+    aiResponse.type === "edit" &&
+    aiResponse.scope === "day" &&
+    aiResponse.day
+  ) {
+    console.log("Editing day...");
+    conversation.currentTrip = applyItineraryUpdate(
+      conversation.currentTrip,
+      aiResponse.dayNumber,
+      aiResponse.day
+    );
   }
 
-  conversation.planningStage = nextPlanningStage(conversation.planningStage, aiResponse.type);
+  console.log("Saving conversation...");
+
+  conversation.planningStage = nextPlanningStage(
+    conversation.planningStage,
+    aiResponse.type
+  );
 
   conversation.messages.push({
     role: "assistant",
     content: aiResponse.message,
     responseType: aiResponse.type,
-    tripSnapshot: aiResponse.type === "generate" || aiResponse.type === "edit" ? conversation.currentTrip : null,
+    tripSnapshot:
+      aiResponse.type === "generate" || aiResponse.type === "edit"
+        ? conversation.currentTrip
+        : null,
   });
 
   await conversation.save();
+
+  console.log("Conversation saved");
+  console.log("==========================");
+
   return conversation;
 }
 
