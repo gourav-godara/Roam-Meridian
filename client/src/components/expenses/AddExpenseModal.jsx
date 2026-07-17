@@ -1,11 +1,60 @@
+import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
+import { createExpense } from "../../services/expenseApi";
 
 const AddExpenseModal = ({
   isOpen,
   onClose,
+  refreshExpenses,
 }) => {
-  if (!isOpen) return null;
 
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    amount: "",
+    category: "Accommodation",
+    participants: [],
+    itinerary: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await createExpense(formData);
+
+alert("Expense created successfully!");
+      if (refreshExpenses) {
+        await refreshExpenses();
+      }
+
+      onClose();
+
+      setFormData({
+        title: "",
+        description: "",
+        amount: "",
+        category: "Accommodation",
+        participants: [],
+        itinerary: "",
+      });
+
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+        "Unable to create expense."
+      );
+    }
+  };
+
+  if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
 
@@ -16,8 +65,8 @@ const AddExpenseModal = ({
         <div className="flex items-center justify-between border-b px-8 py-5">
 
           <h2 className="text-2xl font-bold">
-            Add Expense
-          </h2>
+  Add Expense
+</h2>
 
           <button
             onClick={onClose}
@@ -32,7 +81,10 @@ const AddExpenseModal = ({
 
         <div className="p-8">
 
-          <form className="space-y-5">
+          <form
+    className="space-y-5"
+    onSubmit={handleSubmit}
+>
 
   {/* Title */}
 
@@ -44,6 +96,9 @@ const AddExpenseModal = ({
     <input
       type="text"
       placeholder="Hotel Booking"
+      name="title"
+    value={formData.title}
+    onChange={handleChange}
       className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
     />
   </div>
@@ -56,6 +111,9 @@ const AddExpenseModal = ({
     </label>
 
     <textarea
+      name="description"
+    value={formData.description}
+    onChange={handleChange}
       rows="3"
       placeholder="Enter description..."
       className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -70,6 +128,9 @@ const AddExpenseModal = ({
     </label>
 
     <input
+      name="amount"
+    value={formData.amount}
+    onChange={handleChange}
       type="number"
       placeholder="5000"
       className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -84,6 +145,9 @@ const AddExpenseModal = ({
     </label>
 
     <select
+    name="category"
+    value={formData.category}
+    onChange={handleChange}
       className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
     >
       <option>Accommodation</option>

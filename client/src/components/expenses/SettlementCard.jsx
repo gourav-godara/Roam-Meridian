@@ -1,16 +1,5 @@
 const SettlementCard = ({
-  settlements = [
-    {
-      from: "Rahul",
-      to: "Jinal",
-      amount: 1500,
-    },
-    {
-      from: "Gourav",
-      to: "Jinal",
-      amount: 700,
-    },
-  ],
+  settlements = [],
 }) => {
   const totalReceive = settlements.reduce(
     (sum, item) => sum + item.amount,
@@ -41,7 +30,12 @@ const SettlementCard = ({
 
       <div className="space-y-4">
 
-        {settlements.map((item, index) => (
+        {settlements.length === 0 ? (
+  <p className="text-center text-gray-500">
+    No settlements yet.
+  </p>
+) : (
+  settlements.map((item, index) => (
 
           <div
             key={index}
@@ -66,7 +60,9 @@ const SettlementCard = ({
 
           </div>
 
-        ))}
+        ))
+      )}
+        
 
       </div>
 

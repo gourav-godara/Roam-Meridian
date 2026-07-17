@@ -12,9 +12,9 @@ const NAV_ITEMS = [
   { to: "/dashboard/trips", label: "My Trips", icon: FiBriefcase },
   { to: "/dashboard/wishlist", label: "Wishlist", icon: FiHeart },
   { to: "/dashboard/bookings", label: "Bookings", icon: FiCalendar },
-  { to: "/dashboard/reviews", label: "Reviews", icon: FiStar },
+  { to: "/reviews", label: "Reviews", icon: FiStar },
   { to: "/planner", label: "AI Itinerary", icon: FiZap },
-  { to: "/dashboard/expenses", label: "Expenses", icon: FiDollarSign },
+  { to: "/expenses", label: "Expenses", icon: FiDollarSign },
   { to: "/profile", label: "Profile Settings", icon: FiUser },
 ];
 
