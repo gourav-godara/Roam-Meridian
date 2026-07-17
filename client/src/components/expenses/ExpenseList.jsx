@@ -1,6 +1,11 @@
 import ExpenseCard from "./ExpenseCard";
 
-const ExpenseList = ({ expenses = [] }) => {
+const ExpenseList = ({
+  expenses = [],
+  refreshExpenses,
+  setEditingExpense,
+  setOpenModal,
+}) => {
   if (!expenses.length) {
     return (
       <div className="bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
@@ -26,9 +31,12 @@ const ExpenseList = ({ expenses = [] }) => {
 
         {expenses.map((expense) => (
           <ExpenseCard
-            key={expense._id}
-            expense={expense}
-          />
+  key={expense._id}
+  expense={expense}
+  refreshExpenses={refreshExpenses}
+  setEditingExpense={setEditingExpense}
+  setOpenModal={setOpenModal}
+/>
         ))}
 
       </div>

@@ -6,7 +6,7 @@ const expenseSchema = new mongoose.Schema(
     itinerary: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Planner",
-      required: false,
+      required: true,
     },
 
     // User who paid the expense
