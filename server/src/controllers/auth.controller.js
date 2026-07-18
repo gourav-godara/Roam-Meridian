@@ -333,7 +333,10 @@ const getProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                authProvider: user.authProvider,
+                dateOfBirth: user.dateOfBirth,
                 createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
             },
         });
     } catch (error) {
@@ -348,7 +351,7 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, dateOfBirth, profileImage } = req.body;
 
         const user = await User.findById(req.user.id);
 
@@ -376,6 +379,10 @@ const updateProfile = async (req, res) => {
             user.name = name;
         }
 
+        if(dateOfBirth !== undefined) {
+            user.dateOfBirth = dateOfBirth;
+        }
+
         await user.save();
 
         return res.status(200).json({
@@ -386,6 +393,10 @@ const updateProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                authProvider: user.authProvider,
+                dateOfBirth: user.dateOfBirth,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
             },
         });
     } catch (error) {
