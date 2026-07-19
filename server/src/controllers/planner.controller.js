@@ -2,12 +2,32 @@ const plannerService = require("../services/planner.service");
 
 async function sendMessage(req, res, next) {
   try {
+    console.log("\n========== REQUEST ==========");
+    console.log("REQ BODY:");
+    console.log(JSON.stringify(req.body, null, 2));
+
     const { conversationId, message, tripParams } = req.body;
+
     if (!message) {
-      return res.status(400).json({ success: false, message: "message is required." });
+      return res.status(400).json({
+        success: false,
+        message: "message is required.",
+      });
     }
-    const conversation = await plannerService.sendMessage(req.user.id, { conversationId, message, tripParams });
-    res.status(200).json({ success: true, data: conversation });
+
+    console.log("Message:", message);
+    console.log("Trip Params:", tripParams);
+
+    const conversation = await plannerService.sendMessage(req.user.id, {
+      conversationId,
+      message,
+      tripParams,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: conversation,
+    });
   } catch (err) {
     next(err);
   }

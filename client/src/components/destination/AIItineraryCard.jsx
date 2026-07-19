@@ -9,7 +9,6 @@ function AIItineraryCard({ itinerary, onRegenerate }) {
 
   const handleRegenerate = () => {
     setRegenerating(true);
-    // TODO: wire to real Gemini/OpenAI planner endpoint
     setTimeout(() => setRegenerating(false), 1200);
     onRegenerate?.();
   };
