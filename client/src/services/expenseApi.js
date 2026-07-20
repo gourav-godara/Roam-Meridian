@@ -44,3 +44,9 @@ export const deleteExpense = async (id) => {
   const { data } = await API.delete(`/expenses/${id}`);
   return data;
 };
+
+export const settleExpense = async (id) => {
+  const { data } = await API.patch(`/expenses/${id}/settle`);
+  return data;
+};
+
