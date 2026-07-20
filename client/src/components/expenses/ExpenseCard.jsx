@@ -1,6 +1,37 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const ExpenseCard = ({ expense }) => {
+import { deleteExpense } from "../../services/expenseApi";
+
+const ExpenseCard = ({
+  expense,
+  refreshExpenses,
+  setEditingExpense,
+  setOpenModal,
+}) => {
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+        "Delete this expense?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+        await deleteExpense(expense._id);
+
+        alert("Expense deleted.");
+
+        await refreshExpenses();
+    } catch (err) {
+        alert(
+            err.response?.data?.message ||
+            "Unable to delete expense."
+        );
+    }
+};
+const handleEdit = () => {
+  setEditingExpense(expense);
+  setOpenModal(true);
+};
   return (
     <div className="bg-white rounded-2xl shadow border border-gray-100 p-5 hover:shadow-lg transition">
 
@@ -19,7 +50,7 @@ const ExpenseCard = ({ expense }) => {
 
         <span
           className={`px-3 py-1 rounded-full text-sm font-medium ${
-            expense.status === "Paid"
+            expense.status === "Settled"
               ? "bg-green-100 text-green-700"
               : "bg-yellow-100 text-yellow-700"
           }`}
@@ -51,8 +82,8 @@ const ExpenseCard = ({ expense }) => {
           </p>
 
           <p className="font-medium">
-            {expense.paidBy}
-          </p>
+  {expense.paidBy?.name}
+</p>
         </div>
 
         <div>
@@ -61,8 +92,8 @@ const ExpenseCard = ({ expense }) => {
           </p>
 
           <p className="font-medium">
-            {expense.date}
-          </p>
+  {new Date(expense.createdAt).toLocaleDateString()}
+</p>
         </div>
 
       </div>
@@ -75,29 +106,39 @@ const ExpenseCard = ({ expense }) => {
         </p>
 
         <div className="flex flex-wrap gap-2">
-
-          {expense.participants.map((person) => (
-            <span
-              key={person}
-              className="bg-gray-100 px-3 py-1 rounded-full text-sm"
-            >
-              {person}
-            </span>
-          ))}
-
-        </div>
+  {expense.participants?.length ? (
+    expense.participants.map((person) => (
+      <span
+        key={person._id}
+        className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+      >
+        {person.name}
+      </span>
+    ))
+  ) : (
+    <span className="text-gray-500 text-sm">
+      No participants
+    </span>
+  )}
+</div>
 
       </div>
 
       {/* Footer */}
       <div className="flex justify-end gap-3 mt-6">
 
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition">
-          <FaEdit />
-          Edit
-        </button>
+        <button
+  onClick={handleEdit}
+  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+>
+  <FaEdit />
+  Edit
+</button>
 
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition">
+        <button
+    onClick={handleDelete}
+    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+>
           <FaTrash />
           Delete
         </button>
