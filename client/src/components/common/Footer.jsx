@@ -20,7 +20,7 @@ const supportLinks = [
 
 function Footer() {
   return (
-    <footer className="mt-20 border-t border-border bg-[#F8F6F2]">
+    <footer className="border-t border-border bg-[#FFFFFF]">
       <div className="max-w-360 mx-auto px-8 lg:px-12 py-8">
 
         <div className="flex flex-col lg:flex-row justify-between gap-16">

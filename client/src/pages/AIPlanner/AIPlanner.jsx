@@ -44,7 +44,7 @@ function AIPlanner() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-8">
+    <div className="min-h-screen bg-bg pb-30">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-5 px-4 sm:px-6 lg:px-10 xl:grid-cols-[minmax(0,1fr)_310px]">
         <section className="flex min-h-[calc(100vh-145px)] flex-col overflow-hidden rounded-[2rem] border border-border bg-white shadow-sm">
           <PlannerHeader />
