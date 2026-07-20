@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 
 // Import Routes
 const authRoutes = require("./routes/auth.routes");
+const wishlistRoutes = require("./routes/wishlist.routes");
 const userRoutes = require("./routes/user.routes");
 const destinationRoutes = require("./routes/destination.routes");
 const plannerRoutes = require("./routes/planner.routes");
@@ -32,6 +33,7 @@ app.use(
 
 // ================= Routes =================
 app.use("/api/auth", authRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/destinations", destinationRoutes);
 app.use("/api/planner", plannerRoutes);
