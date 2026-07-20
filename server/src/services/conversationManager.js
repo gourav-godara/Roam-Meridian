@@ -1,6 +1,6 @@
 const Conversation = require("../models/Conversation");
 const { buildPrompt } = require("../utils/promptBuilder");
-const { generateResponse } = require("./geminiClient");
+const { generateResponse } = require("./openRouterClient");
 
 const RECENT_MESSAGE_WINDOW = 6;
 
@@ -110,11 +110,11 @@ async function handleUserMessage(userId, { conversationId, message, tripParams }
     latestMessage: message,
   });
 
-  console.log("Calling Gemini...");
+  console.log("Calling Ai-Assistant...");
 
   const aiResponse = await generateResponse(systemPrompt, userPrompt);
 
-  console.log("Gemini replied:");
+  console.log("Ai-Assistant replied:");
   console.log(aiResponse);
 
   if (aiResponse.type === "generate" && aiResponse.trip) {
