@@ -5,6 +5,7 @@ const getAllTrips = async (req, res) => {
         const trips = await Trip.find({
             createdBy: req.user.id,
         })
+        .populate("destinationId", "name city country");
             .populate("createdBy", "name email")
             .populate("collaborators", "name email");
 

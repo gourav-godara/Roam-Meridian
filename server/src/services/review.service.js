@@ -6,6 +6,7 @@ const createReview = async (reviewData) => {
     const existingReview = await Review.findOne({
         user: reviewData.user,
         itinerary: reviewData.itinerary,
+        destination: reviewData.destination,
     });
 
     if (existingReview) {
@@ -27,14 +28,16 @@ const getAllReviews = async (destinationId) => {
 
   return await Review.find(filter)
     .populate("user", "name avatar")
-    .populate("destination", "name city country");
+    .populate("destination", "name city country")
+    .populate("itinerary", "title")
 };
 
 // Get Review By ID
 const getReviewById = async (id) => {
   return await Review.findById(id)
     .populate("user", "name avatar")
-    .populate("destination", "name city country");
+    .populate("destination", "name city country")
+    .populate("itinerary", "title")
 };
 
 // Update Review
