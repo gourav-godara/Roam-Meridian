@@ -180,9 +180,13 @@ const getDestinationById = async (req, res) => {
 const createDestination = async (req, res) => {
     try {
 
-        const { city } = req.body;
+        const { city, state, country } = req.body;
 
-        const location = await fetchLocation(city);
+        const location = await fetchLocation(
+            city,
+            state,
+            country
+        );
 
         const destinationData = {
             ...req.body,

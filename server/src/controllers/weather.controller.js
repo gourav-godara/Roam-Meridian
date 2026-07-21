@@ -15,12 +15,13 @@ const fetchWeather = async (city) => {
     return {
         city: response.data.name,
         country: response.data.sys.country,
-        temperature: response.data.main.temp,
-        description: response.data.weather[0].description,
+        temp: response.data.main.temp,
+        condition: response.data.weather[0].description,
         humidity: response.data.main.humidity,
-        windSpeed: response.data.wind.speed,
+        wind: Number((response.data.wind.speed * 3.6).toFixed(1)),
+        feelsLike: response.data.main.feels_like,
     };
-};
+};;
 
 const getWeather = async (req, res) => {
     try {

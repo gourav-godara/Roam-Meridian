@@ -32,6 +32,16 @@ description: {
   trim: true,
 },
 
+bestTime: {
+    type: String,
+    trim: true,
+},
+
+duration: {
+    type: String,
+    trim: true,
+},
+
 category: {
   type: String,
   required: true,
