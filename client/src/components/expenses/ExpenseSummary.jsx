@@ -44,9 +44,7 @@ const ExpenseSummary = ({
             <div>
               <p className="text-gray-500 text-sm">{card.title}</p>
 
-              <h2 className="text-3xl font-bold mt-2">
-                {card.value}
-              </h2>
+              <h2 className="text-3xl font-bold mt-2">{card.value}</h2>
             </div>
 
             <div

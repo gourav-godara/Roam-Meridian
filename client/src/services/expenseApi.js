@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 // Attach JWT token to every request
@@ -45,8 +46,8 @@ export const deleteExpense = async (id) => {
   return data;
 };
 
+// Mark expense as settled
 export const settleExpense = async (id) => {
   const { data } = await API.patch(`/expenses/${id}/settle`);
   return data;
 };
-
