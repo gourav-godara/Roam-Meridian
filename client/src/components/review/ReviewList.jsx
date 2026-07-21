@@ -1,7 +1,11 @@
 import ReviewCard from "./ReviewCard";
 import EmptyReview from "./EmptyReview";
 
-const ReviewList = ({ reviews }) => {
+const ReviewList = ({
+  reviews,
+  onEdit,
+  onDelete,
+}) => {
   if (!reviews || reviews.length === 0) {
     return <EmptyReview />;
   }
@@ -12,6 +16,8 @@ const ReviewList = ({ reviews }) => {
         <ReviewCard
           key={review._id}
           review={review}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>

@@ -4,7 +4,8 @@ const getAllTrips = async (req, res) => {
     try {
         const trips = await Trip.find({
             createdBy: req.user.id,
-        });
+        })
+        .populate("destinationId", "name city country");
 
         res.status(200).json({
             success: true,

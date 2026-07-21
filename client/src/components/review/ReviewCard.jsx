@@ -1,7 +1,23 @@
-import { FaStar, FaRegStar } from "react-icons/fa";
+import {
+  FaStar,
+  FaRegStar,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 
-const ReviewCard = ({ review }) => {
+const ReviewCard = ({
+  review,
+  onEdit,
+  onDelete,
+}) => {
+  const currentUser = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  const isOwner =
+    currentUser?.id === review.user?._id;
+
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -43,7 +59,7 @@ const ReviewCard = ({ review }) => {
         )}
       </div>
 
-      {/* Review Text */}
+      {/* Review */}
       <p className="mt-4 text-gray-600 leading-relaxed">
         {review.reviewText}
       </p>
@@ -64,15 +80,53 @@ const ReviewCard = ({ review }) => {
 
       {/* Footer */}
       <div className="flex justify-between items-center mt-6 pt-4 border-t">
-        <span className="text-sm text-gray-500">
-          👍 {review.likes} Likes
-        </span>
 
-        {review.isEdited && (
-          <span className="text-xs text-blue-500">
-            Edited
+        <div className="flex items-center gap-3">
+
+          <span className="text-sm text-gray-500">
+            👍 {review.likes || 0} Likes
           </span>
+
+          {review.isEdited && (
+            <span className="text-xs text-blue-500">
+              Edited
+            </span>
+          )}
+
+        </div>
+
+        {isOwner && (
+          <div className="flex gap-3">
+
+            <button
+              onClick={() => onEdit(review)}
+              className="
+                p-2
+                rounded-lg
+                text-blue-600
+                hover:bg-blue-50
+                transition
+              "
+            >
+              <FaEdit />
+            </button>
+
+            <button
+              onClick={() => onDelete(review._id)}
+              className="
+                p-2
+                rounded-lg
+                text-red-600
+                hover:bg-red-50
+                transition
+              "
+            >
+              <FaTrash />
+            </button>
+
+          </div>
         )}
+
       </div>
     </motion.div>
   );
