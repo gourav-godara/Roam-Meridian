@@ -1,11 +1,17 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
-import { createExpense } from "../../services/expenseApi";
+import {
+  createExpense,
+  updateExpense,
+} from "../../services/expenseApi";
 
 const AddExpenseModal = ({
-  isOpen,
-  onClose,
-  refreshExpenses,
+    isOpen,
+    onClose,
+    refreshExpenses,
+    editingExpense,
+    trips = [],
 }) => {
 
   const [formData, setFormData] = useState({
@@ -13,9 +19,20 @@ const AddExpenseModal = ({
     description: "",
     amount: "",
     category: "Accommodation",
+
+    trip: "",
+    paidBy: "",
     participants: [],
-    itinerary: "",
-  });
+});
+const selectedTrip = trips.find(
+    (trip) => trip._id === formData.itinerary
+);
+const tripMembers = selectedTrip
+    ? [
+        selectedTrip.createdBy,
+        ...(selectedTrip.collaborators || []),
+      ]
+    : [];
 
   const handleChange = (e) => {
     setFormData({
@@ -26,11 +43,19 @@ const AddExpenseModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(formData);
     try {
-      await createExpense(formData);
+      if (editingExpense) {
+  await updateExpense(editingExpense._id, formData);
+} else {
+  await createExpense(formData);
+}
 
-alert("Expense created successfully!");
+alert(
+  editingExpense
+    ? "Expense updated successfully!"
+    : "Expense created successfully!"
+);
       if (refreshExpenses) {
         await refreshExpenses();
       }
@@ -38,13 +63,14 @@ alert("Expense created successfully!");
       onClose();
 
       setFormData({
-        title: "",
-        description: "",
-        amount: "",
-        category: "Accommodation",
-        participants: [],
-        itinerary: "",
-      });
+  title: "",
+  description: "",
+  amount: "",
+  category: "Accommodation",
+  trip: "",
+  paidBy: "",
+  participants: [],
+});
 
     } catch (err) {
       alert(
@@ -53,7 +79,34 @@ alert("Expense created successfully!");
       );
     }
   };
+ /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+  if (!isOpen) return;
 
+  if (editingExpense) {
+    setFormData({
+      title: editingExpense.title ?? "",
+      description: editingExpense.description ?? "",
+      amount: editingExpense.amount ?? "",
+      category: editingExpense.category ?? "Accommodation",
+      trip: editingExpense.trip?._id ?? "",
+      paidBy: editingExpense.paidBy?._id ?? "",
+      participants:
+        editingExpense.participants?.map((p) => p._id) ?? [],
+    });
+  } else {
+    setFormData({
+      title: "",
+      description: "",
+      amount: "",
+      category: "Accommodation",
+      trip: "",
+      paidBy: "",
+      participants: [],
+    });
+  }
+}, [isOpen, editingExpense]);
+/* eslint-disable react-hooks/set-state-in-effect */
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -65,7 +118,7 @@ alert("Expense created successfully!");
         <div className="flex items-center justify-between border-b px-8 py-5">
 
           <h2 className="text-2xl font-bold">
-  Add Expense
+  {editingExpense ? "Edit Expense" : "Add Expense"}
 </h2>
 
           <button
@@ -158,7 +211,26 @@ alert("Expense created successfully!");
       <option>Other</option>
     </select>
   </div>
+    <div>
+    <label className="block text-sm font-medium mb-2">
+        Trip
+    </label>
 
+    <select
+        name="itinerary"
+        value={formData.itinerary}
+        onChange={handleChange}
+        className="w-full border rounded-xl px-4 py-3"
+    >
+        <option value="">Select Trip</option>
+
+        {trips.map((trip) => (
+            <option key={trip._id} value={trip._id}>
+                {trip.title}
+            </option>
+        ))}
+    </select>
+</div>
   {/* Paid By */}
 
   <div>
@@ -166,13 +238,23 @@ alert("Expense created successfully!");
       Paid By
     </label>
 
-    <select
-      className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
-    >
-      <option>Jinal</option>
-      <option>Gourav</option>
-      <option>Rahul</option>
-    </select>
+      <select
+    name="paidBy"
+    value={formData.paidBy}
+    onChange={handleChange}
+    className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
+>
+    <option value="">Select Payer</option>
+
+    {tripMembers.map((member) => (
+        <option
+            key={member._id}
+            value={member._id}
+        >
+            {member.name}
+        </option>
+    ))}
+</select>
   </div>
 
   {/* Participants */}
@@ -185,21 +267,38 @@ alert("Expense created successfully!");
 
     <div className="grid grid-cols-2 gap-3">
 
-      <label className="flex items-center gap-2">
-        <input type="checkbox" />
-        Jinal
-      </label>
+      {tripMembers.map((member) => (
+    <label
+        key={member._id}
+        className="flex items-center gap-2"
+    >
+        <input
+            type="checkbox"
+            checked={formData.participants.includes(member._id)}
+            onChange={(e) => {
+                if (e.target.checked) {
+                    setFormData({
+                        ...formData,
+                        participants: [
+                            ...formData.participants,
+                            member._id,
+                        ],
+                    });
+                } else {
+                    setFormData({
+                        ...formData,
+                        participants:
+                            formData.participants.filter(
+                                (id) => id !== member._id
+                            ),
+                    });
+                }
+            }}
+        />
 
-      <label className="flex items-center gap-2">
-        <input type="checkbox" />
-        Gourav
-      </label>
-
-      <label className="flex items-center gap-2">
-        <input type="checkbox" />
-        Rahul
-      </label>
-
+        {member.name}
+    </label>
+))}
     </div>
 
   </div>
@@ -220,7 +319,7 @@ alert("Expense created successfully!");
       type="submit"
       className="px-6 py-3 rounded-xl bg-teal-600 text-white hover:bg-teal-700 transition"
     >
-      Save Expense
+      {editingExpense ? "Update Expense" : "Save Expense"}
     </button>
 
   </div>

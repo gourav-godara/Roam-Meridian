@@ -4,9 +4,9 @@ const expenseService = require("../services/expense.service");
 const createExpense = async (req, res) => {
   try {
     const expense = await expenseService.createExpense({
-  ...req.body,
-  paidBy: req.user.id,
-});
+      ...req.body,
+      paidBy: req.user.id,
+    });
 
     res.status(201).json({
       success: true,
@@ -112,9 +112,10 @@ const deleteExpense = async (req, res) => {
     if (expense.paidBy._id.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: "You can only modify your own expenses.",
+        message: "You can only delete your own expenses.",
       });
     }
+
     await expenseService.deleteExpense(req.params.id);
 
     res.json({
@@ -129,10 +130,56 @@ const deleteExpense = async (req, res) => {
   }
 };
 
+// Settle Expense
+const settleExpense = async (req, res) => {
+  try {
+    const expense = await expenseService.getExpenseById(req.params.id);
+
+    if (!expense) {
+      return res.status(404).json({
+        success: false,
+        message: "Expense not found",
+      });
+    }
+
+    if (expense.paidBy._id.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Only the payer can settle this expense.",
+      });
+    }
+
+    if (expense.status === "Settled") {
+      return res.status(400).json({
+        success: false,
+        message: "Expense is already settled.",
+      });
+    }
+
+    const updatedExpense = await expenseService.updateExpense(
+      req.params.id,
+      {
+        status: "Settled",
+      }
+    );
+
+    res.json({
+      success: true,
+      data: updatedExpense,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   createExpense,
   getAllExpenses,
   getExpenseById,
   updateExpense,
   deleteExpense,
+  settleExpense,
 };

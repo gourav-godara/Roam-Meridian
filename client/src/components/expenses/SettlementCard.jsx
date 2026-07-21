@@ -1,5 +1,6 @@
 const SettlementCard = ({
   settlements = [],
+  onSettle,
 }) => {
   const totalReceive = settlements.reduce(
     (sum, item) => sum + item.amount,
@@ -8,7 +9,7 @@ const SettlementCard = ({
 
   return (
     <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 h-fit sticky top-6">
-
+      
       <h2 className="text-2xl font-bold mb-6">
         Settlement Summary
       </h2>
@@ -41,22 +42,32 @@ const SettlementCard = ({
             key={index}
             className="border rounded-xl p-4"
           >
-
+            <p className="text-sm text-gray-500">
+    {item.title}
+</p>
             <p className="font-medium">
               <span className="text-red-500">
-                {item.from}
+                
+                {item.from.name}
               </span>
 
               {" owes "}
 
               <span className="text-green-600">
-                {item.to}
+                {item.to.name}
               </span>
             </p>
 
             <p className="text-xl font-bold mt-2">
-              ₹{item.amount}
-            </p>
+  ₹{item.amount.toFixed(2)}
+</p>
+
+<button
+  onClick={() => onSettle(item.expenseId)}
+  className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition"
+>
+  Mark Settled
+</button>
 
           </div>
 
@@ -68,22 +79,7 @@ const SettlementCard = ({
 
       {/* Button */}
 
-      <button
-        className="
-          mt-6
-          w-full
-          bg-teal-600
-          hover:bg-teal-700
-          text-white
-          py-3
-          rounded-xl
-          font-semibold
-          transition
-        "
-      >
-        Settle Up
-      </button>
-
+      
     </div>
   );
 };

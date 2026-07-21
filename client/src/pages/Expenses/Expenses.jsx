@@ -5,8 +5,11 @@ import ExpenseSummary from "../../components/expenses/ExpenseSummary";
 import ExpenseFilters from "../../components/expenses/ExpenseFilters";
 import ExpenseList from "../../components/expenses/ExpenseList";
 import SettlementCard from "../../components/expenses/SettlementCard";
-
-
+import { useEffect } from "react";
+import axios from "axios";
+import useTrips from "../../hooks/useTrips";
+import { calculateSettlements } from "../../utils/calculateSettlements";
+import { settleExpense } from "../../services/expenseApi";
 const Expenses = () => {
     const [openModal, setOpenModal] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
@@ -25,36 +28,33 @@ const currentUser = JSON.parse(localStorage.getItem("user"));
 
 const currentUserName = currentUser?.name;
 const currentUserId = currentUser?.id;
+useEffect(() => {
+  const fetchTrips = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-const settlements = expenses
-  .filter((expense) => expense.status === "Pending")
-  .flatMap((expense) => {
-    const participants = expense.participants || [];
+      const res = await axios.get(
+        "http://localhost:5001/api/trips",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    if (
-      !expense.paidBy ||
-      participants.length === 0
-    ) {
-      return [];
+      console.log("Trips:", res.data);
+    } catch (err) {
+      console.log(err.response?.data || err);
     }
+  };
 
-    const share = expense.amount / participants.length;
-
-    return participants
-      .filter(
-        (participant) =>
-          participant._id !== expense.paidBy._id
-      )
-      .map((participant) => ({
-        from: participant.name,
-        to: expense.paidBy.name,
-        amount: share,
-      }));
-  });
+  fetchTrips();
+}, []);
+const settlements = calculateSettlements(expenses);
   const mySettlements = settlements.filter(
   (item) =>
-    item.from === currentUserName ||
-    item.to === currentUserName
+    item.from.name === currentUserName ||
+    item.to.name === currentUserName
 );
 const summary = {
   totalExpenses: expenses.reduce(
@@ -70,13 +70,32 @@ const summary = {
     .reduce((sum, expense) => sum + expense.amount, 0),
 
   youOwe: settlements
-  .filter((item) => item.from === localStorage.getItem("userName"))
+  .filter((item) => item.from._id === currentUserId)
   .reduce((sum, item) => sum + item.amount, 0), // Will calculate after settlement logic
 
   settlements: expenses.filter(
     (expense) => expense.status === "Settled"
   ).length,
 };
+
+const handleSettle = async (expenseId) => {
+  try {
+    await settleExpense(expenseId);
+
+    alert("Expense settled successfully!");
+
+    refreshExpenses();
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+      "Unable to settle expense."
+    );
+  }
+};
+const { trips } = useTrips();
+console.log("Trips:", trips);
+
+
   if (loading) {
   return (
     <h2 className="text-center mt-20 text-xl">
@@ -103,7 +122,7 @@ const filteredExpenses = expenses.filter((expense) => {
   const matchesStatus =
     status === "All" ||
     expense.status === status;
-
+  
   return (
     matchesSearch &&
     matchesCategory &&
@@ -142,6 +161,7 @@ const filteredExpenses = expenses.filter((expense) => {
   }}
   refreshExpenses={refreshExpenses}
   editingExpense={editingExpense}
+  trips={trips}
 />
         <div className="xl:col-span-2">
          <ExpenseList
@@ -152,7 +172,10 @@ const filteredExpenses = expenses.filter((expense) => {
 />
         </div>
 
-        <SettlementCard settlements={mySettlements} />
+        <SettlementCard
+  settlements={mySettlements}
+  onSettle={handleSettle}
+/>
 
       </div>
 

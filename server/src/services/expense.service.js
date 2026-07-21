@@ -23,7 +23,8 @@ const getAllExpenses = async (userId) => {
 const getExpenseById = async (id) => {
   return await Expense.findById(id)
     .populate("paidBy", "name email")
-    .populate("participants", "name email");
+    .populate("participants", "name email")
+    .populate("itinerary", "title");
 };
 
 // Update Expense

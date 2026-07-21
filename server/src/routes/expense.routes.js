@@ -19,4 +19,9 @@ router.put("/:id", expenseController.updateExpense);
 
 router.delete("/:id", expenseController.deleteExpense);
 
+router.patch(
+  "/:id/settle",
+  authMiddleware,
+  expenseController.settleExpense
+);
 module.exports = router;
