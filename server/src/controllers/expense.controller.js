@@ -20,7 +20,7 @@ const createExpense = async (req, res) => {
   }
 };
 
-// Get All Expenses
+// Get All Expenses (only ones the user paid or is participating in)
 const getAllExpenses = async (req, res) => {
   try {
     const expenses = await expenseService.getAllExpenses(req.user.id);
@@ -49,6 +49,18 @@ const getExpenseById = async (req, res) => {
       });
     }
 
+    const isPayer = expense.paidBy._id.toString() === req.user.id;
+    const isParticipant = expense.participants.some(
+      (p) => p._id.toString() === req.user.id
+    );
+
+    if (!isPayer && !isParticipant) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied.",
+      });
+    }
+
     res.json({
       success: true,
       data: expense,
@@ -61,7 +73,7 @@ const getExpenseById = async (req, res) => {
   }
 };
 
-// Update Expense
+// Update Expense (only the payer can edit)
 const updateExpense = async (req, res) => {
   try {
     const expense = await expenseService.getExpenseById(req.params.id);
@@ -97,7 +109,7 @@ const updateExpense = async (req, res) => {
   }
 };
 
-// Delete Expense
+// Delete Expense (only the payer can delete)
 const deleteExpense = async (req, res) => {
   try {
     const expense = await expenseService.getExpenseById(req.params.id);
@@ -130,7 +142,7 @@ const deleteExpense = async (req, res) => {
   }
 };
 
-// Settle Expense
+// Settle Expense (only the payer can mark it settled)
 const settleExpense = async (req, res) => {
   try {
     const expense = await expenseService.getExpenseById(req.params.id);
@@ -156,12 +168,9 @@ const settleExpense = async (req, res) => {
       });
     }
 
-    const updatedExpense = await expenseService.updateExpense(
-      req.params.id,
-      {
-        status: "Settled",
-      }
-    );
+    const updatedExpense = await expenseService.updateExpense(req.params.id, {
+      status: "Settled",
+    });
 
     res.json({
       success: true,

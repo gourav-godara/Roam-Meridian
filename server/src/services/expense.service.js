@@ -2,16 +2,18 @@ const Expense = require("../models/expense.model");
 
 // Create Expense
 const createExpense = async (expenseData) => {
-  return await Expense.create(expenseData);
+  const expense = await Expense.create(expenseData);
+
+  return await Expense.findById(expense._id)
+    .populate("paidBy", "name email")
+    .populate("participants", "name email")
+    .populate("itinerary", "title");
 };
 
-// Get All Expenses
+// Get All Expenses (paid by the user or shared with them)
 const getAllExpenses = async (userId) => {
   return await Expense.find({
-    $or: [
-      { paidBy: userId },
-      { participants: userId },
-    ],
+    $or: [{ paidBy: userId }, { participants: userId }],
   })
     .populate("paidBy", "name email")
     .populate("participants", "name email")
@@ -32,7 +34,10 @@ const updateExpense = async (id, data) => {
   return await Expense.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,
-  });
+  })
+    .populate("paidBy", "name email")
+    .populate("participants", "name email")
+    .populate("itinerary", "title");
 };
 
 // Delete Expense

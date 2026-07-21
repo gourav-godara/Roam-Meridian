@@ -1,5 +1,5 @@
 const validateExpense = (req, res, next) => {
-  const { title, amount } = req.body;
+  const { title, amount, itinerary } = req.body;
 
   if (!title || title.trim() === "") {
     return res.status(400).json({
@@ -12,6 +12,13 @@ const validateExpense = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Amount must be greater than zero.",
+    });
+  }
+
+  if (!itinerary) {
+    return res.status(400).json({
+      success: false,
+      message: "Trip is required.",
     });
   }
 

@@ -9,43 +9,34 @@ const ExpenseCard = ({
   setOpenModal,
 }) => {
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-        "Delete this expense?"
-    );
+    const confirmDelete = window.confirm("Delete this expense?");
 
     if (!confirmDelete) return;
 
     try {
-        await deleteExpense(expense._id);
+      await deleteExpense(expense._id);
 
-        alert("Expense deleted.");
+      alert("Expense deleted.");
 
-        await refreshExpenses();
+      await refreshExpenses();
     } catch (err) {
-        alert(
-            err.response?.data?.message ||
-            "Unable to delete expense."
-        );
+      alert(err.response?.data?.message || "Unable to delete expense.");
     }
-};
-const handleEdit = () => {
-  setEditingExpense(expense);
-  setOpenModal(true);
-};
+  };
+
+  const handleEdit = () => {
+    setEditingExpense(expense);
+    setOpenModal(true);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow border border-gray-100 p-5 hover:shadow-lg transition">
-
       {/* Header */}
       <div className="flex justify-between items-start">
-
         <div>
-          <h3 className="text-xl font-semibold">
-            {expense.title}
-          </h3>
+          <h3 className="text-xl font-semibold">{expense.title}</h3>
 
-          <p className="text-gray-500 text-sm mt-1">
-            {expense.category}
-          </p>
+          <p className="text-gray-500 text-sm mt-1">{expense.category}</p>
         </div>
 
         <span
@@ -57,94 +48,72 @@ const handleEdit = () => {
         >
           {expense.status}
         </span>
-
       </div>
 
       {/* Amount */}
       <div className="mt-5">
-
-        <p className="text-gray-500 text-sm">
-          Amount
-        </p>
+        <p className="text-gray-500 text-sm">Amount</p>
 
         <h2 className="text-3xl font-bold text-teal-600">
           ₹{expense.amount}
         </h2>
-
       </div>
 
       {/* Details */}
       <div className="grid grid-cols-2 gap-4 mt-6 text-sm">
-
         <div>
-          <p className="text-gray-500">
-            Paid By
-          </p>
+          <p className="text-gray-500">Paid By</p>
 
-          <p className="font-medium">
-  {expense.paidBy?.name}
-</p>
+          <p className="font-medium">{expense.paidBy?.name}</p>
         </div>
 
         <div>
-          <p className="text-gray-500">
-            Date
-          </p>
+          <p className="text-gray-500">Date</p>
 
           <p className="font-medium">
-  {new Date(expense.createdAt).toLocaleDateString()}
-</p>
+            {new Date(expense.createdAt).toLocaleDateString()}
+          </p>
         </div>
-
       </div>
 
       {/* Participants */}
       <div className="mt-5">
-
-        <p className="text-gray-500 text-sm mb-2">
-          Participants
-        </p>
+        <p className="text-gray-500 text-sm mb-2">Participants</p>
 
         <div className="flex flex-wrap gap-2">
-  {expense.participants?.length ? (
-    expense.participants.map((person) => (
-      <span
-        key={person._id}
-        className="bg-gray-100 px-3 py-1 rounded-full text-sm"
-      >
-        {person.name}
-      </span>
-    ))
-  ) : (
-    <span className="text-gray-500 text-sm">
-      No participants
-    </span>
-  )}
-</div>
-
+          {expense.participants?.length ? (
+            expense.participants.map((person) => (
+              <span
+                key={person._id}
+                className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+              >
+                {person.name}
+              </span>
+            ))
+          ) : (
+            <span className="text-gray-500 text-sm">No participants</span>
+          )}
+        </div>
       </div>
 
       {/* Footer */}
       <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={handleEdit}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+        >
+          <FaEdit />
+          Edit
+        </button>
 
         <button
-  onClick={handleEdit}
-  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
->
-  <FaEdit />
-  Edit
-</button>
-
-        <button
-    onClick={handleDelete}
-    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
->
+          onClick={handleDelete}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+        >
           <FaTrash />
           Delete
         </button>
-
       </div>
-
     </div>
   );
 };
