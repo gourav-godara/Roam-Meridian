@@ -6,6 +6,8 @@ const getAllTrips = async (req, res) => {
             createdBy: req.user.id,
         })
         .populate("destinationId", "name city country");
+            .populate("createdBy", "name email")
+            .populate("collaborators", "name email");
 
         res.status(200).json({
             success: true,
@@ -89,9 +91,9 @@ const getTripById = async (req, res) => {
         const trip = await Trip.findOne({
             _id: id,
             createdBy: req.user.id,
-        });
-        
-        console.log("Trip:", trip);
+        })
+            .populate("createdBy", "name email")
+            .populate("collaborators", "name email");
 
         if(!trip) {
             return res.status(404).json({
