@@ -101,7 +101,7 @@ const tripSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: ["planning", "ongoing", "completed"],
+            enum: ["planning", "ongoing", "completed", "wishlist"],
             default: "planning",
         },
 

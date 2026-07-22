@@ -1,4 +1,5 @@
 const expenseService = require("../services/expense.service");
+const notificationService = require("../services/notification.service");
 
 // Create Expense
 const createExpense = async (req, res) => {
@@ -7,6 +8,22 @@ const createExpense = async (req, res) => {
       ...req.body,
       paidBy: req.user.id,
     });
+
+    const participantIds = (req.body.participants || []).filter(
+      (id) => id !== req.user.id
+    );
+
+    if (participantIds.length > 0) {
+      await notificationService.createNotificationsForUsers(
+        participantIds,
+        {
+          type: "expense",
+          message: `${expense.paidBy.name} added a new expense "${expense.title}" (₹${expense.amount})`,
+          link: "/expenses",
+          relatedId: expense._id,
+        }
+      );
+    }
 
     res.status(201).json({
       success: true,
@@ -171,6 +188,22 @@ const settleExpense = async (req, res) => {
     const updatedExpense = await expenseService.updateExpense(req.params.id, {
       status: "Settled",
     });
+
+    const participantIds = expense.participants
+      .map((p) => p._id.toString())
+      .filter((id) => id !== req.user.id);
+
+    if (participantIds.length > 0) {
+      await notificationService.createNotificationsForUsers(
+        participantIds,
+        {
+          type: "settlement",
+          message: `${expense.paidBy.name} marked "${expense.title}" as settled`,
+          link: "/expenses",
+          relatedId: expense._id,
+        }
+      );
+    }
 
     res.json({
       success: true,
