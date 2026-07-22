@@ -8,6 +8,7 @@ const placeTypes = {
     atm: "service.financial.atm",
     petrol_pump: "service.vehicle.fuel",
     tourist_attraction: "tourism.sights",
+    things_to_do: "entertainment",
     bus_stop: "public_transport",
 };
 
