@@ -1,21 +1,24 @@
 import { useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
-import AddReviewModal from "../../components/review/AddReviewModal";
+import AddReviewModal from "./AddReviewModal";
 import useReview from "../../hooks/useReview";
-import { deleteReview } from "../../services/reviewApi";
+import useTrips from "../../hooks/useTrips";
+import {
+  createReview,
+  updateReview,
+  deleteReview,
+} from "../../services/reviewApi";
 
 import ReviewStats from "../../components/review/ReviewStats";
 import ReviewFilter from "../../components/review/ReviewFilter";
 import ReviewList from "../../components/review/ReviewList";
 
 const ReviewPage = () => {
-  const {
-    reviews,
-    loading,
-    error,
-    refreshReviews,
-  } = useReview();
+  const { reviews, loading, error, refreshReviews } = useReview();
+  const { trips } = useTrips();
+
+  const completedTrips = trips.filter((trip) => trip.status === "completed");
 
   const [search, setSearch] = useState("");
   const [rating, setRating] = useState("");
@@ -47,23 +50,34 @@ const ReviewPage = () => {
       filtered.sort((a, b) => a.rating - b.rating);
     } else {
       filtered.sort(
-        (a, b) =>
-          new Date(b.createdAt) -
-          new Date(a.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
     }
 
     return filtered;
   }, [reviews, search, rating, sortBy]);
 
-  // Create Review (temporary)
-  const handleReviewSubmit = (reviewData) => {
-    console.log("Review Submitted:", reviewData);
+  // Create / Update Review
+  const handleReviewSubmit = async (reviewData) => {
+    try {
+      if (editingReview) {
+        await updateReview(editingReview._id, {
+          rating: reviewData.rating,
+          reviewText: reviewData.reviewText,
+        });
+        alert("Review updated successfully!");
+      } else {
+        await createReview(reviewData);
+        alert("Review submitted successfully!");
+      }
 
-    setOpenModal(false);
-    setEditingReview(null);
+      setOpenModal(false);
+      setEditingReview(null);
 
-    // Backend integration will be added later
+      await refreshReviews();
+    } catch (err) {
+      alert(err.response?.data?.message || "Unable to save review.");
+    }
   };
 
   // Edit Review
@@ -88,8 +102,7 @@ const ReviewPage = () => {
       refreshReviews();
     } catch (err) {
       alert(
-        err.response?.data?.message ||
-          "Failed to delete review."
+        err.response?.data?.message || "Failed to delete review."
       );
     }
   };
@@ -104,23 +117,17 @@ const ReviewPage = () => {
 
   if (error) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        {error}
-      </div>
+      <div className="text-center mt-10 text-red-500">{error}</div>
     );
   }
 
   return (
     <div className="min-h-screen bg-slate-50 px-8 py-10">
       <div className="max-w-7xl mx-auto">
-
         {/* Header */}
         <div className="mb-10 flex justify-between items-center">
-
           <div>
-            <h1 className="text-4xl font-bold">
-              My Reviews
-            </h1>
+            <h1 className="text-4xl font-bold">My Reviews</h1>
 
             <p className="text-gray-500 mt-2">
               Manage and explore your travel experiences.
@@ -137,7 +144,6 @@ const ReviewPage = () => {
             <FaPlus />
             Write Review
           </button>
-
         </div>
 
         <ReviewStats reviews={reviews} />
@@ -156,18 +162,19 @@ const ReviewPage = () => {
           onEdit={handleEditReview}
           onDelete={handleDeleteReview}
         />
-
       </div>
 
       <AddReviewModal
-        isOpen={openModal}
-        editingReview={editingReview}
-        onClose={() => {
-          setOpenModal(false);
-          setEditingReview(null);
-        }}
-        onSubmit={handleReviewSubmit}
-      />
+  key={editingReview?._id || "new"}   // ← add this
+  isOpen={openModal}
+  editingReview={editingReview}
+  trips={completedTrips}
+  onClose={() => {
+    setOpenModal(false);
+    setEditingReview(null);
+  }}
+  onSubmit={handleReviewSubmit}
+/>
     </div>
   );
 };

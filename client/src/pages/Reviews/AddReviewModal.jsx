@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaTimes } from "react-icons/fa";
 
 const AddReviewModal = ({
   isOpen,
   onClose,
   onSubmit,
+  editingReview,
+  trips = [],
 }) => {
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [itinerary, setItinerary] = useState("");
+
+
 
   if (!isOpen) return null;
 
@@ -24,71 +29,90 @@ const AddReviewModal = ({
       return;
     }
 
+    if (!editingReview && !itinerary) {
+      alert("Please select a trip.");
+      return;
+    }
+
     onSubmit({
       rating,
       reviewText,
+      itinerary,
     });
-
-    setRating(0);
-    setReviewText("");
   };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
       <div className="bg-white rounded-2xl w-full max-w-lg p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">
+            {editingReview ? "Edit Review" : "Write Review"}
+          </h2>
 
-        <h2 className="text-2xl font-bold mb-6">
-          Write Review
-        </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500 transition"
+          >
+            <FaTimes size={18} />
+          </button>
+        </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
-
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Trip — locked once editing, since a review is tied to one trip */}
           <div>
+            <label className="font-medium">Trip</label>
 
-            <label className="font-medium">
-              Rating
-            </label>
+            <select
+              value={itinerary}
+              onChange={(e) => setItinerary(e.target.value)}
+              disabled={!!editingReview}
+              className="w-full border rounded-xl mt-2 p-3 disabled:bg-gray-100"
+            >
+              <option value="">Select a completed trip</option>
 
-            <div className="flex gap-2 mt-3">
-
-              {[1,2,3,4,5].map((star)=>(
-                <FaStar
-                  key={star}
-                  onClick={()=>setRating(star)}
-                  className={`cursor-pointer text-3xl ${
-                    star<=rating
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                />
+              {trips.map((trip) => (
+                <option key={trip._id} value={trip._id}>
+                  {trip.title}
+                </option>
               ))}
+            </select>
 
-            </div>
-
+            {trips.length === 0 && !editingReview && (
+              <p className="text-sm text-gray-500 mt-2">
+                You can only review a trip once it's marked completed.
+              </p>
+            )}
           </div>
 
           <div>
+            <label className="font-medium">Rating</label>
 
-            <label className="font-medium">
-              Review
-            </label>
+            <div className="flex gap-2 mt-3">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`cursor-pointer text-3xl ${
+                    star <= rating ? "text-yellow-400" : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="font-medium">Review</label>
 
             <textarea
               rows={5}
               value={reviewText}
-              onChange={(e)=>setReviewText(e.target.value)}
+              onChange={(e) => setReviewText(e.target.value)}
               className="w-full border rounded-xl mt-2 p-3 resize-none"
               placeholder="Share your experience..."
             />
-
           </div>
 
           <div className="flex justify-end gap-4">
-
             <button
               type="button"
               onClick={onClose}
@@ -101,15 +125,11 @@ const AddReviewModal = ({
               type="submit"
               className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-xl"
             >
-              Submit Review
+              {editingReview ? "Update Review" : "Submit Review"}
             </button>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
   );
 };

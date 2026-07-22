@@ -16,11 +16,10 @@ const reviewSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Itinerary from which the review was created
-    // (Will connect once Planner module is completed)
+    // Trip from which the review was created
     itinerary: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Planner",
+      ref: "Trip",
       required: true,
     },
 

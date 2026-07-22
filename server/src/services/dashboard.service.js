@@ -187,6 +187,20 @@ const mapPins = trips.map((trip, index) => ({
   left: positions[index % positions.length].left,
   type: trip.status === "completed" ? "visited" : "wishlist",
 }));
+
+// Shaped for the dashboard's ReviewCard component
+const recentReviewsFormatted = recentReviews.map((review) => ({
+  id: review._id,
+  destination: review.destination?.name || "Destination",
+  image:
+    review.images?.[0] ||
+    review.destination?.images?.[0] ||
+    "https://placehold.co/100x100",
+  rating: review.rating,
+  review: review.reviewText,
+  createdAt: new Date(review.createdAt).toLocaleDateString(),
+}));
+
   return { // Returns a massive object full of data arrays.
     user: {
   name: user.name,
@@ -238,7 +252,7 @@ activityTimeline,
 travelTip: {
   text: "Visit popular attractions early in the morning to avoid crowds.",
   },
-    recentReviews,
+    recentReviews: recentReviewsFormatted,
 
     expenseSummary: {
   totalSpent,
