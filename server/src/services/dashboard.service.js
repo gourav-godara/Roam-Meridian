@@ -33,12 +33,51 @@ const recentReviews = await Review.find({
   .sort({ createdAt: -1 })
   .limit(5);
   const expenses = await Expense.find({
-  paidBy: userId,
-});
+  $or: [
+    { paidBy: userId },
+    { participants: userId },
+  ],
+})
+  .populate("paidBy", "name")
+  .populate("participants", "name");
 const totalSpent = expenses.reduce(
   (sum, expense) => sum + expense.amount,
   0
 );
+let youOwe = 0;
+let youAreOwed = 0;
+
+expenses.forEach((expense) => {
+  if (expense.status === "Settled") return;
+
+  const participants = expense.participants || [];
+
+  if (participants.length === 0) return;
+
+  const share = expense.amount / participants.length;
+
+  const paidByMe =
+    expense.paidBy._id.toString() === userId.toString();
+
+  if (paidByMe) {
+    // Others owe me
+    participants.forEach((participant) => {
+      if (participant._id.toString() !== userId.toString()) {
+        youAreOwed += share;
+      }
+    });
+  } else {
+    // I owe the payer
+    const iAmParticipant = participants.some(
+      (participant) =>
+        participant._id.toString() === userId.toString()
+    );
+
+    if (iAmParticipant) {
+      youOwe += share;
+    }
+  }
+});
 const user = await User.findById(userId);
 const destinations = await Destination.find().limit(4);
 const upcomingTripData = upcomingTrips[0]
@@ -203,8 +242,8 @@ travelTip: {
 
     expenseSummary: {
   totalSpent,
-  youOwe: 0,
-  youAreOwed: 0,
+  youOwe: Number(youOwe.toFixed(2)),
+  youAreOwed: Number(youAreOwed.toFixed(2)),
   recentExpenses: expenses.slice(0, 5),
 },
     travelHistory: completedTrips,

@@ -42,7 +42,7 @@ app.use("/api/expenses", expenseRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/weather", weatherRoutes);
-
+app.use("/api/users", userRoutes);
 app.use("/api/maps", mapsRoutes);
 // Export App
 app.get("/", (req, res) => {

@@ -2,11 +2,14 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "User API Working",
-  });
-});
+const auth = require("../middleware/auth.middleware");
+
+const userController = require("../controllers/user.controller");
+
+router.get(
+  "/search",
+  auth,
+  userController.searchUsers
+);
 
 module.exports = router;

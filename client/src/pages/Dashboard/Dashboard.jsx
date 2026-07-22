@@ -11,7 +11,7 @@ import RecentBookings from "../../components/dashboard/RecentBookings";
 import RecommendationCard from "../../components/dashboard/RecommendationCard";
 import TravelMap from "../../components/dashboard/TravelMap";
 import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
-
+import ExpenseCard from "../../components/dashboard/ExpenseCard";
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
@@ -24,7 +24,8 @@ function Dashboard() {
     mapPins,
     activityTimeline,
     travelTip,
-    loading
+    loading,
+    expenseSummary,
   } = useDashboard();
   if (loading) {
   return <div>Loading...</div>;
@@ -76,6 +77,7 @@ function Dashboard() {
           transition={{ duration: 0.3 }}
         >
           <StatsGrid stats={stats} />
+          <ExpenseCard summary={expenseSummary}/>
         </motion.div>
 
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
