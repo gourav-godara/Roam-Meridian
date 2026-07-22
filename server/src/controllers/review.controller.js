@@ -1,12 +1,45 @@
 const reviewService = require("../services/review.service");
 const Review = require("../models/review.model");
+const Trip = require("../models/trip.model");
+
 // Create Review
 const createReview = async (req, res, next) => {
   try {
+    const { itinerary } = req.body;
+
+    const trip = await Trip.findById(itinerary);
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found.",
+      });
+    }
+
+    const isCreator = trip.createdBy.toString() === req.user.id;
+    const isCollaborator = trip.collaborators.some(
+      (collaboratorId) => collaboratorId.toString() === req.user.id
+    );
+
+    if (!isCreator && !isCollaborator) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only review trips you were part of.",
+      });
+    }
+
+    if (trip.status !== "completed") {
+      return res.status(400).json({
+        success: false,
+        message: "You can only review a trip after it is completed.",
+      });
+    }
+
     const review = await reviewService.createReview({
-  ...req.body,
-  user: req.user.id,
-});
+      ...req.body,
+      user: req.user.id,
+      destination: trip.destinationId,
+    });
 
     res.status(201).json({
       success: true,
