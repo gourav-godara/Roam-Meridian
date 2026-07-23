@@ -50,18 +50,40 @@ function Explore() {
         const response = await getAllDestinations();
 
         const mappedDestinations = (response.data || []).map((destination) => ({
-          id: destination._id,
-          name: destination.name,
-          location: [destination.city, destination.state, destination.country]
-            .filter(Boolean)
-            .join(", "),
-          category: destination.category,
-          rating: destination.rating?.average ?? 0,
-          reviews: destination.rating?.count ?? 0,
-          price: destination.budget?.min ?? 0,
-          image: destination.images?.[0] || "",
-          isFavorite: false,
-        }));
+  id: destination._id,
+
+  name: destination.name,
+
+  location: [
+    destination.city,
+    destination.state,
+    destination.country,
+  ]
+    .filter(Boolean)
+    .join(", "),
+
+  category: destination.category,
+
+  description: destination.description,
+
+  duration: destination.duration,
+
+  bestTime: destination.bestTime,
+
+  rating: destination.rating?.average ?? 0,
+
+  reviews: destination.rating?.count ?? 0,
+
+  price: destination.budget?.min ?? 0,
+
+  maxPrice: destination.budget?.max ?? 0,
+
+  image: destination.images?.[0] || "",
+
+  images: destination.images || [],
+
+  isFavorite: false,
+}));
 
         setDestinations(mappedDestinations);
       } catch (error) {

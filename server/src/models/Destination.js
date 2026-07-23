@@ -46,9 +46,20 @@ category: {
   type: String,
   required: true,
   enum: {
-    values: ["Beach", "Mountains", "Heritage", "Adventure"],
-    message: "{VALUE} is not a valid category",
-},  
+  values: [
+    "Beach",
+    "Mountains",
+    "Heritage",
+    "Adventure",
+    "Nature",
+    "Wildlife",
+    "City",
+    "Spiritual",
+    "Snow",
+    "Food",
+  ],
+  message: "{VALUE} is not a valid category",
+},
 },
 
 images: [
