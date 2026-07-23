@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-
 import useReview from "../../hooks/useReview";
 
 import ReviewStats from "../../components/review/ReviewStats";
@@ -16,33 +15,22 @@ const ReviewPage = () => {
   const filteredReviews = useMemo(() => {
     let filtered = [...reviews];
 
-    // Search
     if (search) {
       filtered = filtered.filter((review) =>
-        review.destination?.name
-          ?.toLowerCase()
-          .includes(search.toLowerCase())
+        review.destination?.name?.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
-    // Rating
     if (rating) {
-      filtered = filtered.filter(
-        (review) => review.rating >= Number(rating)
-      );
+      filtered = filtered.filter((review) => review.rating >= Number(rating));
     }
 
-    // Sort
     if (sortBy === "highest") {
       filtered.sort((a, b) => b.rating - a.rating);
     } else if (sortBy === "lowest") {
       filtered.sort((a, b) => a.rating - b.rating);
     } else {
-      filtered.sort(
-        (a, b) =>
-          new Date(b.createdAt) -
-          new Date(a.createdAt)
-      );
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     return filtered;
@@ -50,31 +38,31 @@ const ReviewPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen text-xl">
-        Loading Reviews...
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-forest/20 border-t-forest rounded-full animate-spin" />
+          <p className="text-sm text-muted">Loading reviews...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        {error}
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8]">
+        <p className="text-red-600 text-sm">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-8 py-10">
-
-      <div className="max-w-7xl mx-auto">
-
+    <div className="min-h-screen bg-[#FAFAF8] pt-28 sm:pt-32 pb-16">
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold">
+          <h1 className="font-display text-3xl sm:text-4xl text-ink">
             My Reviews
           </h1>
-
-          <p className="text-gray-500 mt-2">
+          <p className="text-muted mt-2">
             Manage and explore your travel experiences.
           </p>
         </div>
@@ -90,10 +78,11 @@ const ReviewPage = () => {
           setSortBy={setSortBy}
         />
 
-        <ReviewList reviews={filteredReviews} />
-
+        <ReviewList
+          reviews={filteredReviews}
+          onWriteReview={() => alert("Review form coming soon!")}
+        />
       </div>
-
     </div>
   );
 };

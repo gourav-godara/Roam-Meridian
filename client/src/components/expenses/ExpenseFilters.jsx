@@ -1,4 +1,4 @@
-import { FaSearch, FaPlus } from "react-icons/fa";
+import { FiSearch, FiPlus, FiChevronDown } from "react-icons/fi";
 
 const ExpenseFilters = ({
   onAddExpense,
@@ -10,77 +10,66 @@ const ExpenseFilters = ({
   setStatus,
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow border border-gray-100 p-5">
-
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-
-        {/* Search */}
+    <div className="bg-white rounded-2xl border border-border p-4">
+      <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
         <div className="relative w-full lg:w-1/3">
-
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-
+          <FiSearch
+            size={16}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          />
           <input
-  type="text"
-  placeholder="Search expenses..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
-/>
-
+            type="text"
+            placeholder="Search expenses..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-forest/40 transition-colors"
+          />
         </div>
 
-        {/* Category Filter */}
-        <select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
-  className="w-full lg:w-52 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
->
-          <option value="All">All Categories</option>
-          <option value="Accommodation">Accommodation</option>
-<option value="Transport">Transport</option>
-<option value="Food">Food</option>
-<option value="Shopping">Shopping</option>
-<option value="Activities">Activities</option>
-<option value="Other">Other</option>
-        </select>
+        <div className="relative w-full lg:w-52">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-forest/40 transition-colors bg-white"
+          >
+            <option value="All">All Categories</option>
+            <option value="Accommodation">Accommodation</option>
+            <option value="Transport">Transport</option>
+            <option value="Food">Food</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Activities">Activities</option>
+            <option value="Other">Other</option>
+          </select>
+          <FiChevronDown
+            size={14}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
+        </div>
 
-        {/* Status Filter */}
-        <select
-  value={status}
-  onChange={(e) => setStatus(e.target.value)}
-  className="w-full lg:w-44 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
->
-          <option value="All">All Status</option>
-<option value="Pending">Pending</option>
-<option value="Settled">Settled</option>
-        </select>
+        <div className="relative w-full lg:w-44">
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-forest/40 transition-colors bg-white"
+          >
+            <option value="All">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Settled">Settled</option>
+          </select>
+          <FiChevronDown
+            size={14}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
+        </div>
 
-        {/* Add Expense Button */}
-        <button onClick={onAddExpense}
-          className="
-            w-full
-            lg:w-auto
-            flex
-            items-center
-            justify-center
-            gap-2
-            bg-teal-600
-            hover:bg-teal-700
-            text-white
-            px-6
-            py-3
-            rounded-xl
-            font-semibold
-            transition
-          "
+        <button
+          onClick={onAddExpense}
+          className="w-full lg:w-auto flex items-center justify-center gap-2 bg-forest hover:bg-forest-dark text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shrink-0"
         >
-          <FaPlus />
-
+          <FiPlus size={16} />
           Add Expense
         </button>
-
       </div>
-
     </div>
   );
 };
