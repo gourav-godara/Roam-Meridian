@@ -12,8 +12,11 @@ import MapCard from "../../components/destination/MapCard";
 import NearbyRestaurants from "../../components/destination/NearbyRestaurants";
 import RecommendedHotels from "../../components/destination/RecommendedHotels";
 import ResultGrid from "../../components/destination/ResultGrid";
+import UserReviews from "../../components/destination/UserReviews";
 
 import { getDestinationById } from "../../services/destinationApi";
+import { getReviews } from "../../services/reviewApi";
+import useTrips from "../../hooks/useTrips";
 
 import {
   getNearbyPlaces,
@@ -37,6 +40,9 @@ function Destination() {
   const [attractionPlaces, setAttractionPlaces] = useState([]);
   const [thingsToDoPlaces, setThingsToDoPlaces] = useState([]);
 
+  const [reviews, setReviews] = useState([]);
+  const { trips } = useTrips();
+
   useEffect(() => {
     const fetchDestination = async () => {
       try {
@@ -57,6 +63,34 @@ function Destination() {
     };
 
     fetchDestination();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await getReviews(id);
+
+        const mapped = (response.data || []).map((review) => ({
+          id: review._id,
+          name: review.user?.name || "Traveler",
+          avatar:
+            review.user?.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              review.user?.name || "T"
+            )}`,
+          date: new Date(review.createdAt).toLocaleDateString(),
+          rating: review.rating,
+          text: review.reviewText,
+        }));
+
+        setReviews(mapped);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+        setReviews([]);
+      }
+    };
+
+    fetchReviews();
   }, [id]);
 
   useEffect(() => {
@@ -189,6 +223,12 @@ function Destination() {
     .filter(Boolean)
     .join(", ");
 
+  const isWishlisted = trips.some(
+    (trip) =>
+      trip.status === "wishlist" &&
+      (trip.destinationId?._id || trip.destinationId) === destination._id
+  );
+
   const info = {
     bestTime: destination.bestTime || "Not available",
     idealFor: destination.category,
@@ -226,6 +266,8 @@ function Destination() {
 
             <ActionButtons
               destinationId={destination._id}
+              destinationName={destination.name}
+              initialWishlisted={isWishlisted}
             />
 
           </div>
@@ -261,6 +303,8 @@ function Destination() {
               items={hotelPlaces}
               onPlaceRoute={handlePlaceRoute}
             />
+
+            <UserReviews items={reviews} />
 
           </div>
 
