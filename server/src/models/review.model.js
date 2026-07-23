@@ -13,13 +13,13 @@ const reviewSchema = new mongoose.Schema(
     destination: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Destination",
+      required: true,
     },
 
-    // Itinerary from which the review was created
-    // (Will connect once Planner module is completed)
+    // Trip from which the review was created
     itinerary: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Planner",
+      ref: "Trip",
       required: true,
     },
 
@@ -58,6 +58,16 @@ likes: {
   
   {
     timestamps: true,
+  }
+);
+
+reviewSchema.index(
+  {
+    user: 1,
+    itinerary: 1,
+  },
+  {
+    unique: true,
   }
 );
 

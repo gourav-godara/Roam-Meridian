@@ -33,12 +33,51 @@ const recentReviews = await Review.find({
   .sort({ createdAt: -1 })
   .limit(5);
   const expenses = await Expense.find({
-  paidBy: userId,
-});
+  $or: [
+    { paidBy: userId },
+    { participants: userId },
+  ],
+})
+  .populate("paidBy", "name")
+  .populate("participants", "name");
 const totalSpent = expenses.reduce(
   (sum, expense) => sum + expense.amount,
   0
 );
+let youOwe = 0;
+let youAreOwed = 0;
+
+expenses.forEach((expense) => {
+  if (expense.status === "Settled") return;
+
+  const participants = expense.participants || [];
+
+  if (participants.length === 0) return;
+
+  const share = expense.amount / participants.length;
+
+  const paidByMe =
+    expense.paidBy._id.toString() === userId.toString();
+
+  if (paidByMe) {
+    // Others owe me
+    participants.forEach((participant) => {
+      if (participant._id.toString() !== userId.toString()) {
+        youAreOwed += share;
+      }
+    });
+  } else {
+    // I owe the payer
+    const iAmParticipant = participants.some(
+      (participant) =>
+        participant._id.toString() === userId.toString()
+    );
+
+    if (iAmParticipant) {
+      youOwe += share;
+    }
+  }
+});
 const user = await User.findById(userId);
 const destinations = await Destination.find().limit(4);
 const upcomingTripData = upcomingTrips[0]
@@ -148,6 +187,20 @@ const mapPins = trips.map((trip, index) => ({
   left: positions[index % positions.length].left,
   type: trip.status === "completed" ? "visited" : "wishlist",
 }));
+
+// Shaped for the dashboard's ReviewCard component
+const recentReviewsFormatted = recentReviews.map((review) => ({
+  id: review._id,
+  destination: review.destination?.name || "Destination",
+  image:
+    review.images?.[0] ||
+    review.destination?.images?.[0] ||
+    "https://placehold.co/100x100",
+  rating: review.rating,
+  review: review.reviewText,
+  createdAt: new Date(review.createdAt).toLocaleDateString(),
+}));
+
   return { // Returns a massive object full of data arrays.
     user: {
   name: user.name,
@@ -199,12 +252,12 @@ activityTimeline,
 travelTip: {
   text: "Visit popular attractions early in the morning to avoid crowds.",
   },
-    recentReviews,
+    recentReviews: recentReviewsFormatted,
 
     expenseSummary: {
   totalSpent,
-  youOwe: 0,
-  youAreOwed: 0,
+  youOwe: Number(youOwe.toFixed(2)),
+  youAreOwed: Number(youAreOwed.toFixed(2)),
   recentExpenses: expenses.slice(0, 5),
 },
     travelHistory: completedTrips,

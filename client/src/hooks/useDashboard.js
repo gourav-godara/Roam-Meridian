@@ -12,7 +12,9 @@ function useDashboard() {
   const [activityTimeline, setActivityTimeline] = useState([]);
   const [travelTip, setTravelTip] = useState({});
   const [loading, setLoading] = useState(true);
-
+  const [expenseSummary, setExpenseSummary] = useState({});
+  const [travelHistory, setTravelHistory] = useState([]);
+  const [recentReviews, setRecentReviews] = useState([]);
   useEffect(() => {
      console.log("Dashboard useEffect running");
     const fetchDashboard = async () => {
@@ -31,6 +33,9 @@ setRecommendations(data.recommendations || []);
 setMapPins(data.mapPins || []);
 setActivityTimeline(data.activityTimeline || []);
 setTravelTip(data.travelTip || {});
+setExpenseSummary(data.expenseSummary || {});
+setTravelHistory(data.travelHistory || []);
+setRecentReviews(data.recentReviews || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -52,6 +57,9 @@ setTravelTip(data.travelTip || {});
     activityTimeline,
     travelTip,
     loading,
+    expenseSummary,
+    travelHistory,
+    recentReviews,
   };
 }
 

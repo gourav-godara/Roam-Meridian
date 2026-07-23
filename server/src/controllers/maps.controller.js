@@ -58,7 +58,7 @@ const reverseGeocode = async (latitude, longitude) => {
 
 const getLocation = async (req, res) => {
     try {
-        const { city } = req.query;
+        const { city, state, country } = req.query;
 
         if (!city) {
             return res.status(400).json({
@@ -67,7 +67,7 @@ const getLocation = async (req, res) => {
             });
         }
 
-        const location = await fetchLocation(city);
+        const location = await fetchLocation(city, state, country);
 
         return res.status(200).json({
             success: true,
@@ -77,7 +77,7 @@ const getLocation = async (req, res) => {
     } catch (error) {
         console.error(error.response?.data || error.message || error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Failed to fetch location",
         });

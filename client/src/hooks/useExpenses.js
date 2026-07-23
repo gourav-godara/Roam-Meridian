@@ -15,9 +15,7 @@ const useExpenses = () => {
       setExpenses(result.data);
       setError("");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Unable to load expenses."
-      );
+      setError(err.response?.data?.message || "Unable to load expenses.");
     } finally {
       setLoading(false);
     }
@@ -36,9 +34,7 @@ const useExpenses = () => {
         }
       } catch (err) {
         if (!ignore) {
-          setError(
-            err.response?.data?.message || "Unable to load expenses."
-          );
+          setError(err.response?.data?.message || "Unable to load expenses.");
         }
       } finally {
         if (!ignore) {

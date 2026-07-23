@@ -1,9 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/trips`,
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
+// Attach JWT token to every request
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -14,7 +16,10 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+// Get all trips for the logged-in user
 export const getTrips = async () => {
-  const res = await API.get("/");
-  return res.data.data;
+  const { data } = await API.get("/trips");
+  return data;
 };
+
+export default API;

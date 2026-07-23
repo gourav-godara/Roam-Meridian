@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const expenseSchema = new mongoose.Schema(
   {
-    // Trip/Itinerary to which this expense belongs
+    // Trip to which this expense belongs
     itinerary: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Planner",
+      ref: "Trip",
       required: true,
     },
 

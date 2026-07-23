@@ -6,10 +6,7 @@ export function calculateSettlements(expenses) {
 
     const participants = expense.participants || [];
 
-    if (
-      !expense.paidBy ||
-      participants.length === 0
-    ) {
+    if (!expense.paidBy || participants.length === 0) {
       return;
     }
 
