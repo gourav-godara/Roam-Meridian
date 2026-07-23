@@ -14,9 +14,11 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Get all reviews
-export const getReviews = async () => {
-  const { data } = await API.get("/reviews");
+// Get all reviews (optionally filtered by destination)
+export const getReviews = async (destinationId) => {
+  const { data } = await API.get("/reviews", {
+    params: destinationId ? { destinationId } : {},
+  });
   return data;
 };
 

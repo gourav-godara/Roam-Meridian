@@ -22,4 +22,16 @@ export const getTrips = async () => {
   return data;
 };
 
+// Create a full trip
+export const createTrip = async (tripData) => {
+  const { data } = await API.post("/trips", tripData);
+  return data;
+};
+
+// Add a destination to the wishlist (creates a minimal placeholder Trip)
+export const addToWishlist = async (destinationId) => {
+  const { data } = await API.post("/trips/wishlist", { destinationId });
+  return data;
+};
+
 export default API;

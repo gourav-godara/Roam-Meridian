@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PlannerHeader from "../../components/planner/PlannerHeader";
 import SuggestionChips from "../../components/planner/SuggestionChips";
 import ChatWindow from "../../components/planner/ChatWindow";
@@ -17,8 +18,17 @@ const DEFAULT_TRIP_PARAMS = {
 };
 
 function AIPlanner() {
+  const [searchParams] = useSearchParams();
+
+  const destinationIdFromUrl = searchParams.get("destinationId");
+  const destinationNameFromUrl = searchParams.get("destinationName");
+
   const [draft, setDraft] = useState("");
-  const [tripParams, setTripParams] = useState(DEFAULT_TRIP_PARAMS);
+  const [tripParams, setTripParams] = useState({
+    ...DEFAULT_TRIP_PARAMS,
+    destination: destinationNameFromUrl || DEFAULT_TRIP_PARAMS.destination,
+    destinationId: destinationIdFromUrl || null,
+  });
 
   const {
     messages,

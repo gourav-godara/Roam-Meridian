@@ -4,7 +4,13 @@ function UserReviews({ items }) {
   return (
     <div className="mt-10">
       <h3 className="text-base font-semibold text-ink mb-4">User Reviews</h3>
-      <div className="grid sm:grid-cols-2 gap-4">
+
+      {items.length === 0 ? (
+        <p className="text-sm text-gray-500">
+          No reviews yet — be the first to share your experience.
+        </p>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-4">
         {items.map((r) => (
           <div key={r.id} className="bg-white rounded-2xl border border-border p-4">
             <div className="flex items-center gap-3">
@@ -21,7 +27,8 @@ function UserReviews({ items }) {
             <p className="text-sm text-ink leading-relaxed mt-3">{r.text}</p>
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
