@@ -1,24 +1,15 @@
 import ReviewCard from "./ReviewCard";
 import EmptyReview from "./EmptyReview";
 
-const ReviewList = ({
-  reviews,
-  onEdit,
-  onDelete,
-}) => {
+const ReviewList = ({ reviews, onWriteReview }) => {
   if (!reviews || reviews.length === 0) {
-    return <EmptyReview />;
+    return <EmptyReview onWriteReview={onWriteReview} />;
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-4">
       {reviews.map((review) => (
-        <ReviewCard
-          key={review._id}
-          review={review}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <ReviewCard key={review._id} review={review} />
       ))}
     </div>
   );
