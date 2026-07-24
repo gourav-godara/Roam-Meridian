@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../controllers/planner.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
-router.use(authMiddleware);
+router.use(authMiddleware);  
 
 // Conversational flow (new)
 router.post("/message", controller.sendMessage);

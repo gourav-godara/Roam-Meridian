@@ -56,19 +56,19 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
     if (navigator.share) {
       await navigator.share({
         title: destinationName,
-        text: `Check out ${destinationName}!`,
+        text: `Check out this amazing destination on Roam Meridian!`,
         url,
       });
     } else {
       await navigator.clipboard.writeText(url);
-      alert("Destination link copied to clipboard!");
+      alert("Link copied successfully!");
     }
   } catch (error) {
     console.log(error);
   }
 };
   return (
-    <div className="grid grid-cols-3 gap-4 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
       <button
         type="button"
         onClick={handleWishlist}
