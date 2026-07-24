@@ -6,6 +6,8 @@ import Destination from "../pages/Destination/Destination";
 import AIPlanner from "../pages/AIPlanner/AIPlanner";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Itineraries from "../pages/Itineraries/Itineraries";
+import CreateTrip from "../pages/CreateTrip/CreateTrip";
+import TripDetail from "../pages/TripDetail/TripDetail";
 import Blogs from "../pages/Blogs/Blogs";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
@@ -44,7 +46,9 @@ function AppRouter() {
           <Route element={<ProtectedRoute />}> 
           <Route path="/planner" element={<AIPlanner />} /> 
           <Route path="/dashboard" element={<Dashboard />} /> 
-          <Route path="/itineraries" element={<Itineraries />} /> 
+          <Route path="/itineraries" element={<Itineraries />} />
+          <Route path="/create-trip" element={<CreateTrip />} /> 
+          <Route path="/itineraries/:id" element={<TripDetail />} />
           <Route path="/profile" element={<Profile />} /> 
           </Route>
         </Route>

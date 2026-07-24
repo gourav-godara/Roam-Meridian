@@ -4,6 +4,7 @@ export const ROUTES = {
   DESTINATION: "/destination/:id",
   PLANNER: "/planner",
   DASHBOARD: "/dashboard",
+  TRIP_DETAIL: "/itineraries/:id",
   ITINERARIES: "/itineraries",
   BLOGS: "/blogs",
   ABOUT: "/about",

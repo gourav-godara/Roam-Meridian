@@ -3,7 +3,10 @@ const Trip = require("../models/trip.model");
 const getAllTrips = async (req, res) => {
     try {
         const trips = await Trip.find({
-            createdBy: req.user.id,
+            $or: [
+                { createdBy: req.user.id },
+                { collaborators: req.user.id },
+            ],
         })
         .populate("destinationId", "name city country")
         .populate("createdBy", "name email")
@@ -141,8 +144,12 @@ const getTripById = async (req, res) => {
     try {
         const trip = await Trip.findOne({
             _id: id,
-            createdBy: req.user.id,
+            $or: [
+                { createdBy: req.user.id },
+                { collaborators: req.user.id },
+            ],
         })
+            .populate("destinationId", "name city country")
             .populate("createdBy", "name email")
             .populate("collaborators", "name email");
 

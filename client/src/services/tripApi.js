@@ -16,7 +16,6 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Get all trips for the logged-in user
 export const getTrips = async () => {
   const { data } = await API.get("/trips");
   return data;
