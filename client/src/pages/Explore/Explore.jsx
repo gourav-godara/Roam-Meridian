@@ -5,6 +5,8 @@ import MobileFilterDrawer from "../../components/explore/MobileFilterDrawer";
 import DestinationGrid from "../../components/explore/DestinationGrid";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getAllDestinations } from "../../services/destinationApi";
+import { addToWishlist } from "../../services/tripApi";
+import useTrips from "../../hooks/useTrips";
 
 const DEFAULT_FILTERS = {
   categories: ["All"],
@@ -12,82 +14,108 @@ const DEFAULT_FILTERS = {
   rating: 0,
 };
 
-function sortDestinations(list, sort) {
-  const sorted = [...list];
-
-  switch (sort) {
-    case "Highest Rated":
-      return sorted.sort((a, b) => b.rating - a.rating);
-
-    case "Lowest Price":
-      return sorted.sort((a, b) => a.price - b.price);
-
-    case "Highest Price":
-      return sorted.sort((a, b) => b.price - a.price);
-
-    case "Most Popular":
-      return sorted.sort((a, b) => b.reviews - a.reviews);
-
-    default:
-      return sorted;
-  }
-}
-
 function Explore() {
   const [destinations, setDestinations] = useState([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("Recommended");
+
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
+
   const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [loading, setLoading] = useState(true);
+
+  const [savingId, setSavingId] = useState(null);
+
+  const [page, setPage] = useState(1);
+
+  const [totalPages, setTotalPages] = useState(1);
 
   const debouncedQuery = useDebounce(query, 300);
 
+  const { trips, refreshTrips } = useTrips();
+
+  const wishlistedIds = useMemo(() => {
+    return new Set(
+      trips
+        .filter((trip) => trip.status === "wishlist")
+        .map((trip) => trip.destinationId?._id || trip.destinationId)
+    );
+  }, [trips]);
+
   useEffect(() => {
     const fetchDestinations = async () => {
+      setLoading(true);
+
       try {
-        const response = await getAllDestinations();
+        const response = await getAllDestinations({
+          page,
+          limit: 12,
+          search: debouncedQuery,
 
-        const mappedDestinations = (response.data || []).map((destination) => ({
-  id: destination._id,
+          category:
+            appliedFilters.categories.includes("All")
+              ? ""
+              : appliedFilters.categories[0],
 
-  name: destination.name,
+          minBudget: appliedFilters.budget[0],
+          maxBudget: appliedFilters.budget[1],
 
-  location: [
-    destination.city,
-    destination.state,
-    destination.country,
-  ]
-    .filter(Boolean)
-    .join(", "),
+          rating: appliedFilters.rating,
 
-  category: destination.category,
+          sort:
+            sort === "Highest Rated"
+              ? "rating"
+              : sort === "Lowest Price"
+              ? "budget"
+              : sort === "Newest"
+              ? "newest"
+              : sort === "A-Z"
+              ? "name"
+              : "",
+        });
 
-  description: destination.description,
+        const mapped = response.data.map((destination) => ({
+          id: destination._id,
 
-  duration: destination.duration,
+          name: destination.name,
 
-  bestTime: destination.bestTime,
+          location: [
+            destination.city,
+            destination.state,
+            destination.country,
+          ]
+            .filter(Boolean)
+            .join(", "),
 
-  rating: destination.rating?.average ?? 0,
+          category: destination.category,
 
-  reviews: destination.rating?.count ?? 0,
+          description: destination.description,
 
-  price: destination.budget?.min ?? 0,
+          duration: destination.duration,
 
-  maxPrice: destination.budget?.max ?? 0,
+          bestTime: destination.bestTime,
 
-  image: destination.images?.[0] || "",
+          rating: destination.rating?.average ?? 0,
 
-  images: destination.images || [],
+          reviews: destination.rating?.count ?? 0,
 
-  isFavorite: false,
-}));
+          price: destination.budget?.min ?? 0,
 
-        setDestinations(mappedDestinations);
+          maxPrice: destination.budget?.max ?? 0,
+
+          image: destination.images?.[0] || "",
+
+          images: destination.images || [],
+        }));
+
+        setDestinations(mapped);
+
+        setTotalPages(response.totalPages || 1);
       } catch (error) {
         console.error("Failed to fetch destinations:", error);
+
         setDestinations([]);
       } finally {
         setLoading(false);
@@ -95,57 +123,45 @@ function Explore() {
     };
 
     fetchDestinations();
-  }, []);
+  }, [page, debouncedQuery, appliedFilters, sort]);
 
-  const toggleFavorite = (id) => {
-    setDestinations((prev) =>
-      prev.map((destination) =>
-        destination.id === id
-          ? {
-              ...destination,
-              isFavorite: !destination.isFavorite,
-            }
-          : destination
-      )
-    );
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedQuery, appliedFilters, sort]);
+
+  const toggleFavorite = async (id) => {
+    if (wishlistedIds.has(id) || savingId === id) return;
+
+    try {
+      setSavingId(id);
+
+      await addToWishlist(id);
+
+      await refreshTrips();
+    } catch (error) {
+      if (error.response?.status === 409) {
+        await refreshTrips();
+      } else {
+        alert(
+          error.response?.data?.message ||
+            "Unable to add this destination to your wishlist."
+        );
+      }
+    } finally {
+      setSavingId(null);
+    }
   };
 
+  const destinationsWithFavorite = useMemo(() => {
+    return destinations.map((destination) => ({
+      ...destination,
+      isFavorite: wishlistedIds.has(destination.id),
+    }));
+  }, [destinations, wishlistedIds]);
+
   const filtered = useMemo(() => {
-    let result = destinations;
-
-    if (debouncedQuery.trim()) {
-      const q = debouncedQuery.trim().toLowerCase();
-
-      result = result.filter(
-        (destination) =>
-          destination.name.toLowerCase().includes(q) ||
-          destination.location.toLowerCase().includes(q)
-      );
-    }
-
-    if (!appliedFilters.categories.includes("All")) {
-      result = result.filter((destination) =>
-        appliedFilters.categories.some(
-          (category) =>
-            category.toLowerCase() === destination.category.toLowerCase()
-        )
-      );
-    }
-
-    result = result.filter(
-      (destination) =>
-        destination.price >= appliedFilters.budget[0] &&
-        destination.price <= appliedFilters.budget[1]
-    );
-
-    if (appliedFilters.rating > 0) {
-      result = result.filter(
-        (destination) => destination.rating >= appliedFilters.rating
-      );
-    }
-
-    return sortDestinations(result, sort);
-  }, [destinations, debouncedQuery, appliedFilters, sort]);
+    return destinationsWithFavorite;
+  }, [destinationsWithFavorite]);
 
   const handleApply = () => {
     setAppliedFilters(filters);
@@ -184,12 +200,40 @@ function Explore() {
                   } found`}
             </p>
 
-            {!loading && (
+            {!loading && filtered.length === 0 && (
+              <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-500">
+                No destinations match your filters.
+              </div>
+            )}
+
+            {!loading && filtered.length > 0 && (
               <DestinationGrid
                 destinations={filtered}
                 onToggleFavorite={toggleFavorite}
               />
             )}
+
+            <div className="flex justify-center items-center gap-4 mt-10">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((prev) => prev - 1)}
+                className="px-4 py-2 rounded-lg bg-gray-200 disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              <span className="font-medium">
+                Page {page} of {totalPages}
+              </span>
+
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((prev) => prev + 1)}
+                className="px-4 py-2 rounded-lg bg-green-700 text-white disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>

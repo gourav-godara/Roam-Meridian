@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import Button from "../common/Button";
 import { addToWishlist } from "../../services/tripApi";
-
+import { FiShare2 } from "react-icons/fi";
 function ActionButtons({ destinationId, destinationName, initialWishlisted = false }) {
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [saving, setSaving] = useState(false);
@@ -49,9 +49,26 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
 
     navigate(`/planner?${params.toString()}`);
   };
+  const handleShare = async () => {
+  const url = window.location.href;
 
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: destinationName,
+        text: `Check out ${destinationName}!`,
+        url,
+      });
+    } else {
+      await navigator.clipboard.writeText(url);
+      alert("Destination link copied to clipboard!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
   return (
-    <div className="grid grid-cols-2 gap-4 mt-6">
+    <div className="grid grid-cols-3 gap-4 mt-6">
       <button
         type="button"
         onClick={handleWishlist}
@@ -66,7 +83,14 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
         )}
         {wishlisted ? "Wishlisted" : "Add to Wishlist"}
       </button>
-
+        <button
+  type="button"
+  onClick={handleShare}
+  className="flex items-center justify-center gap-2 border rounded-2xl py-3.5 text-sm font-semibold hover:bg-gray-100 transition"
+>
+  <FiShare2 size={17} />
+  Share
+</button>
       <Button
         variant="primary"
         onClick={handlePlanWithAI}
