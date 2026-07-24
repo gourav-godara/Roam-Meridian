@@ -21,6 +21,7 @@ export const getTrips = async () => {
   return data;
 };
 
+<<<<<<< HEAD
 export const getTripById = async (id) => {
   const { data } = await API.get(`/trips/${id}`);
   return data;
@@ -38,6 +39,17 @@ export const updateTrip = async (id, updates) => {
 
 export const deleteTrip = async (id) => {
   const { data } = await API.delete(`/trips/${id}`);
+=======
+// Create a full trip
+export const createTrip = async (tripData) => {
+  const { data } = await API.post("/trips", tripData);
+  return data;
+};
+
+// Add a destination to the wishlist (creates a minimal placeholder Trip)
+export const addToWishlist = async (destinationId) => {
+  const { data } = await API.post("/trips/wishlist", { destinationId });
+>>>>>>> 1af1e5bc55167d6043f4af6718b432fcdc2c51fc
   return data;
 };
 

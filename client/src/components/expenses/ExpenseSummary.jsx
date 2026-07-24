@@ -1,58 +1,33 @@
+import { FiDollarSign, FiCreditCard, FiUpload, FiUsers } from "react-icons/fi";
+
 const ExpenseSummary = ({
-  summary = {
-    totalExpenses: 0,
-    youPaid: 0,
-    youOwe: 0,
-    settlements: 0,
-  },
+  summary = { totalExpenses: 0, youPaid: 0, youOwe: 0, settlements: 0 },
 }) => {
   const cards = [
     {
       title: "Total Expenses",
       value: `₹${summary.totalExpenses}`,
-      color: "bg-blue-500",
-      icon: "💰",
+      icon: FiDollarSign,
     },
-    {
-      title: "You Paid",
-      value: `₹${summary.youPaid}`,
-      color: "bg-green-500",
-      icon: "💳",
-    },
-    {
-      title: "You Owe",
-      value: `₹${summary.youOwe}`,
-      color: "bg-orange-500",
-      icon: "📤",
-    },
-    {
-      title: "Settlements",
-      value: summary.settlements,
-      color: "bg-purple-500",
-      icon: "🤝",
-    },
+    { title: "You Paid", value: `₹${summary.youPaid}`, icon: FiCreditCard },
+    { title: "You Owe", value: `₹${summary.youOwe}`, icon: FiUpload },
+    { title: "Settlements", value: summary.settlements, icon: FiUsers },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-      {cards.map((card) => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {cards.map(({ title, value, icon: Icon }) => (
         <div
-          key={card.title}
-          className="bg-white rounded-2xl shadow p-6 border border-gray-100"
+          key={title}
+          className="bg-white rounded-2xl border border-border p-5 hover:shadow-md transition-shadow"
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">{card.title}</p>
-
-              <h2 className="text-3xl font-bold mt-2">{card.value}</h2>
-            </div>
-
-            <div
-              className={`${card.color} w-14 h-14 rounded-xl flex items-center justify-center text-2xl`}
-            >
-              {card.icon}
-            </div>
+          <div className="w-11 h-11 rounded-xl bg-forest/10 flex items-center justify-center mb-4">
+            <Icon size={19} className="text-forest" />
           </div>
+          <p className="text-xs text-gray-500">{title}</p>
+          <h2 className="text-2xl font-semibold text-ink mt-1 font-display">
+            {value}
+          </h2>
         </div>
       ))}
     </div>

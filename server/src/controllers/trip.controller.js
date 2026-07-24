@@ -86,7 +86,58 @@ const createTrip = async (req, res) => {
     }
 }
 
+const addToWishlist = async (req, res) => {
+    const { destinationId } = req.body;
 
+    if (!destinationId) {
+        return res.status(400).json({
+            success: false,
+            message: "Destination ID is required.",
+        });
+    }
+
+    try {
+        // Check if destination is already in wishlist
+        const existingTrip = await Trip.findOne({
+            createdBy: req.user.id,
+            destinationId,
+            status: "wishlist",
+        });
+
+        if (existingTrip) {
+            return res.status(409).json({
+                success: false,
+                message: "Destination already exists in wishlist.",
+            });
+        }
+
+        // Create wishlist entry
+        const wishlistTrip = await Trip.create({
+            title: "Wishlist",
+            destinationId,
+            createdBy: req.user.id,
+            startDate: new Date(),
+            endDate: new Date(),
+            travelers: 1,
+            budget: 0,
+            status: "wishlist",
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Added to wishlist successfully.",
+            data: wishlistTrip,
+        });
+
+    } catch (error) {
+        console.error("Error adding to wishlist:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to add destination to wishlist.",
+        });
+    }
+};
 const getTripById = async (req, res) => {
     const { id } = req.params;
 
@@ -197,8 +248,13 @@ const deleteTrip = async (req, res) => {
 module.exports = {
     getAllTrips,
     createTrip,
+    addToWishlist,
     getTripById,
     updateTrip,
     deleteTrip,
+<<<<<<< HEAD
 
 };
+=======
+};
+>>>>>>> 1af1e5bc55167d6043f4af6718b432fcdc2c51fc

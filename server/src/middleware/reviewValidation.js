@@ -1,5 +1,11 @@
 const validateReview = (req, res, next) => {
-  const { rating, reviewText, itinerary } = req.body;
+  const {
+    rating,
+    reviewText,
+    itinerary,
+    destination,
+    destinationId,
+} = req.body;
 
   if (!rating) {
     return res.status(400).json({
@@ -22,12 +28,13 @@ const validateReview = (req, res, next) => {
     });
   }
 
-  if (!itinerary) {
-  return res.status(400).json({
-    success: false,
-    message: "Itinerary is required.",
-  });
-}
+  // Require either itinerary OR destination
+  if (!itinerary && !destination && !destinationId) {
+    return res.status(400).json({
+      success: false,
+      message: "Destination or itinerary is required.",
+    });
+  }
 
   next();
 };

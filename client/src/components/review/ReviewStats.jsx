@@ -1,78 +1,38 @@
-import {
-  FaStar,
-  FaRegCommentDots,
-  FaHeart,
-  FaCamera,
-} from "react-icons/fa";
+import { FiStar, FiMessageCircle, FiHeart, FiCamera } from "react-icons/fi";
 
 const ReviewStats = ({ reviews = [] }) => {
   const totalReviews = reviews.length;
 
   const averageRating =
     totalReviews > 0
-      ? (
-          reviews.reduce(
-            (sum, review) => sum + review.rating,
-            0
-          ) / totalReviews
-        ).toFixed(1)
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(
+          1,
+        )
       : "0.0";
 
-  const totalLikes = reviews.reduce(
-    (sum, review) => sum + (review.likes || 0),
-    0
-  );
-
-  const reviewsWithPhotos = reviews.filter(
-    (review) => review.images?.length > 0
-  ).length;
+  const totalLikes = reviews.reduce((sum, r) => sum + (r.likes || 0), 0);
+  const reviewsWithPhotos = reviews.filter((r) => r.images?.length > 0).length;
 
   const stats = [
-    {
-      title: "Average Rating",
-      value: averageRating,
-      icon: <FaStar />,
-      color: "bg-yellow-500",
-    },
-    {
-      title: "Total Reviews",
-      value: totalReviews,
-      icon: <FaRegCommentDots />,
-      color: "bg-blue-500",
-    },
-    {
-      title: "Total Likes",
-      value: totalLikes,
-      icon: <FaHeart />,
-      color: "bg-red-500",
-    },
-    {
-      title: "With Photos",
-      value: reviewsWithPhotos,
-      icon: <FaCamera />,
-      color: "bg-teal-500",
-    },
+    { title: "Average Rating", value: averageRating, icon: FiStar },
+    { title: "Total Reviews", value: totalReviews, icon: FiMessageCircle },
+    { title: "Total Likes", value: totalLikes, icon: FiHeart },
+    { title: "With Photos", value: reviewsWithPhotos, icon: FiCamera },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-      {stats.map((stat) => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {stats.map(({ title, value, icon: Icon }) => (
         <div
-          key={stat.title}
-          className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-6"
+          key={title}
+          className="bg-white rounded-2xl border border-border p-5 hover:shadow-md transition-shadow"
         >
-          <div
-            className={`${stat.color} w-14 h-14 rounded-xl flex items-center justify-center text-white text-2xl mb-5`}
-          >
-            {stat.icon}
+          <div className="w-11 h-11 rounded-xl bg-forest/10 flex items-center justify-center mb-4">
+            <Icon size={19} className="text-forest" />
           </div>
-
-          <p className="text-gray-500 text-sm">
-            {stat.title}
-          </p>
-
-          <h2 className="text-3xl font-bold mt-2 text-gray-800">
-            {stat.value}
+          <p className="text-xs text-gray-500">{title}</p>
+          <h2 className="text-2xl font-semibold text-ink mt-1 font-display">
+            {value}
           </h2>
         </div>
       ))}
