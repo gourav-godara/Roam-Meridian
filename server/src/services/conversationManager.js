@@ -39,9 +39,9 @@ function mergeTripContext(existing, aiTrip) {
 
   return {
     ...base,
-    destination: base.destination ?? aiTrip.destination,
-    duration: base.duration ?? aiTrip.days?.length,
-    budget: base.budget ?? aiTrip.budget,
+    destination: aiTrip.destination ?? base.destination,
+    duration: aiTrip.days?.length ?? base.duration,
+    budget: aiTrip.budget ?? base.budget,
     travelers: base.travelers,
     travelStyle: base.travelStyle,
   };

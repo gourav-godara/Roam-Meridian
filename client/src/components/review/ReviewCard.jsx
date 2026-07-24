@@ -1,132 +1,64 @@
-import {
-  FaStar,
-  FaRegStar,
-  FaEdit,
-  FaTrash,
-} from "react-icons/fa";
+import { FiStar, FiThumbsUp } from "react-icons/fi";
 import { motion } from "framer-motion";
 
-const ReviewCard = ({
-  review,
-  onEdit,
-  onDelete,
-}) => {
-  const currentUser = JSON.parse(
-    localStorage.getItem("user")
-  );
-
-  const isOwner =
-    currentUser?.id === review.user?._id;
-
+const ReviewCard = ({ review }) => {
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.25 }}
-      className="
-        bg-white
-        rounded-2xl
-        shadow-md
-        hover:shadow-xl
-        p-6
-        transition-all
-      "
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.2 }}
+      className="bg-white rounded-2xl border border-border p-6 hover:shadow-md transition-shadow"
     >
-      {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-gray-800">
+          <h3 className="text-lg font-semibold text-ink font-display">
             {review.destination?.name || "Travel Review"}
           </h3>
-
           <p className="text-sm text-gray-500 mt-1">
             By {review.user?.name || "Anonymous"}
           </p>
         </div>
-
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-400 shrink-0">
           {new Date(review.createdAt).toLocaleDateString()}
         </span>
       </div>
 
-      {/* Rating */}
-      <div className="flex items-center gap-1 mt-4 text-yellow-500">
-        {[1, 2, 3, 4, 5].map((star) =>
-          star <= review.rating ? (
-            <FaStar key={star} />
-          ) : (
-            <FaRegStar key={star} />
-          )
-        )}
+      <div className="flex items-center gap-1 mt-3">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <FiStar
+            key={star}
+            size={15}
+            className={
+              star <= review.rating ? "fill-gold text-gold" : "text-gray-300"
+            }
+          />
+        ))}
       </div>
 
-      {/* Review */}
-      <p className="mt-4 text-gray-600 leading-relaxed">
+      <p className="mt-3 text-sm text-ink leading-relaxed">
         {review.reviewText}
       </p>
 
-      {/* Images */}
       {review.images?.length > 0 && (
-        <div className="flex gap-3 mt-5 overflow-x-auto">
+        <div className="flex gap-2.5 mt-4 overflow-x-auto">
           {review.images.map((image, index) => (
             <img
               key={index}
               src={image}
               alt="Review"
-              className="w-24 h-24 rounded-xl object-cover"
+              className="w-20 h-20 rounded-xl object-cover shrink-0"
             />
           ))}
         </div>
       )}
 
-      {/* Footer */}
-      <div className="flex justify-between items-center mt-6 pt-4 border-t">
-
-        <div className="flex items-center gap-3">
-
-          <span className="text-sm text-gray-500">
-            👍 {review.likes || 0} Likes
-          </span>
-
-          {review.isEdited && (
-            <span className="text-xs text-blue-500">
-              Edited
-            </span>
-          )}
-
-        </div>
-
-        {isOwner && (
-          <div className="flex gap-3">
-
-            <button
-              onClick={() => onEdit(review)}
-              className="
-                p-2
-                rounded-lg
-                text-blue-600
-                hover:bg-blue-50
-                transition
-              "
-            >
-              <FaEdit />
-            </button>
-
-            <button
-              onClick={() => onDelete(review._id)}
-              className="
-                p-2
-                rounded-lg
-                text-red-600
-                hover:bg-red-50
-                transition
-              "
-            >
-              <FaTrash />
-            </button>
-
-          </div>
+      <div className="flex justify-between items-center mt-5 pt-4 border-t border-border">
+        <span className="flex items-center gap-1.5 text-xs text-gray-500">
+          <FiThumbsUp size={13} />
+          {review.likes || 0} Likes
+        </span>
+        {review.isEdited && (
+          <span className="text-xs text-forest font-medium">Edited</span>
         )}
-
       </div>
     </motion.div>
   );

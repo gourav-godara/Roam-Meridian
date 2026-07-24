@@ -1,9 +1,25 @@
 import api from "./api";
 
-export const getAllDestinations = async () => {
+export const getAllDestinations = async ({
+  page = 1,
+  limit = 12,
+  search = "",
+  category = "",
+  minBudget = "",
+  maxBudget = "",
+  rating = "",
+  sort = "",
+} = {}) => {
   const response = await api.get("/destinations", {
     params: {
-      limit: 100,
+      page,
+      limit,
+      search,
+      category,
+      minBudget,
+      maxBudget,
+      rating,
+      sort,
     },
   });
 

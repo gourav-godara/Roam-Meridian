@@ -21,23 +21,15 @@ export const getTrips = async () => {
   return data;
 };
 
-export const getTripById = async (id) => {
-  const { data } = await API.get(`/trips/${id}`);
+// Create a full trip
+export const createTrip = async (tripData) => {
+  const { data } = await API.post("/trips", tripData);
   return data;
 };
 
-export const createTrip = async (payload) => {
-  const { data } = await API.post("/trips", payload);
-  return data;
-};
-
-export const updateTrip = async (id, updates) => {
-  const { data } = await API.put(`/trips/${id}`, updates);
-  return data;
-};
-
-export const deleteTrip = async (id) => {
-  const { data } = await API.delete(`/trips/${id}`);
+// Add a destination to the wishlist (creates a minimal placeholder Trip)
+export const addToWishlist = async (destinationId) => {
+  const { data } = await API.post("/trips/wishlist", { destinationId });
   return data;
 };
 
