@@ -1,6 +1,9 @@
 const CATEGORIES = [
-  "All", "Mountains", "Beach", "Heritage", "Adventure", "Wildlife",
-  "Nature", "Camping", "Snow", "City", "Spiritual", "Food",
+  "All",
+  "Beach",
+  "Mountains",
+  "Heritage",
+  "Adventure",
 ];
 
 function CategoryFilter({ selected, onChange }) {

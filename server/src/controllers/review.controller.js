@@ -5,9 +5,42 @@ const Trip = require("../models/trip.model");
 // Create Review
 const createReview = async (req, res, next) => {
   try {
-    const { itinerary } = req.body;
+    let {
+    itinerary,
+    destination,
+    destinationId,
+} = req.body;
+
+destination = destination || destinationId;
+    // If itinerary not provided, find a completed trip automatically
+    if (!itinerary && destination) {
+      const trip = await Trip.findOne({
+        destinationId: destination,
+        status: "completed",
+        $or: [
+          { createdBy: req.user.id },
+          { collaborators: req.user.id },
+        ],
+      });
+
+      if (!trip) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Complete a trip to this destination before writing a review.",
+        });
+      }
+
+      itinerary = trip._id;
+    }
 
     const trip = await Trip.findById(itinerary);
+
+    // Convert uploaded files into image paths
+const uploadedImages =
+  req.files?.map(
+    (file) => `/uploads/reviews/${file.filename}`
+  ) || [];
 
     if (!trip) {
       return res.status(404).json({
@@ -17,37 +50,40 @@ const createReview = async (req, res, next) => {
     }
 
     const isCreator = trip.createdBy.toString() === req.user.id;
+
     const isCollaborator = trip.collaborators.some(
-      (collaboratorId) => collaboratorId.toString() === req.user.id
+      (id) => id.toString() === req.user.id
     );
 
     if (!isCreator && !isCollaborator) {
       return res.status(403).json({
         success: false,
-        message: "You can only review trips you were part of.",
+        message: "You can only review trips you joined.",
       });
     }
 
     if (trip.status !== "completed") {
       return res.status(400).json({
         success: false,
-        message: "You can only review a trip after it is completed.",
+        message: "Trip must be completed before reviewing.",
       });
     }
 
     const review = await reviewService.createReview({
-      ...req.body,
-      user: req.user.id,
-      destination: trip.destinationId,
-    });
+  ...req.body,
+  itinerary,
+  destination: trip.destinationId,
+  user: req.user.id,
+  images: uploadedImages,
+});
 
     res.status(201).json({
       success: true,
       message: "Review created successfully.",
       data: review,
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 

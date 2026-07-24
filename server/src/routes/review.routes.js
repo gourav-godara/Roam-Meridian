@@ -1,16 +1,17 @@
 const validateReview = require("../middleware/reviewValidation");
 const express = require("express");
-
+const upload = require("../middleware/upload.middleware");
 const router = express.Router();
 
 const reviewController = require("../controllers/review.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 // Create Review
 router.post(
-    "/",
-    authMiddleware,
-    validateReview,
-    reviewController.createReview
+  "/",
+  authMiddleware,
+  upload.array("images", 5),   // Accept up to 5 images
+  validateReview,
+  reviewController.createReview
 );
 
 // Get All Reviews

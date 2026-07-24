@@ -22,6 +22,14 @@ export const getReviews = async (destinationId) => {
   return data;
 };
 
+// Get the live average rating + review count for a destination
+export const getAverageRating = async (destinationId) => {
+  const { data } = await API.get("/reviews/average", {
+    params: { destinationId },
+  });
+  return data;
+};
+
 // Get review by ID
 export const getReviewById = async (id) => {
   const { data } = await API.get(`/reviews/${id}`);
@@ -29,9 +37,31 @@ export const getReviewById = async (id) => {
 };
 
 // Create review
-export const createReview = async (reviewData) => {
-  const { data } = await API.post("/reviews", reviewData);
-  return data;
+export const createReview = (data) => {
+  const formData = new FormData();
+
+  formData.append("rating", data.rating);
+  formData.append("reviewText", data.reviewText);
+
+  if (data.destinationId) {
+    formData.append("destination", data.destinationId);
+  }
+
+  if (data.itinerary) {
+    formData.append("itinerary", data.itinerary);
+  }
+
+  if (data.images?.length) {
+    data.images.forEach((image) => {
+      formData.append("images", image);
+    });
+  }
+
+  return API.post("/reviews", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // Update review
@@ -45,3 +75,4 @@ export const deleteReview = async (id) => {
   const { data } = await API.delete(`/reviews/${id}`);
   return data;
 };
+

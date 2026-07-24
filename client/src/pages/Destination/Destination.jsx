@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-
+import SimilarDestinations from "../../components/destination/SimilarDestinations";
 import Gallery from "../../components/destination/Gallery";
 import DestinationHeader from "../../components/destination/DestinationHeader";
 import InfoCards from "../../components/destination/InfoCards";
@@ -13,11 +13,11 @@ import NearbyRestaurants from "../../components/destination/NearbyRestaurants";
 import RecommendedHotels from "../../components/destination/RecommendedHotels";
 import ResultGrid from "../../components/destination/ResultGrid";
 import UserReviews from "../../components/destination/UserReviews";
-
+import WriteReviewModal from "../../components/destination/WriteReviewModal";
+import { createReview } from "../../services/reviewApi";
 import { getDestinationById } from "../../services/destinationApi";
-import { getReviews } from "../../services/reviewApi";
+import { getReviews, getAverageRating } from "../../services/reviewApi";
 import useTrips from "../../hooks/useTrips";
-
 import {
   getNearbyPlaces,
   getRouteDetails,
@@ -29,7 +29,7 @@ function Destination() {
   const [destination, setDestination] = useState(null);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [loadingNearby, setLoadingNearby] = useState(false);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
   const [nearbyType, setNearbyType] = useState("restaurant");
 
@@ -39,8 +39,9 @@ function Destination() {
   const [hotelPlaces, setHotelPlaces] = useState([]);
   const [attractionPlaces, setAttractionPlaces] = useState([]);
   const [thingsToDoPlaces, setThingsToDoPlaces] = useState([]);
-
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [liveRating, setLiveRating] = useState(null);
   const { trips } = useTrips();
 
   useEffect(() => {
@@ -81,6 +82,7 @@ function Destination() {
           date: new Date(review.createdAt).toLocaleDateString(),
           rating: review.rating,
           text: review.reviewText,
+          images: review.images || [],
         }));
 
         setReviews(mapped);
@@ -94,9 +96,30 @@ function Destination() {
   }, [id]);
 
   useEffect(() => {
+    const fetchAverageRating = async () => {
+      try {
+        const response = await getAverageRating(id);
+
+        // Only override the seeded rating once real reviews exist
+        if (response.data?.totalReviews > 0) {
+          setLiveRating({
+            average: response.data.averageRating,
+            count: response.data.totalReviews,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch average rating:", error);
+      }
+    };
+
+    fetchAverageRating();
+  }, [id]);
+
+  useEffect(() => {
     if (!destination?.location) return;
 
     const fetchNearby = async () => {
+      setLoadingNearby(true);
       try {
         const response = await getNearbyPlaces(
           destination.location.latitude,
@@ -112,7 +135,9 @@ function Destination() {
         console.error("Failed to fetch nearby places:", error);
 
         setNearbyPlaces([]);
-      }
+      } finally {
+    setLoadingNearby(false);
+}
     };
 
     fetchNearby();
@@ -198,7 +223,47 @@ function Destination() {
       setRouteData(null);
     }
   };
+  const handleReviewSubmit = async (data) => {
+  try {
+    await createReview({
+      destinationId: destination._id,
+      rating: data.rating,
+      reviewText: data.reviewText,
+    });
 
+    setReviewModalOpen(false);
+
+    // Refresh reviews
+    const response = await getReviews(id);
+
+    const mapped = (response.data || []).map((review) => ({
+      id: review._id,
+      name: review.user?.name || "Traveler",
+      avatar:
+        review.user?.avatar ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          review.user?.name || "T"
+        )}`,
+      date: new Date(review.createdAt).toLocaleDateString(),
+      rating: review.rating,
+      text: review.reviewText,
+    }));
+
+    setReviews(mapped);
+
+    // Refresh average rating
+    const avg = await getAverageRating(id);
+
+    setLiveRating({
+      average: avg.data.averageRating,
+      count: avg.data.totalReviews,
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Unable to submit review");
+  }
+};
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -239,6 +304,7 @@ function Destination() {
   };
 
   return (
+    <>
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -257,8 +323,8 @@ function Destination() {
               location={locationText}
               name={destination.name}
               description={destination.description}
-              rating={destination.rating?.average ?? 0}
-              reviewCount={destination.rating?.count ?? 0}
+              rating={liveRating?.average ?? destination.rating?.average ?? 0}
+              reviewCount={liveRating?.count ?? destination.rating?.count ?? 0}
               category={destination.category}
             />
 
@@ -304,8 +370,13 @@ function Destination() {
               onPlaceRoute={handlePlaceRoute}
             />
 
-            <UserReviews items={reviews} />
-
+            <UserReviews
+  items={reviews}
+  onWriteReview={() => setReviewModalOpen(true)}
+/>
+            <SimilarDestinations
+  currentDestinationId={destination._id}
+/>
           </div>
 
           <aside className="hidden lg:block lg:sticky lg:top-28 h-fit">
@@ -315,15 +386,16 @@ function Destination() {
             )}
 
             <MapCard
-              latitude={destination.location.latitude}
-              longitude={destination.location.longitude}
-              name={destination.name}
-              nearbyPlaces={nearbyPlaces}
-              nearbyType={nearbyType}
-              setNearbyType={setNearbyType}
-              routeData={routeData}
-              onPlaceRoute={handlePlaceRoute}
-            />
+  latitude={destination.location.latitude}
+  longitude={destination.location.longitude}
+  name={destination.name}
+  nearbyPlaces={nearbyPlaces}
+  nearbyType={nearbyType}
+  setNearbyType={setNearbyType}
+  routeData={routeData}
+  onPlaceRoute={handlePlaceRoute}
+  loadingNearby={loadingNearby}
+/>
 
           </aside>
 
@@ -331,6 +403,13 @@ function Destination() {
 
       </div>
     </motion.div>
+    <WriteReviewModal
+  open={reviewModalOpen}
+  onClose={() => setReviewModalOpen(false)}
+  onSubmit={handleReviewSubmit}
+  destinationId={destination._id}
+/>
+</>
   );
 }
 
