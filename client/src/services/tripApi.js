@@ -16,9 +16,28 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Get all trips for the logged-in user
 export const getTrips = async () => {
   const { data } = await API.get("/trips");
+  return data;
+};
+
+export const getTripById = async (id) => {
+  const { data } = await API.get(`/trips/${id}`);
+  return data;
+};
+
+export const createTrip = async (payload) => {
+  const { data } = await API.post("/trips", payload);
+  return data;
+};
+
+export const updateTrip = async (id, updates) => {
+  const { data } = await API.put(`/trips/${id}`, updates);
+  return data;
+};
+
+export const deleteTrip = async (id) => {
+  const { data } = await API.delete(`/trips/${id}`);
   return data;
 };
 
