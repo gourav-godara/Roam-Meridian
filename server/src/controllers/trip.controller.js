@@ -253,8 +253,12 @@ module.exports = {
     updateTrip,
     deleteTrip,
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 };
 =======
 };
 >>>>>>> 1af1e5bc55167d6043f4af6718b432fcdc2c51fc
+=======
+};
+>>>>>>> 8ccb641a8280126528cafb2e574a11ad05b735e9
