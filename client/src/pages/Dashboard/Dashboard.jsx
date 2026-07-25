@@ -12,7 +12,8 @@ import TravelMap from "../../components/dashboard/TravelMap";
 import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
 import ExpenseCard from "../../components/dashboard/ExpenseCard";
 import NotificationBell from "../../components/dashboard/NotificationBell";
-
+import TravelHistory from "../../components/dashboard/TravelHistory";
+import RecentReviews from "../../components/dashboard/RecentReviews";
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
@@ -21,6 +22,8 @@ function Dashboard() {
     upcomingTrip,
     continuePlanning,
     recentBookings,
+    travelHistory,
+    recentReviews,
     recommendations,
     mapPins,
     activityTimeline,
@@ -29,11 +32,24 @@ function Dashboard() {
     expenseSummary,
   } = useDashboard();
   if (loading) {
-  return <div>Loading...</div>;
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse text-xl font-semibold text-forest">
+        Loading Dashboard...
+      </div>
+    </div>
+  );
 }
 
   const firstName = user?.name?.split(" ")[0] || "Traveler";
+  const hour = new Date().getHours();
 
+const greeting =
+hour < 12
+? "Good Morning"
+: hour < 17
+? "Good Afternoon"
+: "Good Evening";
   return (
     <div className="min-h-screen bg-bg flex flex-col lg:flex-row">
       <Sidebar
@@ -55,7 +71,7 @@ function Dashboard() {
             </button>
             <div>
               <h1 className="font-display text-lg sm:text-h3 text-ink">
-                Good Morning, {firstName} 👋
+                {greeting}, {firstName} 👋
               </h1>
               <p className="text-xs sm:text-sm text-muted mt-1">
                 Ready for your next adventure?
@@ -86,6 +102,8 @@ function Dashboard() {
             <UpcomingTripCard trip={upcomingTrip} />
             <ContinuePlanning items={continuePlanning} />
             <RecentBookings bookings={recentBookings} />
+            <TravelHistory trips={travelHistory} />
+            <RecentReviews reviews={recentReviews} />
           </div>
 
           <aside className="flex flex-col gap-6 min-w-0">
