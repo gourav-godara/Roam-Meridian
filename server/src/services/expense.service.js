@@ -7,7 +7,7 @@ const createExpense = async (expenseData) => {
   return await Expense.findById(expense._id)
     .populate("paidBy", "name email")
     .populate("participants", "name email")
-    .populate("itinerary", "title");
+    .populate("trip", "title")
 };
 
 // Get All Expenses (paid by the user or shared with them)
@@ -17,7 +17,7 @@ const getAllExpenses = async (userId) => {
   })
     .populate("paidBy", "name email")
     .populate("participants", "name email")
-    .populate("itinerary", "title")
+    .populate("trip", "title")
     .sort({ createdAt: -1 });
 };
 
@@ -26,7 +26,7 @@ const getExpenseById = async (id) => {
   return await Expense.findById(id)
     .populate("paidBy", "name email")
     .populate("participants", "name email")
-    .populate("itinerary", "title");
+    .populate("trip", "title")
 };
 
 // Update Expense
@@ -37,7 +37,7 @@ const updateExpense = async (id, data) => {
   })
     .populate("paidBy", "name email")
     .populate("participants", "name email")
-    .populate("itinerary", "title");
+    .populate("trip", "title")
 };
 
 // Delete Expense

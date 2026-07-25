@@ -18,7 +18,8 @@ import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
-
+import Reviews from "../pages/Reviews/ReviewPage";
+import Expenses from "../pages/Expenses/Expenses";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -34,6 +35,8 @@ function AppRouter() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/expenses" element={<Expenses />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
 

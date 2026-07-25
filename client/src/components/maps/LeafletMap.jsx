@@ -4,7 +4,25 @@ import {
   Marker,
   Popup,
   Polyline,
+  useMap,
 } from "react-leaflet";
+import { useEffect } from "react";
+
+function FitBounds({ latitude, longitude, routePositions }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (routePositions.length > 0) {
+      map.fitBounds(routePositions, {
+        padding: [50, 50],
+      });
+    } else {
+      map.setView([latitude, longitude], 13);
+    }
+  }, [map, latitude, longitude, routePositions]);
+
+  return null;
+}
 
 function LeafletMap({
   latitude,
@@ -15,16 +33,13 @@ function LeafletMap({
   onPlaceRoute,
 }) {
   const routePositions =
-    routeData?.geometry?.coordinates?.map(([lng, lat]) => [
-      lat,
-      lng,
-    ]) || [];
+    routeData?.geometry?.coordinates?.map(([lng, lat]) => [lat, lng]) || [];
 
   return (
     <MapContainer
       center={[latitude, longitude]}
       zoom={13}
-      scrollWheelZoom={true}
+      scrollWheelZoom
       style={{
         height: "400px",
         width: "100%",
@@ -34,6 +49,12 @@ function LeafletMap({
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      <FitBounds
+        latitude={latitude}
+        longitude={longitude}
+        routePositions={routePositions}
       />
 
       <Marker position={[latitude, longitude]}>
@@ -53,22 +74,18 @@ function LeafletMap({
           <Popup>
             <strong>{place.name}</strong>
 
-            {place.address && (
-              <>
-                <br />
-                {place.address}
-              </>
-            )}
+            <br />
+
+            {place.address}
 
             <br />
 
             <button
-              type="button"
               onClick={() => onPlaceRoute(place)}
               style={{
-                marginTop: "8px",
+                marginTop: 8,
                 cursor: "pointer",
-                fontWeight: "600",
+                fontWeight: 600,
               }}
             >
               Show Route
@@ -78,7 +95,14 @@ function LeafletMap({
       ))}
 
       {routePositions.length > 0 && (
-        <Polyline positions={routePositions} />
+        <Polyline
+          positions={routePositions}
+          pathOptions={{
+            color: "#16a34a",
+            weight: 6,
+            opacity: 1,
+          }}
+        />
       )}
     </MapContainer>
   );

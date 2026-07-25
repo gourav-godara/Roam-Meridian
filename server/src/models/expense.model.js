@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const expenseSchema = new mongoose.Schema(
   {
     // Trip to which this expense belongs
-    itinerary: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Trip",
-      required: true,
-    },
+    trip: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Trip",
+    required: true,
+},
 
     // User who paid the expense
     paidBy: {
