@@ -5,16 +5,21 @@ import Card from "../common/Card";
 import Button from "../common/Button";
 import { createTrip } from "../../services/tripApi";
 
-function CreateTripForm() {
+function CreateTripForm({ plannerData = null }) {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    title: "",
-    destination: "",
+    title: plannerData?.title || "",
+    destination: plannerData?.destination || "",
+
     startDate: "",
     endDate: "",
-    budget: "",
-    travelers: 1,
+
+    budget: plannerData?.budget || "",
+    travelers: plannerData?.travelers || 1,
+
     collaborators: "",
     isPublic: false,
   });
@@ -28,48 +33,63 @@ function CreateTripForm() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async (status = "planning") => {
     try {
+      setLoading(true);
+
+      const collaboratorIds = formData.collaborators
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+
       const payload = {
         title: formData.title,
 
-        // Temporary until AI Planner passes the destination
-        destinationId: "6a60c3e6ef1ab708d09eca39",
+        // Temporary destination until AI Planner integration
+        destinationId:
+          plannerData?.destinationId ||
+          "6a60c3e6ef1ab708d09eca39",
+
+        plannerId: plannerData?._id || null,
 
         startDate: formData.startDate,
         endDate: formData.endDate,
 
         travelers: Number(formData.travelers),
+
         budget: Number(formData.budget),
 
-        // Will later contain collaborator user IDs
-        collaborators: [],
+        collaborators: collaboratorIds,
 
-        coverImage: "",
+        coverImage: plannerData?.coverImage || "",
+
+        itinerary:
+          plannerData?.itinerary || [
+            {
+              day: 1,
+              activities: [
+                {
+                  time: "09:00",
+                  title: "AI Planner itinerary will appear here",
+                  location: "",
+                  notes: "",
+                },
+              ],
+            },
+          ],
+
+        status,
 
         isPublic: formData.isPublic,
-
-        // Temporary itinerary until AI Planner integration
-        itinerary: [
-          {
-            day: 1,
-            activities: [
-              {
-                time: "09:00",
-                title: "AI Planner itinerary will appear here",
-                location: "",
-                notes: "",
-              },
-            ],
-          },
-        ],
       };
 
       await createTrip(payload);
 
-      alert("Trip created successfully!");
+      alert(
+        status === "draft"
+          ? "Trip saved as Draft."
+          : "Trip created successfully!"
+      );
 
       navigate("/itineraries");
     } catch (err) {
@@ -79,12 +99,20 @@ function CreateTripForm() {
         err.response?.data?.message ||
           "Failed to create trip."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Card className="border border-border p-6">
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit("planning");
+        }}
+        className="space-y-5"
+      >
 
         {/* Title */}
         <div>
@@ -116,10 +144,13 @@ function CreateTripForm() {
             onChange={handleChange}
             placeholder="Goa"
             className="w-full border rounded-lg px-4 py-2"
+            disabled={!!plannerData}
           />
 
           <p className="text-xs text-gray-500 mt-1">
-            This field will automatically come from the AI Planner later.
+            {plannerData
+              ? "Imported automatically from AI Planner."
+              : "This field will automatically come from the AI Planner later."}
           </p>
         </div>
 
@@ -173,8 +204,7 @@ function CreateTripForm() {
             required
           />
         </div>
-
-        {/* Travelers */}
+                {/* Travelers */}
         <div>
           <label className="block text-sm font-medium mb-2">
             Travelers
@@ -202,26 +232,53 @@ function CreateTripForm() {
             name="collaborators"
             value={formData.collaborators}
             onChange={handleChange}
-            placeholder="Email(s) separated by commas"
+            placeholder="Enter collaborator IDs separated by commas"
             className="w-full border rounded-lg px-4 py-2"
           />
+
+          <p className="text-xs text-gray-500 mt-1">
+            AI Planner will later provide collaborator selection automatically.
+          </p>
         </div>
 
         {/* Public */}
         <div className="flex items-center gap-3">
           <input
+            id="isPublic"
             type="checkbox"
             name="isPublic"
             checked={formData.isPublic}
             onChange={handleChange}
           />
 
-          <label>Make this trip public</label>
+          <label htmlFor="isPublic">
+            Make this trip public
+          </label>
         </div>
 
-        <Button type="submit" variant="primary">
-          Create Trip
-        </Button>
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-3">
+
+          <Button
+            type="button"
+            variant="secondary"
+            loading={loading}
+            onClick={() => handleSubmit("draft")}
+            className="sm:flex-1"
+          >
+            Save as Draft
+          </Button>
+
+          <Button
+            type="submit"
+            variant="primary"
+            loading={loading}
+            className="sm:flex-1"
+          >
+            Create Trip
+          </Button>
+
+        </div>
 
       </form>
     </Card>

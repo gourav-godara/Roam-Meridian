@@ -1,13 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 
 import CreateTripForm from "../../components/trips/CreateTripForm";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
 
 function CreateTrip() {
+  const location = useLocation();
+
+  // Later AI Planner will navigate here using:
+  // navigate("/create-trip", { state: { plannerData } })
+  const plannerData = location.state?.plannerData || null;
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+
       <Link
         to="/itineraries"
         className="inline-flex items-center gap-2 text-sm text-muted hover:text-ink mb-6"
@@ -22,11 +27,20 @@ function CreateTrip() {
         </h1>
 
         <p className="text-sm text-muted mt-1">
-          Complete the details below to convert your saved itinerary into a trip.
+          Complete your trip details before saving it.
         </p>
       </div>
 
-      <CreateTripForm />
+      {plannerData && (
+        <div className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4">
+          <p className="text-sm text-green-700">
+            ✔ Itinerary imported from AI Planner.
+          </p>
+        </div>
+      )}
+
+      <CreateTripForm plannerData={plannerData} />
+
     </div>
   );
 }

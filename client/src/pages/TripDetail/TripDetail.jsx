@@ -1,167 +1,308 @@
-import { useParams, Link } from "react-router-dom";
-import { FiArrowLeft, FiCalendar, FiUsers, FiMapPin } from "react-icons/fi";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  FiArrowLeft,
+  FiCalendar,
+  FiUsers,
+  FiMapPin,
+  FiEdit2,
+  FiTrash2,
+} from "react-icons/fi";
+
+import Button from "../../components/common/Button";
+import { updateTrip, deleteTrip } from "../../services/tripApi";
+
 import useTrip from "../../hooks/useTrip";
 import Card from "../../components/common/Card";
 import Avatar from "../../components/common/Avatar";
 
 const STATUS_STYLES = {
+  draft: "bg-gray-100 text-gray-600",
   planning: "bg-amber-100 text-amber-700",
-  ongoing: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-700",
+  ongoing: "bg-green-100 text-green-700",
+  completed: "bg-blue-100 text-blue-700",
 };
 
 function TripDetail() {
   const { id } = useParams();
+
+  const navigate = useNavigate();
+
+const handleDelete = async () => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this trip?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteTrip(id);
+
+    alert("Trip deleted successfully.");
+
+    navigate("/itineraries");
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+        "Failed to delete trip."
+    );
+  }
+};
+
+const handleStatusChange = async (e) => {
+  try {
+    await updateTrip(id, {
+      status: e.target.value,
+    });
+
+    window.location.reload();
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+        "Failed to update trip status."
+    );
+  }
+};
+
   const { trip, loading, error } = useTrip(id);
 
   if (loading) {
-    return <div className="text-center py-20 text-muted">Loading trip…</div>;
+    return (
+      <div className="text-center py-20">
+        Loading Trip...
+      </div>
+    );
   }
 
   if (error || !trip) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <p className="text-error mb-4">{error || "Trip not found."}</p>
-        <Link to="/itineraries" className="text-forest font-medium hover:underline">
-          Back to My Trips
+      <div className="text-center py-20">
+        <p>{error || "Trip not found."}</p>
+
+        <Link
+          to="/itineraries"
+          className="text-forest mt-4 inline-block"
+        >
+          Back to Trips
         </Link>
       </div>
     );
   }
 
-  const destinationLabel = [trip.destinationId?.name, trip.destinationId?.city, trip.destinationId?.country]
-    .filter(Boolean)
-    .join(", ");
-
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-5xl mx-auto px-6 py-8">
+
       <Link
         to="/itineraries"
-        className="inline-flex items-center gap-2 text-sm text-muted hover:text-ink mb-6"
+        className="inline-flex items-center gap-2 mb-6"
       >
-        <FiArrowLeft size={16} /> Back to My Trips
+        <FiArrowLeft />
+        Back to Trips
       </Link>
 
       {trip.coverImage && (
         <img
           src={trip.coverImage}
           alt={trip.title}
-          className="w-full h-56 sm:h-72 object-cover rounded-3xl mb-6"
+          className="w-full h-72 rounded-3xl object-cover mb-8"
         />
       )}
 
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+      <div className="flex justify-between items-start mb-8">
+
         <div>
-          <h1 className="font-display text-h3 text-ink">{trip.title}</h1>
-          {destinationLabel && (
-            <p className="flex items-center gap-1.5 text-sm text-muted mt-1.5">
-              <FiMapPin size={14} /> {destinationLabel}
-            </p>
-          )}
+
+          <h1 className="text-4xl font-bold">
+            {trip.title}
+          </h1>
+
+          <p className="text-gray-500 flex items-center gap-2 mt-2">
+            <FiMapPin />
+            {trip.destinationId?.name}
+          </p>
+
         </div>
-        <span
-          className={`px-4 py-2 rounded-full text-sm font-medium capitalize ${
-            STATUS_STYLES[trip.status] || "bg-gray-100 text-gray-700"
-          }`}
-        >
-          {trip.status}
-        </span>
+
+        <div className="flex flex-col gap-3 items-end">
+
+  <select
+    value={trip.status}
+    onChange={handleStatusChange}
+    className="border rounded-lg px-3 py-2 capitalize"
+  >
+    <option value="planning">Planning</option>
+    <option value="ongoing">Ongoing</option>
+    <option value="completed">Completed</option>
+  </select>
+
+  <div className="flex gap-2">
+
+    <Button
+      size="sm"
+      variant="secondary"
+      leftIcon={FiEdit2}
+      onClick={() => navigate(`/trips/${id}/edit`)}
+    >
+      Edit
+    </Button>
+
+    <Button
+      size="sm"
+      variant="danger"
+      leftIcon={FiTrash2}
+      onClick={handleDelete}
+    >
+      Delete
+    </Button>
+
+  </div>
+
+</div>
+
       </div>
 
-      <Card className="border border-border p-5 mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div>
-          <p className="text-xs text-muted mb-1 flex items-center gap-1">
-            <FiCalendar size={13} /> Dates
-          </p>
-          <p className="text-sm font-medium text-ink">
-            {new Date(trip.startDate).toLocaleDateString()} –{" "}
-            {new Date(trip.endDate).toLocaleDateString()}
-          </p>
+      <Card className="p-6 mb-8">
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+          <div>
+            <p className="text-gray-400 text-sm">
+              Dates
+            </p>
+
+            <p className="font-medium flex items-center gap-2 mt-1">
+              <FiCalendar />
+              {new Date(
+                trip.startDate
+              ).toLocaleDateString()}{" "}
+              -
+              {" "}
+              {new Date(
+                trip.endDate
+              ).toLocaleDateString()}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-400 text-sm">
+              Budget
+            </p>
+
+            <p className="font-medium">
+              ₹{trip.budget}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-400 text-sm">
+              Travelers
+            </p>
+
+            <p className="font-medium flex items-center gap-2">
+              <FiUsers />
+              {trip.travelers}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-gray-400 text-sm">
+              Created By
+            </p>
+
+            <p className="font-medium">
+              {trip.createdBy?.name}
+            </p>
+          </div>
+
         </div>
-        <div>
-          <p className="text-xs text-muted mb-1 flex items-center gap-1">
-            <FiUsers size={13} /> Travelers
-          </p>
-          <p className="text-sm font-medium text-ink">{trip.travelers}</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted mb-1">Budget</p>
-          <p className="text-sm font-medium text-ink">
-            ₹{trip.budget?.toLocaleString("en-IN")}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-muted mb-1">Created by</p>
-          <p className="text-sm font-medium text-ink">
-            {trip.createdBy?.name || "—"}
-          </p>
-        </div>
+
       </Card>
 
       {trip.collaborators?.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-muted uppercase tracking-wide mb-3">
+        <>
+          <h2 className="text-xl font-semibold mb-4">
             Collaborators
           </h2>
-          <div className="flex flex-wrap gap-3">
-            {trip.collaborators.map((c) => (
+
+          <div className="flex gap-4 flex-wrap mb-8">
+
+            {trip.collaborators.map((user) => (
               <div
-                key={c._id}
-                className="flex items-center gap-2 border border-border rounded-full pl-1.5 pr-3 py-1.5 bg-white"
+                key={user._id}
+                className="flex items-center gap-2 bg-white border rounded-full px-3 py-2"
               >
-                <Avatar user={c} size={28} />
-                <span className="text-sm text-ink">{c.name}</span>
+                <Avatar user={user} size={32} />
+
+                <span>{user.name}</span>
               </div>
             ))}
+
           </div>
+        </>
+      )}
+
+      <h2 className="text-2xl font-semibold mb-5">
+        Trip Itinerary
+      </h2>
+
+      {trip.itinerary?.length === 0 ? (
+        <Card className="p-8 text-center">
+          No itinerary added.
+        </Card>
+      ) : (
+        <div className="space-y-5">
+
+          {trip.itinerary.map((day) => (
+            <Card
+              key={day.day}
+              className="p-5"
+            >
+              <h3 className="font-bold text-lg mb-4">
+                Day {day.day}
+              </h3>
+
+              {day.activities?.length === 0 ? (
+                <p>No activities.</p>
+              ) : (
+                <div className="space-y-4">
+
+                  {day.activities.map((activity, index) => (
+                    <div
+                      key={index}
+                      className="border-l-4 border-forest pl-4"
+                    >
+
+                      <p className="font-medium">
+                        {activity.time}
+                      </p>
+
+                      <p className="font-semibold">
+                        {activity.title}
+                      </p>
+
+                      {activity.location && (
+                        <p className="text-gray-500">
+                          📍 {activity.location}
+                        </p>
+                      )}
+
+                      {activity.notes && (
+                        <p className="text-gray-500">
+                          {activity.notes}
+                        </p>
+                      )}
+
+                    </div>
+                  ))}
+
+                </div>
+              )}
+
+            </Card>
+          ))}
+
         </div>
       )}
 
-      <h2 className="text-sm font-semibold text-muted uppercase tracking-wide mb-3">
-        Itinerary
-      </h2>
-
-      {(!trip.itinerary || trip.itinerary.length === 0) && (
-        <Card className="border border-border p-8 text-center text-muted text-sm">
-          No day-by-day itinerary added yet.
-        </Card>
-      )}
-
-      <div className="flex flex-col gap-4">
-        {trip.itinerary?.map((day) => (
-          <Card key={day.day} className="border border-border p-5">
-            <h3 className="font-display text-base text-ink mb-3">
-              Day {day.day}
-            </h3>
-            {day.activities?.length > 0 ? (
-              <ul className="flex flex-col gap-3">
-                {day.activities.map((activity, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    {activity.time && (
-                      <span className="text-muted shrink-0 w-14">
-                        {activity.time}
-                      </span>
-                    )}
-                    <div>
-                      <p className="font-medium text-ink">{activity.title}</p>
-                      {activity.location && (
-                        <p className="text-muted flex items-center gap-1 mt-0.5">
-                          <FiMapPin size={12} /> {activity.location}
-                        </p>
-                      )}
-                      {activity.notes && (
-                        <p className="text-muted mt-0.5">{activity.notes}</p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted">No activities planned yet.</p>
-            )}
-          </Card>
-        ))}
-      </div>
     </div>
   );
 }
