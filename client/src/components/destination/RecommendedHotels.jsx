@@ -1,30 +1,64 @@
-import { FiStar } from "react-icons/fi";
 import Button from "../common/Button";
 
-function RecommendedHotels({ items }) {
+function RecommendedHotels({ items = [], onPlaceRoute }) {
   return (
     <div className="mt-10">
-      <h3 className="text-base font-semibold text-ink mb-4">Recommended Hotels</h3>
-      <div className="grid sm:grid-cols-3 gap-4">
-        {items.map((h) => (
-          <div key={h.id} className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-            <div className="aspect-[4/3] overflow-hidden">
-              <img src={h.image} alt={h.name} className="w-full h-full object-cover" />
-            </div>
-            <div className="p-3.5 flex flex-col flex-1">
-              <h4 className="text-sm font-semibold text-ink truncate">{h.name}</h4>
-              <span className="flex items-center gap-1 text-xs font-medium text-ink mt-1">
-                <FiStar size={12} className="fill-gold text-gold" />
-                {h.rating}
-              </span>
-              <div className="flex items-center justify-between mt-auto pt-3">
-                <span className="text-sm font-semibold text-forest">{h.pricePerNight}<span className="text-xs text-gray-500 font-normal">/night</span></span>
-                <Button variant="ghost" className="!py-1.5 !px-3 !text-xs">View</Button>
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-xl font-semibold text-ink">
+          Recommended Hotels
+        </h3>
+
+        <span className="text-sm text-gray-500">
+          {items.length} found
+        </span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-border p-8 text-center text-gray-500">
+          No nearby hotels found.
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {items.slice(0, 6).map((hotel, index) => (
+            <div
+              key={`${hotel.name}-${index}`}
+              className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-lg transition p-5 flex flex-col"
+            >
+              <h4 className="font-semibold text-lg">
+                {hotel.name}
+              </h4>
+
+              <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+                {hotel.address || "Address not available"}
+              </p>
+
+              {hotel.category?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {hotel.category.slice(0, 2).map((cat) => (
+                    <span
+                      key={cat}
+                      className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs"
+                    >
+                      {cat.replaceAll(".", " ")}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-auto pt-5">
+                <Button
+                  onClick={() => {
+                    console.log(hotel);
+                    onPlaceRoute?.(hotel)}}
+                  className="w-full"
+                >
+                  Show Route
+                </Button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -15,17 +15,45 @@ const userSchema = new mongoose.Schema(
             trim: true,
         },
 
+        googleId: {
+            type: String,
+            default: null,
+        },
+
         password: {
             type: String,
-            required: true,
             minlength: 8,
             select: false,
+            required: function() {
+                return this.authProvider === "local"
+            },
         },
+
+        authProvider: {
+            type: String,
+            enum: ["local", "google"],
+            default: "local",
+        },
+
         role: {
             type: String,
             enum: ["user", "admin"],
             default: "user",
         },
+
+        dateOfBirth: {
+            type: Date,
+            default: null,
+        },
+
+        wishlist: {
+            type: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Destination",
+                },
+            ],
+    },
     },
     {
         timestamps: true,

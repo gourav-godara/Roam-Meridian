@@ -6,6 +6,8 @@ import Destination from "../pages/Destination/Destination";
 import AIPlanner from "../pages/AIPlanner/AIPlanner";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Itineraries from "../pages/Itineraries/Itineraries";
+import TripDetail from "../pages/TripDetail/TripDetail";
+import EditTrip from "../pages/EditTrip/EditTrip";
 import Blogs from "../pages/Blogs/Blogs";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
@@ -16,7 +18,8 @@ import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
-
+import Reviews from "../pages/Reviews/ReviewPage";
+import Expenses from "../pages/Expenses/Expenses";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -32,10 +35,14 @@ function AppRouter() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/expenses" element={<Expenses />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<AIPlanner />} />
 
             <Route path="/itineraries" element={<Itineraries />} />
+            <Route path="/trips/:id" element={<TripDetail />} />
+            <Route path="/trips/:id/edit" element={<EditTrip />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>

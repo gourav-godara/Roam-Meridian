@@ -14,6 +14,12 @@ city: {
   trim: true,
 },
 
+state: {
+    type: String,
+    required: true,
+    trim: true,
+},
+
 country: {
   type: String,
   required: true,
@@ -26,13 +32,34 @@ description: {
   trim: true,
 },
 
+bestTime: {
+    type: String,
+    trim: true,
+},
+
+duration: {
+    type: String,
+    trim: true,
+},
+
 category: {
   type: String,
   required: true,
   enum: {
-    values: ["Beach", "Mountains", "Heritage", "Adventure"],
-    message: "{VALUE} is not a valid category",
-},  
+  values: [
+    "Beach",
+    "Mountains",
+    "Heritage",
+    "Adventure",
+    "Nature",
+    "Wildlife",
+    "City",
+    "Spiritual",
+    "Snow",
+    "Food",
+  ],
+  message: "{VALUE} is not a valid category",
+},
 },
 
 images: [

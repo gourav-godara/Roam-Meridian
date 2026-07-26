@@ -39,7 +39,7 @@ const itineraryDaySchema = new mongoose.Schema(
         },
     },
     { _id: false }
-)
+);
 
 const tripSchema = new mongoose.Schema(
     {
@@ -61,11 +61,18 @@ const tripSchema = new mongoose.Schema(
             required: true,
         },
 
+        // Planner document from which this trip was created
+        plannerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Planner",
+            default: null,
+        },
+
         collaborators: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User",
-            }
+            },
         ],
 
         coverImage: {
@@ -101,8 +108,14 @@ const tripSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: ["planning", "ongoing", "completed"],
-            default: "planning",
+            enum: [
+                "draft",
+                "planning",
+                "ongoing",
+                "completed",
+                "wishlist",
+            ],
+            default: "draft",
         },
 
         isPublic: {
@@ -110,13 +123,10 @@ const tripSchema = new mongoose.Schema(
             default: false,
         },
     },
-
     {
         timestamps: true,
     }
 );
-
-
 
 const Trip = mongoose.model("Trip", tripSchema);
 

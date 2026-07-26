@@ -1,5 +1,5 @@
 const validateExpense = (req, res, next) => {
-  const { title, amount, paidBy, itinerary } = req.body;
+  const { title, amount, trip } = req.body;
 
   if (!title || title.trim() === "") {
     return res.status(400).json({
@@ -15,17 +15,10 @@ const validateExpense = (req, res, next) => {
     });
   }
 
-  if (!paidBy) {
+  if (!trip) {
     return res.status(400).json({
       success: false,
-      message: "Paid By is required.",
-    });
-  }
-
-  if (!itinerary) {
-    return res.status(400).json({
-      success: false,
-      message: "Itinerary is required.",
+      message: "Trip is required.",
     });
   }
 

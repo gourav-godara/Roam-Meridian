@@ -1,13 +1,13 @@
+import { useGoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { useAuth } from "../../context/AuthContext";
+import useAuth from "../../hooks/useAuth";
 import api from "../../services/api";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { FiMail } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +18,29 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await api.post("/auth/google", {
+          accessToken: tokenResponse.access_token,
+        });
+
+        login(response.data.user, response.data.token);
+
+        navigate("/");
+      } catch (error) {
+        setError(
+          error.response?.data?.message ||
+          "Google login failed."
+        );
+      }
+    },
+
+    onError: () => {
+      setError("Google login failed.");
+    },
+  });
 
   const redirectAfterLogin = () => {
     const redirectTo = location.state?.from?.pathname || "/";
@@ -50,13 +73,8 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // TODO: wire to real OAuth flow once Astha's backend supports it
-    console.log("Google login clicked");
-  };
-
-  const handleAppleLogin = () => {
-    // TODO: wire to real OAuth flow once Astha's backend supports it
-    console.log("Apple login clicked");
+    setError("");
+    googleLogin();
   };
 
   return (
@@ -79,14 +97,7 @@ const Login = () => {
           >
             Continue with Google
           </Button>
-          <Button
-            variant="secondary"
-            leftIcon={FaApple}
-            className="w-full"
-            onClick={handleAppleLogin}
-          >
-            Continue with Apple
-          </Button>
+
         </div>
 
         <div className="flex items-center gap-3 my-6">

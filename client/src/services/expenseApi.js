@@ -5,6 +5,17 @@ const API = axios.create({
   withCredentials: true,
 });
 
+// Attach JWT token to every request
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
 // Get all expenses
 export const getExpenses = async () => {
   const { data } = await API.get("/expenses");
@@ -32,5 +43,11 @@ export const updateExpense = async (id, expenseData) => {
 // Delete expense
 export const deleteExpense = async (id) => {
   const { data } = await API.delete(`/expenses/${id}`);
+  return data;
+};
+
+// Mark expense as settled
+export const settleExpense = async (id) => {
+  const { data } = await API.patch(`/expenses/${id}/settle`);
   return data;
 };

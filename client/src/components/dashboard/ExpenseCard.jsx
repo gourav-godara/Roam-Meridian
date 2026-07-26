@@ -1,19 +1,73 @@
-const ExpenseCard = ({ expense }) => {
-  return (
-    <div className="flex justify-between items-center border-b last:border-none py-3">
-      <div>
-        <h3 className="font-medium">
-          {expense.title}
-        </h3>
+const ExpenseCard = ({ summary }) => {
+  if (!summary) return null;
 
-        <p className="text-sm text-gray-500">
-          Paid by {expense.paidBy}
-        </p>
+  return (
+    <div className="bg-surface rounded-3xl border border-border p-5">
+      <h3 className="text-lg font-semibold mb-4">
+        Expense Summary
+      </h3>
+
+      <div className="space-y-3">
+        <div className="flex justify-between">
+          <span>Total Spent</span>
+          <span className="font-semibold text-teal-600">
+            ₹{summary.totalSpent}
+          </span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>You Owe</span>
+          <span className="font-semibold text-red-500">
+            ₹{summary.youOwe}
+          </span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>You Are Owed</span>
+          <span className="font-semibold text-green-600">
+            ₹{summary.youAreOwed}
+          </span>
+        </div>
       </div>
 
-      <span className="font-semibold text-teal-600">
-        ₹{expense.amount}
-      </span>
+      {summary.recentExpenses?.length > 0 && (
+        <>
+          <hr className="my-5" />
+
+          <h4 className="font-medium mb-3">
+            Recent Expenses
+          </h4>
+
+          <div className="space-y-3">
+            {summary.recentExpenses.map((expense) => (
+              <div
+                key={expense._id}
+                className="flex justify-between"
+              >
+                <div>
+                  <p className="font-medium">
+                    {expense.title}
+                  </p>
+
+                  <p className="text-sm text-gray-500">
+                    ₹{expense.amount}
+                  </p>
+                </div>
+
+                <span
+                  className={
+                    expense.status === "Settled"
+                      ? "text-green-600"
+                      : "text-orange-500"
+                  }
+                >
+                  {expense.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
