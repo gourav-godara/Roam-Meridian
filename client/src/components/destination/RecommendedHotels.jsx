@@ -3,41 +3,57 @@ import Button from "../common/Button";
 function RecommendedHotels({ items = [], onPlaceRoute }) {
   return (
     <div className="mt-10">
-      <h3 className="text-base font-semibold text-ink mb-4">
-        Recommended Hotels
-      </h3>
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-xl font-semibold text-ink">
+          Recommended Hotels
+        </h3>
+
+        <span className="text-sm text-gray-500">
+          {items.length} found
+        </span>
+      </div>
 
       {items.length === 0 ? (
-        <p className="text-sm text-gray-500">
+        <div className="bg-white rounded-2xl border border-border p-8 text-center text-gray-500">
           No nearby hotels found.
-        </p>
+        </div>
       ) : (
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
           {items.slice(0, 6).map((hotel, index) => (
             <div
               key={`${hotel.name}-${index}`}
-              className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow flex flex-col"
+              className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-lg transition p-5 flex flex-col"
             >
-              <div className="p-4 flex flex-col flex-1">
-                <h4 className="text-sm font-semibold text-ink">
-                  {hotel.name}
-                </h4>
+              <h4 className="font-semibold text-lg">
+                {hotel.name}
+              </h4>
 
-                <p className="text-xs text-gray-500 mt-2">
-                  {hotel.address || "Address not available"}
-                </p>
+              <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+                {hotel.address || "Address not available"}
+              </p>
 
-                {onPlaceRoute && (
-                  <div className="mt-auto pt-4">
-                    <Button
-                      variant="ghost"
-                      className="!py-1.5 !px-3 !text-xs"
-                      onClick={() => onPlaceRoute(hotel)}
+              {hotel.category?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {hotel.category.slice(0, 2).map((cat) => (
+                    <span
+                      key={cat}
+                      className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs"
                     >
-                      Show Route
-                    </Button>
-                  </div>
-                )}
+                      {cat.replaceAll(".", " ")}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-auto pt-5">
+                <Button
+                  onClick={() => {
+                    console.log(hotel);
+                    onPlaceRoute?.(hotel)}}
+                  className="w-full"
+                >
+                  Show Route
+                </Button>
               </div>
             </div>
           ))}

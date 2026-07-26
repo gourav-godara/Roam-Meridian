@@ -215,7 +215,9 @@ function Destination() {
       );
 
       console.log("Route response:", response);
-
+      console.log("Route Data:", response.data);
+console.log("Geometry:", response.data.geometry);
+console.log("Features:", response.data.features);
       setRouteData(response.data);
     } catch (error) {
       console.error("Failed to fetch route:", error);
