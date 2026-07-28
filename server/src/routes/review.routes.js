@@ -1,4 +1,5 @@
 const validateReview = require("../middleware/reviewValidation");
+const { validateReviewUpdate } = require("../middleware/reviewValidation");
 const express = require("express");
 const upload = require("../middleware/upload.middleware");
 const router = express.Router();
@@ -24,6 +25,7 @@ router.get("/:id", reviewController.getReviewById);
 router.put(
     "/:id",
     authMiddleware,
+    validateReviewUpdate,
     reviewController.updateReview
 );
 

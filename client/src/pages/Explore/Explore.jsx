@@ -7,6 +7,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { getAllDestinations } from "../../services/destinationApi";
 import { addToWishlist } from "../../services/tripApi";
 import useTrips from "../../hooks/useTrips";
+import { useToast } from "../../context/ToastContext";
 
 const DEFAULT_FILTERS = {
   categories: ["All"],
@@ -15,6 +16,7 @@ const DEFAULT_FILTERS = {
 };
 
 function Explore() {
+  const { showToast } = useToast();
   const [destinations, setDestinations] = useState([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("Recommended");
@@ -142,9 +144,10 @@ function Explore() {
       if (error.response?.status === 409) {
         await refreshTrips();
       } else {
-        alert(
+        showToast(
           error.response?.data?.message ||
-            "Unable to add this destination to your wishlist."
+            "Unable to add this destination to your wishlist.",
+          "error"
         );
       }
     } finally {
