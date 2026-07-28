@@ -92,7 +92,7 @@ const createTrip = async (req, res) => {
 };
 
 const addToWishlist = async (req, res) => {
-  const { destinationId } = req.body;
+  const destinationId = req.params.destinationId || req.body.destinationId;
 
   if (!destinationId) {
     return res.status(400).json({

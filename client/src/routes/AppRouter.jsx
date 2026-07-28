@@ -8,18 +8,23 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import Itineraries from "../pages/Itineraries/Itineraries";
 import TripDetail from "../pages/TripDetail/TripDetail";
 import EditTrip from "../pages/EditTrip/EditTrip";
+import CreateTrip from "../pages/CreateTrip/CreateTrip";
+import Expenses from "../pages/Expenses/Expenses";
+import ReviewPage from "../pages/Reviews/ReviewPage";
 import Blogs from "../pages/Blogs/Blogs";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
 import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup/Signup";
+import CreateAccount from "../pages/CreateAccount/CreateAccount";
+import VerifyOtp from "../pages/VerifyOtp/VerifyOtp";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import Profile from "../pages/Profile/Profile";
 import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
-import Reviews from "../pages/Reviews/ReviewPage";
-import Expenses from "../pages/Expenses/Expenses";
+
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -34,15 +39,20 @@ function AppRouter() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
           <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/planner" element={<AIPlanner />} />
 
             <Route path="/itineraries" element={<Itineraries />} />
+            <Route path="/create-trip" element={<CreateTrip />} />
             <Route path="/trips/:id" element={<TripDetail />} />
             <Route path="/trips/:id/edit" element={<EditTrip />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/reviews" element={<ReviewPage />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>
