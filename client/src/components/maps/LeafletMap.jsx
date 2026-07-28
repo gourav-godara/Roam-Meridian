@@ -30,6 +30,11 @@ function FitBounds({ latitude, longitude, routePositions }) {
     } else {
       map.setView([latitude, longitude], 13);
     }
+
+    // Helps Leaflet calculate its size correctly
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
   }, [map, latitude, longitude, routePositions]);
 
   return null;
@@ -42,6 +47,7 @@ function LeafletMap({
   nearbyPlaces = [],
   routeData,
   onPlaceRoute,
+  height = "400px",
 }) {
   const routePositions =
     routeData?.geometry?.coordinates?.map(([lng, lat]) => [lat, lng]) || [];
@@ -52,7 +58,7 @@ function LeafletMap({
       zoom={13}
       scrollWheelZoom
       style={{
-        height: "400px",
+        height,
         width: "100%",
         borderRadius: "16px",
       }}
@@ -96,6 +102,7 @@ function LeafletMap({
             <br />
 
             <button
+              type="button"
               onClick={() => onPlaceRoute(place)}
               style={{
                 marginTop: 8,
