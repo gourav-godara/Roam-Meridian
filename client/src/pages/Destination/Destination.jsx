@@ -373,12 +373,31 @@ console.log("Features:", response.data.features);
             />
 
             <UserReviews
-  items={reviews}
-  onWriteReview={() => setReviewModalOpen(true)}
-/>
-            <SimilarDestinations
-  currentDestinationId={destination._id}
-/>
+            items={reviews}
+            onWriteReview={() => setReviewModalOpen(true)}
+          />
+
+          <div className="lg:hidden mt-8">
+            {weather && (
+              <WeatherCard weather={weather} />
+            )}
+
+            <MapCard
+              latitude={destination.location.latitude}
+              longitude={destination.location.longitude}
+              name={destination.name}
+              nearbyPlaces={nearbyPlaces}
+              nearbyType={nearbyType}
+              setNearbyType={setNearbyType}
+              routeData={routeData}
+              onPlaceRoute={handlePlaceRoute}
+              loadingNearby={loadingNearby}
+            />
+          </div>
+
+          <SimilarDestinations
+            currentDestinationId={destination._id}
+          />
           </div>
 
           <aside className="hidden lg:block lg:sticky lg:top-28 h-fit">

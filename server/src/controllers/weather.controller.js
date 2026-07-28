@@ -1,48 +1,54 @@
 const axios = require("axios");
+const { getOrSet } = require("../utils/cache");
 
 const fetchWeather = async (city) => {
-    const response = await axios.get(
-        "https://api.openweathermap.org/data/2.5/weather",
-        {
-            params: {
-                q: city,
-                appid: process.env.WEATHER_API_KEY,
-                units: "metric",
-            },
+    return getOrSet(
+        `weather:${city.toLowerCase()}`,
+        10 * 60 * 1000, // 10 minutes — weather doesn't change second to second
+        async () => {
+            const response = await axios.get(
+                "https://api.openweathermap.org/data/2.5/weather",
+                {
+                    params: {
+                        q: city,
+                        appid: process.env.WEATHER_API_KEY,
+                        units: "metric",
+                    },
+                }
+            );
+
+            return {
+                city: response.data.name,
+                country: response.data.sys.country,
+                temp: response.data.main.temp,
+                condition: response.data.weather[0].description,
+                humidity: response.data.main.humidity,
+                wind: Number((response.data.wind.speed * 3.6).toFixed(1)),
+                feelsLike: response.data.main.feels_like,
+            };
         }
     );
-
-    return {
-        city: response.data.name,
-        country: response.data.sys.country,
-        temp: response.data.main.temp,
-        condition: response.data.weather[0].description,
-        humidity: response.data.main.humidity,
-        wind: Number((response.data.wind.speed * 3.6).toFixed(1)),
-        feelsLike: response.data.main.feels_like,
-    };
-};;
+};
 
 const getWeather = async (req, res) => {
     try {
 
-    const { city } = req.query;
+        const { city } = req.query;
 
-    if (!city) {
-        return res.status(400).json({
-            success: false,
-            message: "City is required",
+        if (!city) {
+            return res.status(400).json({
+                success: false,
+                message: "City is required",
+            });
+        }
+
+        // API call to OpenWeather
+        const weather = await fetchWeather(city);
+
+        return res.status(200).json({
+            success: true,
+            weather,
         });
-    }
-    
-    //API call to OpenWeather
-    const weather = await fetchWeather(city);
-
-    // ⬇️ Then return it here
-    return res.status(200).json({
-        success: true,
-        weather,
-    });
 
     } catch (error) {
         console.error(error.response?.data || error.message || error);
