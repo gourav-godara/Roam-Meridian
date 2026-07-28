@@ -23,12 +23,14 @@ const getAllDestinations = async (req, res) => {
 
         const filter = {};
 
-        // Search by destination name
+        // Search by destination name, city, or country
         if (search) {
-            filter.name = {
-                $regex: search,
-                $options: "i",
-            };
+            const regex = { $regex: search, $options: "i" };
+            filter.$or = [
+                { name: regex },
+                { city: regex },
+                { country: regex },
+            ];
         }
 
         // Filters
@@ -92,8 +94,6 @@ const getAllDestinations = async (req, res) => {
         else if (sort === "newest") {
             sortOption.createdAt = -1;
         }
-
-        console.log(filter);
 
         // Fetch paginated data
         const destinations = await Destination.find(filter)
@@ -300,3 +300,4 @@ module.exports = {
     updateDestination,
     deleteDestination,
 };
+

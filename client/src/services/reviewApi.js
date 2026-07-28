@@ -1,22 +1,8 @@
-import axios from "axios";
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
-
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+import api from "./api";
 
 // Get all reviews (optionally filtered by destination)
 export const getReviews = async (destinationId) => {
-  const { data } = await API.get("/reviews", {
+  const { data } = await api.get("/reviews", {
     params: destinationId ? { destinationId } : {},
   });
   return data;
@@ -24,7 +10,7 @@ export const getReviews = async (destinationId) => {
 
 // Get the live average rating + review count for a destination
 export const getAverageRating = async (destinationId) => {
-  const { data } = await API.get("/reviews/average", {
+  const { data } = await api.get("/reviews/average", {
     params: { destinationId },
   });
   return data;
@@ -32,7 +18,7 @@ export const getAverageRating = async (destinationId) => {
 
 // Get review by ID
 export const getReviewById = async (id) => {
-  const { data } = await API.get(`/reviews/${id}`);
+  const { data } = await api.get(`/reviews/${id}`);
   return data;
 };
 
@@ -57,7 +43,9 @@ export const createReview = (data) => {
     });
   }
 
-  return API.post("/reviews", formData, {
+  // Override Content-Type for this call only — the shared client defaults
+  // to application/json, but a file upload needs multipart/form-data.
+  return api.post("/reviews", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -66,13 +54,14 @@ export const createReview = (data) => {
 
 // Update review
 export const updateReview = async (id, reviewData) => {
-  const { data } = await API.put(`/reviews/${id}`, reviewData);
+  const { data } = await api.put(`/reviews/${id}`, reviewData);
   return data;
 };
 
 // Delete review
 export const deleteReview = async (id) => {
-  const { data } = await API.delete(`/reviews/${id}`);
+  const { data } = await api.delete(`/reviews/${id}`);
   return data;
 };
+
 

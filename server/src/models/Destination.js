@@ -42,6 +42,14 @@ duration: {
     trim: true,
 },
 
+// Visa/passport/permit info — explicitly requested in the competition
+// handbook's "Destination Listings" requirement.
+entryRequirements: {
+    type: String,
+    trim: true,
+    default: "",
+},
+
 category: {
   type: String,
   required: true,
@@ -120,6 +128,13 @@ location: {
 }
 );
 
+// Speeds up the common filters/sorts used by getAllDestinations
+// (city/country/category filters, rating sort).
+destinationSchema.index({ city: 1 });
+destinationSchema.index({ country: 1 });
+destinationSchema.index({ category: 1 });
+destinationSchema.index({ "rating.average": -1 });
+
 const Destination = mongoose.model("Destination", destinationSchema);
 
-module.exports = Destination; 
+module.exports = Destination;

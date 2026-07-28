@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { FiHeart, FiLoader } from "react-icons/fi";
+import { FiHeart, FiLoader, FiShare2 } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import Button from "../common/Button";
 import { addToWishlist } from "../../services/tripApi";
-import { FiShare2 } from "react-icons/fi";
+import { useToast } from "../../context/ToastContext";
+
 function ActionButtons({ destinationId, destinationName, initialWishlisted = false }) {
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [saving, setSaving] = useState(false);
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,14 +28,16 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
       await addToWishlist(destinationId);
 
       setWishlisted(true);
+      showToast("Added to your wishlist.", "success");
     } catch (error) {
       // Already in wishlist — treat as success, just sync the UI
       if (error.response?.status === 409) {
         setWishlisted(true);
       } else {
-        alert(
+        showToast(
           error.response?.data?.message ||
-            "Unable to add this destination to your wishlist."
+            "Unable to add this destination to your wishlist.",
+          "error"
         );
       }
     } finally {
@@ -49,24 +53,30 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
 
     navigate(`/planner?${params.toString()}`);
   };
-  const handleShare = async () => {
-  const url = window.location.href;
 
-  try {
-    if (navigator.share) {
-      await navigator.share({
-        title: destinationName,
-        text: `Check out this amazing destination on Roam Meridian!`,
-        url,
-      });
-    } else {
-      await navigator.clipboard.writeText(url);
-      alert("Link copied successfully!");
+  const handleShare = async () => {
+    const url = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: destinationName,
+          text: `Check out this amazing destination on Roam Meridian!`,
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        showToast("Link copied to clipboard.", "success");
+      }
+    } catch (error) {
+      // AbortError fires when the user cancels the native share sheet —
+      // that's not a real failure, so don't show an error toast for it.
+      if (error.name !== "AbortError") {
+        showToast("Couldn't share this page.", "error");
+      }
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
       <button
@@ -83,14 +93,16 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
         )}
         {wishlisted ? "Wishlisted" : "Add to Wishlist"}
       </button>
-        <button
-  type="button"
-  onClick={handleShare}
-  className="flex items-center justify-center gap-2 border rounded-2xl py-3.5 text-sm font-semibold hover:bg-gray-100 transition"
->
-  <FiShare2 size={17} />
-  Share
-</button>
+
+      <button
+        type="button"
+        onClick={handleShare}
+        className="flex items-center justify-center gap-2 border rounded-2xl py-3.5 text-sm font-semibold hover:bg-gray-100 transition"
+      >
+        <FiShare2 size={17} />
+        Share
+      </button>
+
       <Button
         variant="primary"
         onClick={handlePlanWithAI}
