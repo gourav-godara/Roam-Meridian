@@ -5,7 +5,9 @@ import MobileFilterDrawer from "../../components/explore/MobileFilterDrawer";
 import DestinationGrid from "../../components/explore/DestinationGrid";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getAllDestinations } from "../../services/destinationApi";
-import useWishlist from "../../hooks/useWishlist";
+import { addToWishlist } from "../../services/tripApi";
+import useTrips from "../../hooks/useTrips";
+import { useToast } from "../../context/ToastContext";
 
 const DEFAULT_FILTERS = {
   categories: ["All"],
@@ -14,6 +16,7 @@ const DEFAULT_FILTERS = {
 };
 
 function Explore() {
+  const { showToast } = useToast();
   const [destinations, setDestinations] = useState([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("Recommended");
@@ -33,17 +36,15 @@ function Explore() {
 
   const debouncedQuery = useDebounce(query, 300);
 
-  const {
-    wishlist,
-    addItem,
-    removeItem,
-  } = useWishlist();
+  const { trips, refreshTrips } = useTrips();
 
-const wishlistedIds = useMemo(() => {
-  return new Set(
-    wishlist.map((destination) => destination._id)
-  );
-}, [wishlist]);
+  const wishlistedIds = useMemo(() => {
+    return new Set(
+      trips
+        .filter((trip) => trip.status === "wishlist")
+        .map((trip) => trip.destinationId?._id || trip.destinationId)
+    );
+  }, [trips]);
 
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -131,19 +132,24 @@ const wishlistedIds = useMemo(() => {
   }, [debouncedQuery, appliedFilters, sort]);
 
   const toggleFavorite = async (id) => {
+    if (wishlistedIds.has(id) || savingId === id) return;
+
     try {
       setSavingId(id);
 
-      if(wishlistedIds.has(id)) {
-        await removeItem(id);
+      await addToWishlist(id);
+
+      await refreshTrips();
+    } catch (error) {
+      if (error.response?.status === 409) {
+        await refreshTrips();
       } else {
-        await addItem(id);
+        showToast(
+          error.response?.data?.message ||
+            "Unable to add this destination to your wishlist.",
+          "error"
+        );
       }
-    }   catch (error) {
-      alert(
-        error.response?.data?.message ||
-        "Unable to update wishlist."
-      );
     } finally {
       setSavingId(null);
     }
