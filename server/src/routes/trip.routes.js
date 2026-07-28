@@ -17,7 +17,10 @@ router.get("/", authMiddleware, getAllTrips);
 router.get("/user", authMiddleware, getAllTrips);
 
 router.post("/", authMiddleware, createTrip);
+
+router.post("/wishlist/:destinationId", authMiddleware, addToWishlist);
 router.post("/wishlist", authMiddleware, addToWishlist);
+
 router.get("/:id", authMiddleware, getTripById);
 router.put("/:id", authMiddleware, updateTrip);
 router.delete("/:id", authMiddleware, deleteTrip);
