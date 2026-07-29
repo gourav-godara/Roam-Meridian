@@ -24,7 +24,7 @@ import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
-
+import Wishlist from "../pages/Wishlist/Wishlist";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -42,7 +42,7 @@ function AppRouter() {
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/planner" element={<AIPlanner />} />

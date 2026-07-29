@@ -5,9 +5,7 @@ import MobileFilterDrawer from "../../components/explore/MobileFilterDrawer";
 import DestinationGrid from "../../components/explore/DestinationGrid";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getAllDestinations } from "../../services/destinationApi";
-import { addToWishlist } from "../../services/tripApi";
-import useTrips from "../../hooks/useTrips";
-import { useToast } from "../../context/ToastContext";
+import useWishlist from "../../hooks/useWishlist";
 
 const DEFAULT_FILTERS = {
   categories: ["All"],
@@ -16,7 +14,6 @@ const DEFAULT_FILTERS = {
 };
 
 function Explore() {
-  const { showToast } = useToast();
   const [destinations, setDestinations] = useState([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("Recommended");
@@ -36,15 +33,17 @@ function Explore() {
 
   const debouncedQuery = useDebounce(query, 300);
 
-  const { trips, refreshTrips } = useTrips();
+  const {
+    wishlist,
+    addItem,
+    removeItem,
+  } = useWishlist();
 
-  const wishlistedIds = useMemo(() => {
-    return new Set(
-      trips
-        .filter((trip) => trip.status === "wishlist")
-        .map((trip) => trip.destinationId?._id || trip.destinationId)
-    );
-  }, [trips]);
+const wishlistedIds = useMemo(() => {
+  return new Set(
+    wishlist.map((destination) => destination._id)
+  );
+}, [wishlist]);
 
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -132,24 +131,19 @@ function Explore() {
   }, [debouncedQuery, appliedFilters, sort]);
 
   const toggleFavorite = async (id) => {
-    if (wishlistedIds.has(id) || savingId === id) return;
-
     try {
       setSavingId(id);
 
-      await addToWishlist(id);
-
-      await refreshTrips();
-    } catch (error) {
-      if (error.response?.status === 409) {
-        await refreshTrips();
+      if(wishlistedIds.has(id)) {
+        await removeItem(id);
       } else {
-        showToast(
-          error.response?.data?.message ||
-            "Unable to add this destination to your wishlist.",
-          "error"
-        );
+        await addItem(id);
       }
+    }   catch (error) {
+      alert(
+        error.response?.data?.message ||
+        "Unable to update wishlist."
+      );
     } finally {
       setSavingId(null);
     }
