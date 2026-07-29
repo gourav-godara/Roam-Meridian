@@ -84,6 +84,19 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+<<<<<<< HEAD
+=======
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://roam-meridian.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
+>>>>>>> 59984aef1c62f183b7f57fb3f6d16dba79aaeb30
 // ================= Routes =================
 app.use("/api/auth", authRoutes);
 app.use("/api/wishlist", wishlistRoutes);

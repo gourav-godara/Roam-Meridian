@@ -116,9 +116,6 @@ const createTrip = async (req, res) => {
 };
 
 const addToWishlist = async (req, res) => {
-  // The frontend posts to /trips/wishlist/:destinationId with no body,
-  // so accept the id from the route param first and fall back to the
-  // body for any other caller.
   const destinationId = req.params.destinationId || req.body.destinationId;
 
   if (!destinationId) {
