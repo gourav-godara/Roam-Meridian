@@ -5,25 +5,19 @@ const Trip = require("../models/trip.model");
 // Create Review
 const createReview = async (req, res, next) => {
   try {
-    let {
-    itinerary,
-    destination,
-    destinationId,
-} = req.body;
+    let { itinerary, destination, destinationId } = req.body;
 
-destination = destination || destinationId;
+    destination = destination || destinationId;
+
     // If itinerary not provided, find a completed trip automatically
     if (!itinerary && destination) {
-      const trip = await Trip.findOne({
+      const autoTrip = await Trip.findOne({
         destinationId: destination,
         status: "completed",
-        $or: [
-          { createdBy: req.user.id },
-          { collaborators: req.user.id },
-        ],
+        $or: [{ createdBy: req.user.id }, { collaborators: req.user.id }],
       });
 
-      if (!trip) {
+      if (!autoTrip) {
         return res.status(400).json({
           success: false,
           message:
@@ -31,16 +25,20 @@ destination = destination || destinationId;
         });
       }
 
-      itinerary = trip._id;
+      itinerary = autoTrip._id;
+    }
+
+    // Guard against itinerary being missing/malformed before hitting the
+    // DB — Trip.findById(undefined) throws a CastError, which previously
+    // surfaced as a confusing 500 instead of a clean 404/400.
+    if (!itinerary) {
+      return res.status(400).json({
+        success: false,
+        message: "A destination or completed trip is required to review.",
+      });
     }
 
     const trip = await Trip.findById(itinerary);
-
-    // Convert uploaded files into image paths
-const uploadedImages =
-  req.files?.map(
-    (file) => `/uploads/reviews/${file.filename}`
-  ) || [];
 
     if (!trip) {
       return res.status(404).json({
@@ -69,13 +67,18 @@ const uploadedImages =
       });
     }
 
+    // Only convert uploaded files once we know the trip is valid — no
+    // point building paths for a request we're about to reject.
+    const uploadedImages =
+      req.files?.map((file) => `/uploads/reviews/${file.filename}`) || [];
+
     const review = await reviewService.createReview({
-  ...req.body,
-  itinerary,
-  destination: trip.destinationId,
-  user: req.user.id,
-  images: uploadedImages,
-});
+      ...req.body,
+      itinerary,
+      destination: trip.destinationId,
+      user: req.user.id,
+      images: uploadedImages,
+    });
 
     res.status(201).json({
       success: true,
@@ -90,9 +93,20 @@ const uploadedImages =
 // Get All Reviews
 const getAllReviews = async (req, res, next) => {
   try {
-    const reviews = await reviewService.getAllReviews(
-  req.query.destinationId
-);
+    // ?mine=true scopes results to the logged-in user (used by the "My
+    // Reviews" page). Requires auth — see review.routes.js, which only
+    // attaches auth middleware conditionally for this reason.
+    if (req.query.mine === "true" && !req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Login required to view your reviews.",
+      });
+    }
+
+    const reviews = await reviewService.getAllReviews({
+      destinationId: req.query.destinationId,
+      userId: req.query.mine === "true" ? req.user?.id : undefined,
+    });
 
     res.status(200).json({
       success: true,
@@ -126,7 +140,6 @@ const getReviewById = async (req, res, next) => {
 };
 
 // Update Review
-
 const updateReview = async (req, res, next) => {
   try {
     const existingReview = await Review.findById(req.params.id);
@@ -145,10 +158,7 @@ const updateReview = async (req, res, next) => {
       });
     }
 
-    const review = await reviewService.updateReview(
-      req.params.id,
-      req.body
-    );
+    const review = await reviewService.updateReview(req.params.id, req.body);
 
     res.status(200).json({
       success: true,
@@ -159,6 +169,7 @@ const updateReview = async (req, res, next) => {
     next(error);
   }
 };
+
 // Delete Review
 const deleteReview = async (req, res, next) => {
   try {
@@ -177,6 +188,7 @@ const deleteReview = async (req, res, next) => {
         message: "You can only delete your own review.",
       });
     }
+
     await reviewService.deleteReview(req.params.id);
 
     res.status(200).json({
@@ -187,6 +199,7 @@ const deleteReview = async (req, res, next) => {
     next(error);
   }
 };
+
 // Get Average Rating
 const getAverageRating = async (req, res, next) => {
   try {
@@ -202,6 +215,7 @@ const getAverageRating = async (req, res, next) => {
     next(error);
   }
 };
+
 module.exports = {
   createReview,
   getAllReviews,

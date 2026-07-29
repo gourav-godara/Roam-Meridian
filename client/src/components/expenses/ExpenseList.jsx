@@ -5,6 +5,7 @@ const ExpenseList = ({
   refreshExpenses,
   setEditingExpense,
   setOpenModal,
+  currentUserId,
 }) => {
   if (!expenses.length) {
     return (
@@ -30,6 +31,7 @@ const ExpenseList = ({
             refreshExpenses={refreshExpenses}
             setEditingExpense={setEditingExpense}
             setOpenModal={setOpenModal}
+            currentUserId={currentUserId}
           />
         ))}
       </div>

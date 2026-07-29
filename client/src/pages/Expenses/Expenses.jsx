@@ -8,6 +8,8 @@ import SettlementCard from "../../components/expenses/SettlementCard";
 import useTrips from "../../hooks/useTrips";
 import { calculateSettlements } from "../../utils/calculateSettlements";
 import { settleExpense } from "../../services/expenseApi";
+import { useToast } from "../../context/ToastContext";
+import useAuth from "../../hooks/useAuth";
 
 const Expenses = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -19,15 +21,21 @@ const Expenses = () => {
 
   const { expenses, loading, error, refreshExpenses } = useExpenses();
   const { trips } = useTrips();
+  const { showToast } = useToast();
 
-  const currentUser = JSON.parse(localStorage.getItem("user"));
-  const currentUserName = currentUser?.name;
+  // useAuth already exposes the parsed user object from context — reading
+  // straight from localStorage here was redundant and could drift out of
+  // sync with the actual auth state if the user logs out in another tab.
+  const { user: currentUser } = useAuth();
   const currentUserId = currentUser?.id;
 
   const settlements = calculateSettlements(expenses);
+
+  // Previously this matched by name, not id — two participants who happen
+  // to share a name would get their settlements mixed up. Every other
+  // comparison on this page already uses currentUserId; this now matches.
   const mySettlements = settlements.filter(
-    (item) =>
-      item.from.name === currentUserName || item.to.name === currentUserName,
+    (item) => item.from._id === currentUserId || item.to._id === currentUserId,
   );
 
   const summary = {
@@ -45,10 +53,13 @@ const Expenses = () => {
   const handleSettle = async (expenseId) => {
     try {
       await settleExpense(expenseId);
-      alert("Expense settled successfully!");
+      showToast("Expense settled successfully!", "success");
       refreshExpenses();
     } catch (err) {
-      alert(err.response?.data?.message || "Unable to settle expense.");
+      showToast(
+        err.response?.data?.message || "Unable to settle expense.",
+        "error"
+      );
     }
   };
 
@@ -118,10 +129,15 @@ const Expenses = () => {
               refreshExpenses={refreshExpenses}
               setEditingExpense={setEditingExpense}
               setOpenModal={setOpenModal}
+              currentUserId={currentUserId}
             />
           </div>
 
-          <SettlementCard settlements={mySettlements} onSettle={handleSettle} />
+          <SettlementCard
+            settlements={mySettlements}
+            onSettle={handleSettle}
+            currentUserId={currentUserId}
+          />
         </div>
       </div>
     </div>

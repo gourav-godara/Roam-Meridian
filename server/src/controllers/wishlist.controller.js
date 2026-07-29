@@ -1,92 +1,104 @@
-const User = require("../models/user.model");
-const Destination = require("../models/Destination");
+const Wishlist = require("../models/wishlist.model");
 
-const getWishlist = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).populate("wishlist");
-
-        return res.status(200).json({
-            success: true,
-            wishlist: user.wishlist,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
-    }
-};
-
+/**
+ * Add destination to wishlist
+ */
 const addToWishlist = async (req, res) => {
-    try {
-        const { destinationId } = req.params;
+  try {
+    const { destinationId } = req.body;
 
-        const destination = await Destination.findById(destinationId);
-
-        if(!destination) {
-            return res.status(404).json({
-                success: false,
-                message: "Destination not found",
-            });
-        }
-
-        const user = await User.findById(req.user.id);
-
-        if(
-            user.wishlist.some(
-                (id) => id.toString() === destinationId
-            )
-        ) {
-            return res.status(400).json({
-                success:false,
-                message: "Destination already in wishlist",
-            });
-        }
-
-        user.wishlist.push(destinationId);
-
-        await user.save();
-
-        return res.status(200).json({
-            success: true,
-            message: "Added to wishlist",
-            wishlist: user.wishlist,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+    if (!destinationId) {
+      return res.status(400).json({
+        success: false,
+        message: "Destination ID is required.",
+      });
     }
+
+    // Check duplicate
+    const existing = await Wishlist.findOne({
+      user: req.user.id,
+      destination: destinationId,
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: "Destination already in wishlist.",
+      });
+    }
+
+    const wishlistItem = await Wishlist.create({
+      user: req.user.id,
+      destination: destinationId,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Added to wishlist.",
+      data: wishlistItem,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to add wishlist item.",
+    });
+  }
 };
 
-const removeFromWishlist = async (req, res) => {
-    try {
-        const {destination } = req.params;
+/**
+ * Get user's wishlist
+ */
+const getWishlist = async (req, res) => {
+  try {
+    const wishlist = await Wishlist.find({
+      user: req.user.id,
+    }).populate("destination");
 
-        const user = await User.findById(req.user.id);
+    return res.status(200).json({
+      success: true,
+      count: wishlist.length,
+      data: wishlist,
+    });
+  } catch (error) {
+    console.error(error);
 
-        user.wishlist = user.wishlist.filter(
-            (id) => id.toString() !== destinationId
-        );
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch wishlist.",
+    });
+  }
+};
 
-        await user.save();
+/**
+ * Remove destination from wishlist
+ */
+const removeWishlist = async (req, res) => {
+  try {
+    const { destinationId } = req.params;
 
-        return res.status(200).json({
-            success: true,
-            message: "Removed from wishlist",
-            wishlist: user.wishlist,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
-    }
+    await Wishlist.findOneAndDelete({
+      user: req.user.id,
+      destination: destinationId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Removed from wishlist.",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to remove wishlist item.",
+    });
+  }
 };
 
 module.exports = {
-    getWishlist,
-    addToWishlist,
-    removeFromWishlist,
+  addToWishlist,
+  getWishlist,
+  removeWishlist,
 };

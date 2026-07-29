@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { FiX } from "react-icons/fi";
+import { FiX, FiLoader } from "react-icons/fi";
 import { createExpense, updateExpense } from "../../services/expenseApi";
+import { useToast } from "../../context/ToastContext";
+import useAuth from "../../hooks/useAuth";
 
 const AddExpenseModal = ({
   isOpen,
@@ -9,6 +11,9 @@ const AddExpenseModal = ({
   editingExpense,
   trips = [],
 }) => {
+  const { showToast } = useToast();
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -18,6 +23,8 @@ const AddExpenseModal = ({
     paidBy: "",
     participants: [],
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const selectedTrip = trips.find((trip) => trip._id === formData.trip);
   const tripMembers = selectedTrip
@@ -28,8 +35,30 @@ const AddExpenseModal = ({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validate = () => {
+    if (!formData.title.trim()) return "Please enter an expense title.";
+    if (!formData.trip) return "Please select a trip.";
+    if (!formData.amount || Number(formData.amount) <= 0) {
+      return "Amount must be greater than zero.";
+    }
+    if (formData.participants.length === 0) {
+      return "Select at least one participant to split this expense with.";
+    }
+    return "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationError = validate();
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+
+    setFormError("");
+    setSubmitting(true);
+
     try {
       if (editingExpense) {
         await updateExpense(editingExpense._id, formData);
@@ -37,10 +66,11 @@ const AddExpenseModal = ({
         await createExpense(formData);
       }
 
-      alert(
+      showToast(
         editingExpense
           ? "Expense updated successfully!"
           : "Expense created successfully!",
+        "success"
       );
 
       if (refreshExpenses) {
@@ -59,15 +89,19 @@ const AddExpenseModal = ({
         participants: [],
       });
     } catch (err) {
-      alert(err.response?.data?.message || "Unable to create expense.");
+      setFormError(
+        err.response?.data?.message || "Unable to save this expense."
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen) return;
 
     if (editingExpense) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: editingExpense.title ?? "",
         description: editingExpense.description ?? "",
@@ -83,13 +117,15 @@ const AddExpenseModal = ({
         description: "",
         amount: "",
         category: "Accommodation",
+        // Default "Paid By" to the current user — they can still change
+        // it to log an expense someone else on the trip actually covered.
         trip: "",
-        paidBy: "",
+        paidBy: user?.id || "",
         participants: [],
       });
     }
-  }, [isOpen, editingExpense]);
-  /* eslint-disable react-hooks/set-state-in-effect */
+    setFormError("");
+  }, [isOpen, editingExpense, user?.id]);
 
   if (!isOpen) return null;
 
@@ -103,12 +139,19 @@ const AddExpenseModal = ({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-red-500 transition-colors"
+            aria-label="Close"
           >
             <FiX size={20} />
           </button>
         </div>
 
         <div className="p-6 sm:p-8">
+          {formError && (
+            <div className="mb-5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
+              {formError}
+            </div>
+          )}
+
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-ink mb-2">
@@ -147,6 +190,8 @@ const AddExpenseModal = ({
                 value={formData.amount}
                 onChange={handleChange}
                 type="number"
+                min="0"
+                step="0.01"
                 placeholder="5000"
                 className="w-full border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-forest/40 transition-colors"
               />
@@ -179,7 +224,8 @@ const AddExpenseModal = ({
                 name="trip"
                 value={formData.trip}
                 onChange={handleChange}
-                className="w-full border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-forest/40 transition-colors bg-white"
+                disabled={!!editingExpense}
+                className="w-full border border-border rounded-xl px-4 py-3 text-sm outline-none focus:border-forest/40 transition-colors bg-white disabled:bg-gray-100"
               >
                 <option value="">Select Trip</option>
                 {trips.map((trip) => (
@@ -204,9 +250,14 @@ const AddExpenseModal = ({
                 {tripMembers.map((member) => (
                   <option key={member._id} value={member._id}>
                     {member.name}
+                    {member._id === user?.id ? " (You)" : ""}
                   </option>
                 ))}
               </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Defaults to you — change this if someone else on the trip
+                covered it.
+              </p>
             </div>
 
             <div>
@@ -246,20 +297,29 @@ const AddExpenseModal = ({
                   </label>
                 ))}
               </div>
+
+              {selectedTrip && tripMembers.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  This trip has no other members to split expenses with yet.
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2.5 rounded-xl border border-border text-sm font-medium text-ink hover:bg-mist transition-colors"
+                disabled={submitting}
+                className="px-5 py-2.5 rounded-xl border border-border text-sm font-medium text-ink hover:bg-mist transition-colors disabled:opacity-60"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-forest text-white text-sm font-semibold hover:bg-forest-dark transition-colors"
+                disabled={submitting}
+                className="px-5 py-2.5 rounded-xl bg-forest text-white text-sm font-semibold hover:bg-forest-dark transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
+                {submitting && <FiLoader className="animate-spin" size={16} />}
                 {editingExpense ? "Update Expense" : "Save Expense"}
               </button>
             </div>

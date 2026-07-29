@@ -1,7 +1,12 @@
-import { FiStar, FiThumbsUp } from "react-icons/fi";
+import { FiStar, FiThumbsUp, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { motion } from "framer-motion";
 
-const ReviewCard = ({ review }) => {
+const ReviewCard = ({ review, currentUserId, onEdit, onDelete }) => {
+  const isOwner =
+    !currentUserId ||
+    !review.user?._id ||
+    review.user._id === currentUserId;
+
   return (
     <motion.div
       whileHover={{ y: -3 }}
@@ -56,9 +61,38 @@ const ReviewCard = ({ review }) => {
           <FiThumbsUp size={13} />
           {review.likes || 0} Likes
         </span>
-        {review.isEdited && (
-          <span className="text-xs text-forest font-medium">Edited</span>
-        )}
+
+        <div className="flex items-center gap-3">
+          {review.isEdited && (
+            <span className="text-xs text-forest font-medium">Edited</span>
+          )}
+
+          {/* Edit/delete were previously nowhere in the UI, even though
+              the backend fully supports both with ownership checks. */}
+          {isOwner && (onEdit || onDelete) && (
+            <div className="flex items-center gap-2">
+              {onEdit && (
+                <button
+                  onClick={() => onEdit(review)}
+                  className="text-xs text-gray-500 hover:text-forest flex items-center gap-1"
+                  aria-label="Edit review"
+                >
+                  <FiEdit2 size={13} />
+                </button>
+              )}
+
+              {onDelete && (
+                <button
+                  onClick={() => onDelete(review)}
+                  className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1"
+                  aria-label="Delete review"
+                >
+                  <FiTrash2 size={13} />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaStar, FaTimes } from "react-icons/fa";
+import { FiLoader } from "react-icons/fi";
 
 const AddReviewModal = ({
   isOpen,
@@ -7,32 +8,53 @@ const AddReviewModal = ({
   onSubmit,
   editingReview,
   trips = [],
+  submitting = false,
 }) => {
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [itinerary, setItinerary] = useState("");
+  const [formError, setFormError] = useState("");
 
-
+  // Previously editingReview was accepted as a prop but never actually
+  // used to populate the form — clicking "Edit" opened a blank form
+  // instead of the review's existing content.
+  useEffect(() => {
+    if (editingReview) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRating(editingReview.rating || 0);
+      setReviewText(editingReview.reviewText || "");
+      setItinerary(editingReview.itinerary?._id || editingReview.itinerary || "");
+    } else {
+      setRating(0);
+      setReviewText("");
+      setItinerary("");
+    }
+    setFormError("");
+  }, [editingReview, isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (submitting) return;
+
     if (!rating) {
-      alert("Please select a rating.");
+      setFormError("Please select a rating.");
       return;
     }
 
     if (!reviewText.trim()) {
-      alert("Please write your review.");
+      setFormError("Please write your review.");
       return;
     }
 
     if (!editingReview && !itinerary) {
-      alert("Please select a trip.");
+      setFormError("Please select a trip.");
       return;
     }
+
+    setFormError("");
 
     onSubmit({
       rating,
@@ -42,8 +64,8 @@ const AddReviewModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl w-full max-w-lg p-8">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">
             {editingReview ? "Edit Review" : "Write Review"}
@@ -52,10 +74,17 @@ const AddReviewModal = ({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-red-500 transition"
+            aria-label="Close"
           >
             <FaTimes size={18} />
           </button>
         </div>
+
+        {formError && (
+          <div className="mb-5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
+            {formError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Trip — locked once editing, since a review is tied to one trip */}
@@ -109,7 +138,11 @@ const AddReviewModal = ({
               onChange={(e) => setReviewText(e.target.value)}
               className="w-full border rounded-xl mt-2 p-3 resize-none"
               placeholder="Share your experience..."
+              maxLength={1000}
             />
+            <p className="text-xs text-gray-400 mt-1 text-right">
+              {reviewText.length}/1000
+            </p>
           </div>
 
           <div className="flex justify-end gap-4">
@@ -123,8 +156,10 @@ const AddReviewModal = ({
 
             <button
               type="submit"
-              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-xl"
+              disabled={submitting}
+              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
+              {submitting && <FiLoader className="animate-spin" size={16} />}
               {editingReview ? "Update Review" : "Submit Review"}
             </button>
           </div>
