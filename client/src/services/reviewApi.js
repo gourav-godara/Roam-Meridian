@@ -1,10 +1,14 @@
 import api from "./api";
 
-// Get all reviews (optionally filtered by destination)
-export const getReviews = async (destinationId) => {
-  const { data } = await api.get("/reviews", {
-    params: destinationId ? { destinationId } : {},
-  });
+// Get all reviews (optionally filtered by destination, or scoped to the
+// logged-in user's own reviews with { mine: true })
+export const getReviews = async (destinationId, { mine = false } = {}) => {
+  const params = {};
+
+  if (destinationId) params.destinationId = destinationId;
+  if (mine) params.mine = "true";
+
+  const { data } = await api.get("/reviews", { params });
   return data;
 };
 
@@ -63,5 +67,3 @@ export const deleteReview = async (id) => {
   const { data } = await api.delete(`/reviews/${id}`);
   return data;
 };
-
-

@@ -26,6 +26,9 @@ export const deleteTrip = async (id) => {
 };
 
 export const addToWishlist = async (destinationId) => {
-  const { data } = await api.post(`/trips/wishlist/${destinationId}`);
+  const { data } = await api.post("/trips/wishlist", {
+    destinationId,
+  });
+
   return data;
 };
