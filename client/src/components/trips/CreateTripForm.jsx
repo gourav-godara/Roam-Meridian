@@ -21,7 +21,6 @@ function CreateTripForm({ plannerData = null }) {
     travelers: plannerData?.travelers || 1,
 
     collaborators: "",
-    isPublic: false,
   });
 
   const handleChange = (e) => {
@@ -80,7 +79,7 @@ function CreateTripForm({ plannerData = null }) {
 
         status,
 
-        isPublic: formData.isPublic,
+        isPublic: false,
       };
 
       await createTrip(payload);
@@ -239,21 +238,6 @@ function CreateTripForm({ plannerData = null }) {
           <p className="text-xs text-gray-500 mt-1">
             AI Planner will later provide collaborator selection automatically.
           </p>
-        </div>
-
-        {/* Public */}
-        <div className="flex items-center gap-3">
-          <input
-            id="isPublic"
-            type="checkbox"
-            name="isPublic"
-            checked={formData.isPublic}
-            onChange={handleChange}
-          />
-
-          <label htmlFor="isPublic">
-            Make this trip public
-          </label>
         </div>
 
         {/* Buttons */}
