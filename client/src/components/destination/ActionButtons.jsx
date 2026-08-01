@@ -3,14 +3,17 @@ import { FiHeart, FiLoader, FiShare2 } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import Button from "../common/Button";
-import { addToWishlist } from "../../services/tripApi";
+import useWishlist from "../../hooks/useWishlist";
 import { useToast } from "../../context/ToastContext";
 
-function ActionButtons({ destinationId, destinationName, initialWishlisted = false }) {
-  const [wishlisted, setWishlisted] = useState(initialWishlisted);
+function ActionButtons({ destinationId, destinationName }) {
   const [saving, setSaving] = useState(false);
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const { wishlist, addItem, removeItem } = useWishlist();
+  const wishlisted = wishlist.some(
+    (item) => item._id === destinationId
+  );
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,26 +23,24 @@ function ActionButtons({ destinationId, destinationName, initialWishlisted = fal
       return;
     }
 
-    if (wishlisted || saving) return;
+    if (saving) return;
 
     try {
       setSaving(true);
 
-      await addToWishlist(destinationId);
-
-      setWishlisted(true);
-      showToast("Added to your wishlist.", "success");
-    } catch (error) {
-      // Already in wishlist — treat as success, just sync the UI
-      if (error.response?.status === 409) {
-        setWishlisted(true);
+      if(wishlisted) {
+        await removeItem(destinationId);
+        showToast("Removed from your wishlist.", "success");
       } else {
-        showToast(
-          error.response?.data?.message ||
-            "Unable to add this destination to your wishlist.",
-          "error"
-        );
+        await addItem(destinationId);
+        showToast("Added to your wishlist.", "success");
       }
+    } catch (error) {
+      showToast(
+        error.response?.data?.message ||
+        "Unable to update your wishlist.",
+        "error"
+      );
     } finally {
       setSaving(false);
     }

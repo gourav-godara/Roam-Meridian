@@ -42,7 +42,6 @@ const EditTrip = () => {
             travelers: trip.travelers ?? 1,
             budget: trip.budget ?? 0,
             status: trip.status || "planning",
-            isPublic: trip.isPublic || false,
           });
         }
       } catch (err) {
@@ -64,8 +63,6 @@ const EditTrip = () => {
   }, [id]);
 
   const handleChange = (field) => (e) => {
-    const value =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -84,12 +81,11 @@ const EditTrip = () => {
         travelers: Number(form.travelers),
         budget: Number(form.budget),
         status: form.status,
-        isPublic: form.isPublic,
+        isPublic: false,
       });
 
       setSuccess(true);
 
-      // Trip Updated Successfully -> back to Trip Detail
       setTimeout(() => {
         navigate(`/trips/${id}`);
       }, 900);
@@ -218,16 +214,6 @@ const EditTrip = () => {
             ))}
           </select>
         </div>
-
-        <label className="flex items-center gap-2 text-sm text-ink">
-          <input
-            type="checkbox"
-            checked={form.isPublic}
-            onChange={handleChange("isPublic")}
-            className="h-4 w-4 rounded border-border accent-forest"
-          />
-          Make this trip public
-        </label>
 
         <div className="flex gap-3 pt-4">
           <Button type="submit" variant="primary" loading={saving}>
