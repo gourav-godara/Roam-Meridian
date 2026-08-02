@@ -7,7 +7,6 @@ import Sidebar from "../../components/dashboard/Sidebar";
 import StatsGrid from "../../components/dashboard/StatsGrid";
 import UpcomingTripCard from "../../components/dashboard/UpcomingTripCard";
 import ContinuePlanning from "../../components/dashboard/ContinuePlanning";
-import RecentBookings from "../../components/dashboard/RecentBookings";
 import RecommendationCard from "../../components/dashboard/RecommendationCard";
 import TravelMap from "../../components/dashboard/TravelMap";
 import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
@@ -23,7 +22,6 @@ function Dashboard() {
     stats,
     upcomingTrip,
     continuePlanning,
-    recentBookings,
     travelHistory,
     recentReviews,
     recommendations,
@@ -124,7 +122,6 @@ function Dashboard() {
           <div className="flex flex-col gap-6 min-w-0">
             <UpcomingTripCard trip={upcomingTrip} />
             <ContinuePlanning items={continuePlanning} />
-            <RecentBookings bookings={recentBookings} />
             <TravelHistory trips={travelHistory} />
             <RecentReviews reviews={recentReviews} />
           </div>

@@ -142,22 +142,6 @@ const getDashboardData = async (userId) => {
       image: trip.coverImage || "https://placehold.co/400x300",
     }));
 
-  const recentBookings = trips
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5)
-    .map((trip) => ({
-      id: trip._id,
-      name: trip.title,
-      location: trip.destinationId
-        ? `${trip.destinationId.city}, ${trip.destinationId.country}`
-        : "Destination unavailable",
-      date: `Start: ${new Date(trip.startDate).toLocaleDateString()}`,
-      status: trip.status.charAt(0).toUpperCase() + trip.status.slice(1),
-      amount: `₹${trip.budget}`,
-      image: trip.coverImage || "https://placehold.co/100x100",
-    }));
-
   const recommendations = destinations.map((destination) => ({
     id: destination._id,
     name: destination.name,
@@ -281,7 +265,6 @@ const getDashboardData = async (userId) => {
 
     upcomingTrip: upcomingTripData,
     continuePlanning,
-    recentBookings,
     recommendations,
 
     mapPins,
