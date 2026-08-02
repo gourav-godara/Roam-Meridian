@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { getOrSet } = require("../utils/cache");
 
 const placeTypes = {
     restaurant: "catering.restaurant",
@@ -20,26 +21,34 @@ const getNearbyPlaces = async (lat, lng, type, radius = 1000) => {
         throw new Error("Invalid place type");
     }
 
-    const response = await axios.get(
-        "https://api.geoapify.com/v2/places",
-        {
-            params: {
-                categories: category,
-                filter: `circle:${lng},${lat},${radius}`,
-                limit: 20,
-                apiKey: process.env.GEOAPIFY_API_KEY,
-            },
-            timeout: 10000,
-        }
-    );
+    // Round coordinates slightly so nearby requests for "the same spot"
+    // hit the cache instead of calling the API every time.
+    const cacheKey = `nearby:${category}:${Number(lat).toFixed(3)}:${Number(
+        lng
+    ).toFixed(3)}:${radius}`;
 
-    return response.data.features.map((place) => ({
-        name: place.properties.name || "Unknown Place",
-        latitude: place.properties.lat,
-        longitude: place.properties.lon,
-        address: place.properties.formatted || "",
-        category: place.properties.categories || [],
-    }));
+    return getOrSet(cacheKey, 30 * 60 * 1000, async () => {
+        const response = await axios.get(
+            "https://api.geoapify.com/v2/places",
+            {
+                params: {
+                    categories: category,
+                    filter: `circle:${lng},${lat},${radius}`,
+                    limit: 20,
+                    apiKey: process.env.GEOAPIFY_API_KEY,
+                },
+                timeout: 10000,
+            }
+        );
+
+        return response.data.features.map((place) => ({
+            name: place.properties.name || "Unknown Place",
+            latitude: place.properties.lat,
+            longitude: place.properties.lon,
+            address: place.properties.formatted || "",
+            category: place.properties.categories || [],
+        }));
+    });
 };
 
 module.exports = {
