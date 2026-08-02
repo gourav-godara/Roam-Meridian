@@ -1,33 +1,40 @@
 const axios = require("axios");
 const { getRoute } = require("../services/route.service");
 const { getNearbyPlaces } = require("../services/nearby.service");
+const { getOrSet } = require("../utils/cache");
 
 const fetchLocation = async (city, state, country) => {
-    const response = await axios.get(
-        "https://nominatim.openstreetmap.org/search",
-        {
-            params: {
-                q: `${city}, ${state}, ${country}`,
-                format: "json",
-                limit: 1,
-            },
-            headers: {
-                "User-Agent": "RoamMeridian/1.0",
-            },
+    return getOrSet(
+        `geocode:${city},${state},${country}`.toLowerCase(),
+        24 * 60 * 60 * 1000, // 24 hours — coordinates for a place don't change
+        async () => {
+            const response = await axios.get(
+                "https://nominatim.openstreetmap.org/search",
+                {
+                    params: {
+                        q: `${city}, ${state}, ${country}`,
+                        format: "json",
+                        limit: 1,
+                    },
+                    headers: {
+                        "User-Agent": "RoamMeridian/1.0",
+                    },
+                }
+            );
+
+            if (response.data.length === 0) {
+                throw new Error("Location not found");
+            }
+
+            const location = response.data[0];
+
+            return {
+                latitude: location.lat,
+                longitude: location.lon,
+                address: location.display_name,
+            };
         }
     );
-
-    if (response.data.length === 0) {
-        throw new Error("Location not found");
-    }
-
-    const location = response.data[0];
-
-    return {
-        latitude: location.lat,
-        longitude: location.lon,
-        address: location.display_name,
-    };
 };
 
 const reverseGeocode = async (latitude, longitude) => {

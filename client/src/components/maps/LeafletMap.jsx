@@ -7,6 +7,17 @@ import {
   useMap,
 } from "react-leaflet";
 import { useEffect } from "react";
+import L from "leaflet";
+
+const defaultIcon = L.icon({
+  iconUrl: "/leaflet/marker-icon.png",
+  iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+  shadowUrl: "/leaflet/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 function FitBounds({ latitude, longitude, routePositions }) {
   const map = useMap();
@@ -19,6 +30,11 @@ function FitBounds({ latitude, longitude, routePositions }) {
     } else {
       map.setView([latitude, longitude], 13);
     }
+
+    // Helps Leaflet calculate its size correctly
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
   }, [map, latitude, longitude, routePositions]);
 
   return null;
@@ -31,6 +47,7 @@ function LeafletMap({
   nearbyPlaces = [],
   routeData,
   onPlaceRoute,
+  height = "400px",
 }) {
   const routePositions =
     routeData?.geometry?.coordinates?.map(([lng, lat]) => [lat, lng]) || [];
@@ -41,7 +58,7 @@ function LeafletMap({
       zoom={13}
       scrollWheelZoom
       style={{
-        height: "400px",
+        height,
         width: "100%",
         borderRadius: "16px",
       }}
@@ -57,7 +74,10 @@ function LeafletMap({
         routePositions={routePositions}
       />
 
-      <Marker position={[latitude, longitude]}>
+      <Marker
+        position={[latitude, longitude]}
+        icon={defaultIcon}
+      >
         <Popup>
           <strong>{name}</strong>
         </Popup>
@@ -70,6 +90,7 @@ function LeafletMap({
             Number(place.latitude),
             Number(place.longitude),
           ]}
+          icon={defaultIcon}
         >
           <Popup>
             <strong>{place.name}</strong>
@@ -81,6 +102,7 @@ function LeafletMap({
             <br />
 
             <button
+              type="button"
               onClick={() => onPlaceRoute(place)}
               style={{
                 marginTop: 8,
