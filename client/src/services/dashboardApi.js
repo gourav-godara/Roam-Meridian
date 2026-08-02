@@ -1,11 +1,10 @@
-import axios from "axios"; // Imports Axios, a tool used to send web network requests.
+import api from "./api"; // Shared axios instance (base URL + auth header already wired up).
 
-const API = axios.create({ // Creates a customized instance of Axios.
-  baseURL: import.meta.env.VITE_API_URL, // Pulls your backend's main web link from environment variables.
-  withCredentials: true, // Crucial for security; tells Axios to securely carry cookies/session logs.
-});
-
-export const getDashboard = async () => { // An exported function the app can invoke to request dashboard records.
-  const { data } = await API.get("/dashboard"); // Sends a network GET request to "http://yourbackendurl/dashboard" and extracts data.
-  return data; // Returns that server response package.
+export const getDashboard = async () => {
+  const { data } = await api.get("/dashboard");
+  return data;
 };
+
+
+
+

@@ -1,5 +1,6 @@
 const express = require("express");
 const validateExpense = require("../middleware/expenseValidation");
+const { validateExpenseUpdate } = require("../middleware/expenseValidation");
 const authMiddleware = require("../middleware/auth.middleware");
 const expenseController = require("../controllers/expense.controller");
 
@@ -14,10 +15,11 @@ router.get("/", expenseController.getAllExpenses);
 
 router.get("/:id", expenseController.getExpenseById);
 
-router.put("/:id", expenseController.updateExpense);
+router.put("/:id", validateExpenseUpdate, expenseController.updateExpense);
 
 router.delete("/:id", expenseController.deleteExpense);
 
 router.patch("/:id/settle", expenseController.settleExpense);
 
 module.exports = router;
+

@@ -194,10 +194,8 @@ const resendSignupOTP = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log("Request Body:", req.body);
 
         const user = await User.findOne({ email }).select("+password");
-        console.log("User Found:", user);
 
         if(!user) {
             return res.status(401).json({
@@ -207,7 +205,6 @@ const loginUser = async (req, res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log("Password Match:", isMatch);
 
         if(!isMatch) {
             return res.status(401).json({
@@ -429,22 +426,16 @@ const forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ email });
 
-        if(!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found.",
-            });
+        if(user) {
+            const otp = generateOTP();
+            await saveOTP(email, otp, "forgot-password");
+            await sendOTPEmail(email, otp);
         }
-
-        const otp = generateOTP();
-
-        await saveOTP(email, otp, "forgot-password");
-
-        await sendOTPEmail(email, otp);
 
         return res.status(200).json({
             success: true,
-            message: "OTP sent successfully.",
+            message:
+                "If an account exists for this email, an OTP has been sent.",
         });
 
     } catch (error) {

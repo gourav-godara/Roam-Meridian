@@ -109,13 +109,23 @@ function usePlanner() {
           text,
           tripParams,
         );
+
+        console.log("========== FRONTEND RESPONSE ==========");
+        console.log("Conversation received:", conversation);
+        console.log("Conversation ID:", conversation?._id);
+        console.log("Messages:", conversation?.messages);
+        console.log("Current Trip:", conversation?.currentTrip);
+
         setConversationId(conversation._id);
 
         const plan = buildPlanFromConversation(conversation);
+
+        console.log("Built plan:", plan);
         setCurrentPlan(plan);
 
-        const latestAssistantMessage =
-          conversation.messages[conversation.messages.length - 1];
+        const latestAssistantMessage = [...conversation.messages]
+          .reverse()
+          .find((m) => m.role === "assistant");
 
         setMessages((prev) => [
           ...prev,

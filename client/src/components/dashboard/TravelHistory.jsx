@@ -16,7 +16,7 @@ function TravelHistory({ trips = [] }) {
         </h2>
 
         <Link
-          to="/trips"
+          to="/itineraries"
           className="text-sm text-green-700 font-medium hover:underline"
         >
           View All
