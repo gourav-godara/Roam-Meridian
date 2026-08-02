@@ -9,7 +9,7 @@ import TravelTipCard from "./TravelTipCard";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: FiHome, end: true },
-  { to: "/dashboard/trips", label: "My Trips", icon: FiBriefcase },
+  { to: "/itineraries", label: "My Trips", icon: FiBriefcase },
   { to: "/wishlist", label: "Wishlist", icon: FiHeart },
   { to: "/dashboard/bookings", label: "Bookings", icon: FiCalendar },
   { to: "/reviews", label: "Reviews", icon: FiStar },
