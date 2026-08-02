@@ -6,7 +6,6 @@ function useDashboard() {
   const [stats, setStats] = useState([]);
   const [upcomingTrip, setUpcomingTrip] = useState(null);
   const [continuePlanning, setContinuePlanning] = useState([]);
-  const [recentBookings, setRecentBookings] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [mapPins, setMapPins] = useState([]);
   const [activityTimeline, setActivityTimeline] = useState([]);
@@ -29,7 +28,6 @@ function useDashboard() {
       setStats(data.stats);
       setUpcomingTrip(data.upcomingTrip);
       setContinuePlanning(data.continuePlanning || []);
-      setRecentBookings(data.recentBookings || []);
       setRecommendations(data.recommendations || []);
       setMapPins(data.mapPins || []);
       setActivityTimeline(data.activityTimeline || []);
@@ -61,7 +59,6 @@ function useDashboard() {
     stats,
     upcomingTrip,
     continuePlanning,
-    recentBookings,
     recommendations,
     mapPins,
     activityTimeline,

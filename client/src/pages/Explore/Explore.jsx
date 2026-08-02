@@ -9,7 +9,7 @@ import useWishlist from "../../hooks/useWishlist";
 
 const DEFAULT_FILTERS = {
   categories: ["All"],
-  budget: [0, 50000],
+  budget: [0, 500000],
   rating: 0,
 };
 
