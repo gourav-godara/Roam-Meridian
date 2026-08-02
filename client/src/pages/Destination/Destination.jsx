@@ -40,6 +40,8 @@ function Destination() {
   const [attractionPlaces, setAttractionPlaces] = useState([]);
   const [thingsToDoPlaces, setThingsToDoPlaces] = useState([]);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState("");
   const [reviews, setReviews] = useState([]);
   const [liveRating, setLiveRating] = useState(null);
   const { trips } = useTrips();
@@ -227,10 +229,21 @@ console.log("Features:", response.data.features);
   };
   const handleReviewSubmit = async (data) => {
   try {
+    if (!data.reviewText?.trim()) {
+      setReviewError("Please write a few words about your trip.");
+      return;
+    }
+
+    setReviewSubmitting(true);
+    setReviewError("");
+
     await createReview({
       destinationId: destination._id,
       rating: data.rating,
       reviewText: data.reviewText,
+      // Previously dropped here — the modal collected photo uploads but
+      // they were never actually sent to the backend.
+      images: data.images,
     });
 
     setReviewModalOpen(false);
@@ -262,8 +275,11 @@ console.log("Features:", response.data.features);
     });
 
   } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Unable to submit review");
+    setReviewError(
+      err.response?.data?.message || "Unable to submit your review."
+    );
+  } finally {
+    setReviewSubmitting(false);
   }
 };
   if (loading) {
@@ -426,9 +442,14 @@ console.log("Features:", response.data.features);
     </motion.div>
     <WriteReviewModal
   open={reviewModalOpen}
-  onClose={() => setReviewModalOpen(false)}
+  onClose={() => {
+    setReviewModalOpen(false);
+    setReviewError("");
+  }}
   onSubmit={handleReviewSubmit}
   destinationId={destination._id}
+  submitting={reviewSubmitting}
+  error={reviewError}
 />
 </>
   );

@@ -2,14 +2,14 @@ import { NavLink } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import {
   FiHome, FiBriefcase, FiHeart, FiCalendar, FiStar,
-  FiZap, FiDollarSign, FiUser, FiCompass, FiGift,
+  FiZap, FiDollarSign, FiUser, FiCompass,
 } from "react-icons/fi";
 import ProfileCard from "./ProfileCard";
 import TravelTipCard from "./TravelTipCard";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: FiHome, end: true },
-  { to: "/dashboard/trips", label: "My Trips", icon: FiBriefcase },
+  { to: "/itineraries", label: "My Trips", icon: FiBriefcase },
   { to: "/wishlist", label: "Wishlist", icon: FiHeart },
   { to: "/dashboard/bookings", label: "Bookings", icon: FiCalendar },
   { to: "/reviews", label: "Reviews", icon: FiStar },
@@ -20,7 +20,6 @@ const NAV_ITEMS = [
 
 const QUICK_ACTIONS = [
   { to: "/explore", label: "Explore Destinations", sub: "Find your next adventure", icon: FiCompass },
-  { to: "/dashboard/refer", label: "Refer & Earn", sub: "Invite friends and earn", icon: FiGift },
 ];
 
 function Sidebar({ user, tip, open, onClose }) {

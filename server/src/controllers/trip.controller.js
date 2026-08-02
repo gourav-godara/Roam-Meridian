@@ -5,11 +5,12 @@ const Trip = require("../models/trip.model");
 const getAllTrips = async (req, res) => {
   try {
     const trips = await Trip.find({
-      $or: [
-        { createdBy: req.user.id },
-        { collaborators: req.user.id },
-      ],
-    })
+  $or: [
+    { createdBy: req.user.id },
+    { collaborators: req.user.id },
+  ],
+  status: { $ne: "wishlist" },
+})
       .populate("destinationId", "name city country images")
       .populate("createdBy", "name email")
       .populate("collaborators", "name email");
@@ -28,7 +29,30 @@ const getAllTrips = async (req, res) => {
     });
   }
 };
+const getWishlist = async (req, res) => {
+  try {
+    const wishlist = await Trip.find({
+      createdBy: req.user.id,
+      status: "wishlist",
+    }).populate(
+      "destinationId",
+      "name city state country images description budget rating category duration bestTime"
+    );
 
+    return res.status(200).json({
+      success: true,
+      count: wishlist.length,
+      data: wishlist,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch wishlist.",
+    });
+  }
+};
 const createTrip = async (req, res) => {
   const {
     title,
@@ -296,6 +320,7 @@ module.exports = {
   getAllTrips,
   createTrip,
   addToWishlist,
+  getWishlist,
   getTripById,
   updateTrip,
   deleteTrip,

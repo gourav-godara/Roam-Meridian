@@ -6,6 +6,7 @@ const router = express.Router();
 
 const reviewController = require("../controllers/review.controller");
 const authMiddleware = require("../middleware/auth.middleware");
+const { optionalAuthMiddleware } = require("../middleware/auth.middleware");
 // Create Review
 router.post(
   "/",
@@ -15,8 +16,9 @@ router.post(
   reviewController.createReview
 );
 
-// Get All Reviews
-router.get("/", reviewController.getAllReviews);
+// Get All Reviews — optional auth so ?mine=true can be scoped to the
+// logged-in user while plain public browsing keeps working without a token
+router.get("/", optionalAuthMiddleware, reviewController.getAllReviews);
 router.get("/average", reviewController.getAverageRating);
 // Get Review By ID
 router.get("/:id", reviewController.getReviewById);
