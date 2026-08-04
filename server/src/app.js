@@ -17,7 +17,6 @@ const app = express();
 const weatherRoutes = require("./routes/weather.routes");
 const errorMiddleware = require("./middleware/errorMiddleware"); // ← added
 const mapsRoutes = require("./routes/maps.routes");
-
 // ================= Middleware =================
 
 app.use(express.json());
