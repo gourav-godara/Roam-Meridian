@@ -8,7 +8,8 @@ import useAuth from "../hooks/useAuth";
 function AdminRoute() {
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();
-
+console.log("isAuthenticated:", isAuthenticated);
+console.log("User:", user);
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
