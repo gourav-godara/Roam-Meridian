@@ -48,12 +48,10 @@ async function regenerateConversation(req, res, next) {
   try {
     const { scope, dayNumber } = req.body;
     if (!scope || (scope === "day" && !dayNumber)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "scope is required (and dayNumber when scope is 'day').",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "scope is required (and dayNumber when scope is 'day').",
+      });
     }
     const conversation = await plannerService.regenerateConversation(
       req.user.id,
@@ -70,12 +68,10 @@ async function generate(req, res, next) {
   try {
     const { destination, days, budget, travelers, travelStyle } = req.body;
     if (!destination || !days || !budget) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "destination, days, and budget are required.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "destination, days, and budget are required.",
+      });
     }
 
     const message = `Plan a ${days}-day trip to ${destination} for ${travelers || 1} traveler(s) with a budget of ₹${budget}. Travel style: ${travelStyle || "Balanced"}.`;
@@ -100,12 +96,10 @@ async function regenerateDay(req, res, next) {
       req.user.id,
     );
     if (!conversation) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "No active conversation to regenerate.",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "No active conversation to regenerate.",
+      });
     }
     const updated = await plannerService.regenerateConversation(
       req.user.id,
@@ -127,6 +121,9 @@ async function regenerateDay(req, res, next) {
 async function save(req, res, next) {
   try {
     const plan = await plannerService.savePlan(req.user.id, req.params.id);
+
+    console.log("========== RETURNING TO CLIENT ==========");
+    console.log(JSON.stringify(conversation, null, 2));
     res.status(200).json({ success: true, data: plan });
   } catch (err) {
     next(err);

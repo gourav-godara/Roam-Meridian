@@ -115,15 +115,34 @@ Task: The user wants to change something about the existing trip above. Identify
 }
 
 function buildPrompt(input) {
-  if (input && input.destination && input.days !== undefined && !input.tripContext && !input.latestMessage) {
-    const { destination, budget, days, travelers, travelStyle, preferences = [], mustVisitPlaces = [], foodPreference, transport, accommodation } = input;
+  if (
+    input &&
+    input.destination &&
+    input.days !== undefined &&
+    !input.tripContext &&
+    !input.latestMessage
+  ) {
+    const {
+      destination,
+      budget,
+      days,
+      travelers,
+      travelStyle,
+      preferences = [],
+      mustVisitPlaces = [],
+      foodPreference,
+      transport,
+      accommodation,
+    } = input;
     const lines = [
       `Plan a ${days}-day trip to ${destination}.`,
       `Budget: ₹${budget} for ${travelers} traveler${travelers > 1 ? "s" : ""}.`,
       `Travel style: ${travelStyle || "Balanced"}.`,
     ];
-    if (preferences.length) lines.push(`Preferences: ${preferences.join(", ")}.`);
-    if (mustVisitPlaces.length) lines.push(`Must-visit places: ${mustVisitPlaces.join(", ")}.`);
+    if (preferences.length)
+      lines.push(`Preferences: ${preferences.join(", ")}.`);
+    if (mustVisitPlaces.length)
+      lines.push(`Must-visit places: ${mustVisitPlaces.join(", ")}.`);
     if (foodPreference) lines.push(`Food preference: ${foodPreference}.`);
     if (transport) lines.push(`Preferred transport: ${transport}.`);
     if (accommodation) lines.push(`Preferred accommodation: ${accommodation}.`);
@@ -131,11 +150,36 @@ function buildPrompt(input) {
   }
 
   const { tripContext, currentTrip, recentMessages, latestMessage } = input;
-  const userPrompt = currentTrip
-    ? buildEditPrompt({ currentTrip, recentMessages, latestMessage })
-    : buildGenerationPrompt({ tripContext, recentMessages, latestMessage });
 
-  return { systemPrompt: SYSTEM_PROMPT, userPrompt };
+  const message = (latestMessage || "").toLowerCase();
+
+  const isEdit =
+    currentTrip &&
+    /(change|edit|modify|replace|update|remove|delete|swap|regenerate|move|add to day|shift)/i.test(
+      message,
+    );
+
+  const userPrompt = isEdit
+    ? buildEditPrompt({
+        currentTrip,
+        recentMessages,
+        latestMessage,
+      })
+    : buildGenerationPrompt({
+        tripContext,
+        recentMessages,
+        latestMessage,
+      });
+
+  return {
+    systemPrompt: SYSTEM_PROMPT,
+    userPrompt,
+  };
 }
 
-module.exports = { SYSTEM_PROMPT, buildGenerationPrompt, buildEditPrompt, buildPrompt };
+module.exports = {
+  SYSTEM_PROMPT,
+  buildGenerationPrompt,
+  buildEditPrompt,
+  buildPrompt,
+};

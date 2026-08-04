@@ -49,7 +49,17 @@ function AIPlanner() {
   const handleSend = (text = draft) => {
     if (!text.trim()) return;
 
-    sendMessage(text.trim(), tripParams);
+    const message = text.trim();
+
+    // Detect "plan ... <destination> trip"
+    const match = message.match(/plan\s+\d+\s+days?\s+(.+?)\s+trip/i);
+
+    const updatedTripParams = {
+      ...tripParams,
+      destination: match ? match[1] : tripParams.destination,
+    };
+
+    sendMessage(message, updatedTripParams);
     setDraft("");
   };
 
