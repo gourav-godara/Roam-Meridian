@@ -63,8 +63,13 @@ const EditTrip = () => {
   }, [id]);
 
   const handleChange = (field) => (e) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  const value = e.target.value;
+
+  setForm((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

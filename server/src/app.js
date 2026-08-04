@@ -13,6 +13,7 @@ const expenseRoutes = require("./routes/expense.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const tripRoutes = require("./routes/trip.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const adminRoutes = require("./routes/admin.routes");
 const app = express();
 const weatherRoutes = require("./routes/weather.routes");
 const errorMiddleware = require("./middleware/errorMiddleware"); // ← added
@@ -54,6 +55,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/weather", weatherRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/maps", mapsRoutes);
+app.use("/api/admin", adminRoutes);
 // Export App
 app.get("/", (req, res) => {
   res.send("Server is working!");
