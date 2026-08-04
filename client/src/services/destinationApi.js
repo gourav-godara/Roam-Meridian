@@ -31,3 +31,20 @@ export const getDestinationById = async (id) => {
 
   return response.data;
 };
+
+// Admin-only server-side (see destination.routes.js) — these calls will
+// 403 for a non-admin user.
+export const createDestination = async (destinationData) => {
+  const response = await api.post("/destinations", destinationData);
+  return response.data;
+};
+
+export const updateDestination = async (id, destinationData) => {
+  const response = await api.put(`/destinations/${id}`, destinationData);
+  return response.data;
+};
+
+export const deleteDestination = async (id) => {
+  const response = await api.delete(`/destinations/${id}`);
+  return response.data;
+};

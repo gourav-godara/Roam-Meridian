@@ -12,6 +12,7 @@ function MapCard({
   nearbyType,
   setNearbyType,
   routeData,
+  selectedPlace,
   onPlaceRoute,
   loadingNearby,
 }) {
@@ -30,14 +31,13 @@ function MapCard({
 
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
-  const handleNavigate = () => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      window.open(
-        `https://www.google.com/maps/dir/${pos.coords.latitude},${pos.coords.longitude}/${latitude},${longitude}`,
-        "_blank"
-      );
-    });
-  };
+  const handleNavigate = (place) => {
+  console.log("Navigate place:", place);
+
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}&travelmode=driving`;
+
+  window.open(url, "_blank");
+};
 
   // Prevent page behind fullscreen map from scrolling
   useEffect(() => {
@@ -83,13 +83,6 @@ function MapCard({
           Open in Google Maps
         </a>
 
-        <button
-          type="button"
-          onClick={handleNavigate}
-          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl border border-gray-300 hover:bg-gray-100 transition text-sm font-medium"
-        >
-          Navigate
-        </button>
       </div>
 
       {/* Normal map */}
@@ -129,6 +122,7 @@ function MapCard({
             nearbyPlaces={nearbyPlaces}
             routeData={routeData}
             onPlaceRoute={onPlaceRoute}
+            onNavigate={handleNavigate}
           />
         )}
       </div>
@@ -141,26 +135,40 @@ function MapCard({
 
       {/* Route information */}
       {routeData && (
-        <div className="mt-5 rounded-xl bg-green-50 border border-green-200 p-4">
-          <h3 className="font-semibold mb-2">
-            Route Information
-          </h3>
+  <div className="mt-5 rounded-xl bg-green-50 border border-green-200 p-4">
+    <h3 className="font-semibold mb-2">
+      Route Information
+    </h3>
 
-          <p>
-            Distance:{" "}
-            <strong>
-              {(routeData.distance / 1000).toFixed(2)} km
-            </strong>
-          </p>
+    <p>
+      Distance:{" "}
+      <strong>
+        {(routeData.distance / 1000).toFixed(2)} km
+      </strong>
+    </p>
 
-          <p>
-            Estimated Time:{" "}
-            <strong>
-              {Math.round(routeData.duration / 60)} mins
-            </strong>
-          </p>
-        </div>
-      )}
+    <p>
+      Estimated Time:{" "}
+      <strong>
+        {Math.round(routeData.duration / 60)} mins
+      </strong>
+    </p>
+
+    {selectedPlace && (
+      <button
+        onClick={() =>
+          window.open(
+            `https://www.google.com/maps/dir/?api=1&destination=${selectedPlace.latitude},${selectedPlace.longitude}&travelmode=driving`,
+            "_blank"
+          )
+        }
+        className="mt-4 w-full rounded-xl bg-green-700 text-white py-2 hover:bg-green-800 transition"
+      >
+        Get Directions in Google Maps
+      </button>
+    )}
+  </div>
+)}
 
             {/* Fullscreen map */}
       {isMapExpanded &&
@@ -221,6 +229,7 @@ function MapCard({
               nearbyPlaces={nearbyPlaces}
               routeData={routeData}
               onPlaceRoute={onPlaceRoute}
+              onNavigate={handleNavigate}
               height="100%"
             />
           </div>

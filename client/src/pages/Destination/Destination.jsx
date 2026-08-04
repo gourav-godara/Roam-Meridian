@@ -44,6 +44,7 @@ function Destination() {
   const [reviewError, setReviewError] = useState("");
   const [reviews, setReviews] = useState([]);
   const [liveRating, setLiveRating] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
   const { trips } = useTrips();
 
   useEffect(() => {
@@ -206,6 +207,7 @@ function Destination() {
   }, [destination]);
 
   const handlePlaceRoute = async (place) => {
+    setSelectedPlace(place);
     if (!destination?.location) return;
 
     try {
@@ -408,6 +410,7 @@ console.log("Features:", response.data.features);
               routeData={routeData}
               onPlaceRoute={handlePlaceRoute}
               loadingNearby={loadingNearby}
+              selectedPlace={selectedPlace}
             />
           </div>
 
@@ -432,6 +435,7 @@ console.log("Features:", response.data.features);
   routeData={routeData}
   onPlaceRoute={handlePlaceRoute}
   loadingNearby={loadingNearby}
+  selectedPlace={selectedPlace}
 />
 
           </aside>
