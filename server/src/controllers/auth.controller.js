@@ -125,6 +125,7 @@ const createAccount = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
             },
         });
 
@@ -232,7 +233,9 @@ const loginUser = async (req, res) => {
                 expiresIn: "7d",
             }
         );
-
+        console.log("===== LOGIN CONTROLLER =====");
+console.log(user);
+console.log("role =", user.role);
         return res.status(200).json({
             success: true,
             message: "Login successful.",
@@ -241,7 +244,9 @@ const loginUser = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-            },
+                role: user.role,
+},
+
         });
     } catch (error) {
         console.error("Login Error:", error);
@@ -307,6 +312,8 @@ const googleLogin = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+
             },
         });
 

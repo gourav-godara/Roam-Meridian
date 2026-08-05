@@ -47,6 +47,7 @@ function LeafletMap({
   nearbyPlaces = [],
   routeData,
   onPlaceRoute,
+  onNavigate,
   height = "400px",
 }) {
   const routePositions =
@@ -93,26 +94,34 @@ function LeafletMap({
           icon={defaultIcon}
         >
           <Popup>
-            <strong>{place.name}</strong>
+  <strong>{place.name}</strong>
+  <br />
+  {place.address}
+  <br />
 
-            <br />
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+      marginTop: "8px",
+    }}
+  >
+    <button
+      type="button"
+      onClick={() => onPlaceRoute(place)}
+    >
+      Show Route
+    </button>
 
-            {place.address}
-
-            <br />
-
-            <button
-              type="button"
-              onClick={() => onPlaceRoute(place)}
-              style={{
-                marginTop: 8,
-                cursor: "pointer",
-                fontWeight: 600,
-              }}
-            >
-              Show Route
-            </button>
-          </Popup>
+    <button
+      type="button"
+      onClick={() => onNavigate(place)}
+    >
+      Navigate with Google Maps
+    </button>
+  </div>
+</Popup>
         </Marker>
       ))}
 
