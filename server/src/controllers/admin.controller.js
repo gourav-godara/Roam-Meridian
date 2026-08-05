@@ -33,9 +33,25 @@ const getStats = async (req, res, next) => {
       Trip.countDocuments({
   status: { $ne: "wishlist" },
 }),
-      Trip.countDocuments({
-  status: "wishlist",
-}),
+      User.aggregate([
+  {
+    $project: {
+      wishlistCount: {
+        $size: {
+          $ifNull: ["$wishlist", []],
+        },
+      },
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      total: {
+        $sum: "$wishlistCount",
+      },
+    },
+  },
+]),
       Review.countDocuments(),
       Expense.countDocuments(),
 
@@ -60,33 +76,6 @@ const getStats = async (req, res, next) => {
 
       Expense.aggregate([
         { $group: { _id: null, total: { $sum: "$amount" } } },
-      ]),
-
-      // Destinations ranked by how many trips reference them — a real
-      // "most booked" signal rather than a static/manual list.
-      Trip.aggregate([
-        { $group: { _id: "$destinationId", tripCount: { $sum: 1 } } },
-        { $sort: { tripCount: -1 } },
-        { $limit: 5 },
-        {
-          $lookup: {
-            from: "destinations",
-            localField: "_id",
-            foreignField: "_id",
-            as: "destination",
-          },
-        },
-        { $unwind: "$destination" },
-        {
-          $project: {
-            _id: "$destination._id",
-            name: "$destination.name",
-            city: "$destination.city",
-            country: "$destination.country",
-            image: { $arrayElemAt: ["$destination.images", 0] },
-            tripCount: 1,
-          },
-        },
       ]),
 
       User.find().sort({ createdAt: -1 }).limit(5).select("name email createdAt role"),
@@ -122,6 +111,12 @@ const getStats = async (req, res, next) => {
     // Fill in zero-count days so the chart doesn't have gaps.
     const trendMap = new Map(signupTrend.map((d) => [d._id, d.count]));
     const filledTrend = [];
+
+    const tripsByStatusData = {
+      Trips: totalTrips,
+      Wishlist: totalWishlists[0]?.total || 0,
+    };
+
     for (let i = 13; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
@@ -136,7 +131,7 @@ const getStats = async (req, res, next) => {
           users: totalUsers,
           destinations: totalDestinations,
           trips: totalTrips,
-          wishlists: totalWishlists,
+          wishlists: totalWishlists[0]?.total || 0,
           reviews: totalReviews,
           expenses: totalExpenses,
           totalExpenseAmount: expenseAgg[0]?.total || 0,
@@ -145,10 +140,7 @@ const getStats = async (req, res, next) => {
           (acc, r) => ({ ...acc, [r._id]: r.count }),
           {}
         ),
-        tripsByStatus: tripsByStatus.reduce(
-          (acc, t) => ({ ...acc, [t._id]: t.count }),
-          {}
-        ),
+        tripsByStatus: tripsByStatusData,
         topDestinations,
         signupTrend: filledTrend,
         recent: {
