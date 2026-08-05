@@ -1,3 +1,4 @@
+import Select from "react-select";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -32,7 +33,10 @@ function CreateTripForm({ plannerData = null }) {
   useEffect(() => {
     const loadDestinations = async () => {
       try {
-        const res = await getAllDestinations();
+        const res = await getAllDestinations({
+          page: 1,
+          limit: 100,
+        });
         setDestinations(res.data);
       } catch (err) {
         console.error("Failed to load destinations", err);
@@ -43,6 +47,11 @@ function CreateTripForm({ plannerData = null }) {
       loadDestinations();
     }
   }, [plannerData]);
+
+  const destinationOptions = destinations.map((destination) => ({
+    value: destination._id,
+    label: destination.name,
+  }));
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -163,24 +172,22 @@ function CreateTripForm({ plannerData = null }) {
               disabled
             />
           ) : (
-            <select
-              name="destinationId"
-              value={formData.destinationId}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
-              required
-            >
-              <option value="">Select Destination</option>
-
-                {(destinations || []).map((destination) => (
-                  <option
-                    key={destination._id}
-                    value={destination._id}
-                  >
-                  {destination.name}
-              </option>
-              ))}
-            </select>
+            <Select
+              options={destinationOptions}
+              placeholder="Search destination..."
+              value={
+                destinationOptions.find(
+                (option) => option.value === formData.destinationId
+                ) || null
+              }
+              onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+              destinationId: selected?.value || "",
+              }))
+              }
+              isSearchable
+            />
           )}
 
           <p className="text-xs text-gray-500 mt-1">
