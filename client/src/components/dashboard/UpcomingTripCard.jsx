@@ -1,6 +1,4 @@
 import { FiMoreHorizontal, FiMapPin, FiCalendar } from "react-icons/fi";
-import { Link } from "react-router-dom";
-import Button from "../common/Button";
 
 function UpcomingTripCard({ trip }) {
    if (!trip) {
@@ -51,9 +49,6 @@ function UpcomingTripCard({ trip }) {
             )}
           </div>
 
-          <Link to="/dashboard/trips/current" className="mt-auto pt-4">
-            <Button variant="primary" size="sm">View Itinerary</Button>
-          </Link>
         </div>
       </div>
     </div>
