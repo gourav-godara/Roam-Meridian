@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import {
   FiHome, FiBriefcase, FiHeart, FiCalendar, FiStar,
-  FiZap, FiDollarSign, FiUser, FiCompass,
+  FiZap, FiDollarSign, FiUser, FiCompass, FiShield,
 } from "react-icons/fi";
 import ProfileCard from "./ProfileCard";
 import TravelTipCard from "./TravelTipCard";
@@ -81,6 +81,20 @@ function Sidebar({ user, tip, open, onClose }) {
               </span>
             </NavLink>
           ))}
+
+          {user?.role === "admin" && (
+            <NavLink
+              to="/admin"
+              onClick={onClose}
+              className="flex items-start gap-3 px-3.5 py-2.5 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <FiShield size={17} className="text-muted mt-0.5" />
+              <span>
+                <span className="block text-sm font-medium text-ink">Admin Panel</span>
+                <span className="block text-xs text-muted">Manage the platform</span>
+              </span>
+            </NavLink>
+          )}
         </div>
 
         <TravelTipCard tip={tip} />

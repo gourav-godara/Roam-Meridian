@@ -1,3 +1,11 @@
+
+// Minimal in-memory TTL cache.
+//
+// This is intentionally simple (a Map, not Redis) because the app runs as a
+// single Node process today. If you scale to multiple server instances,
+// swap this for a shared cache (e.g. Redis) so all instances see the same
+// cached values — this implementation is per-process only.
+
 const store = new Map();
 
 /**

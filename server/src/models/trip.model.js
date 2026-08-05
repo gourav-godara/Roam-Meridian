@@ -114,6 +114,7 @@ const tripSchema = new mongoose.Schema(
                 "ongoing",
                 "completed",
                 "wishlist",
+                "cancelled",
             ],
             default: "draft",
         },

@@ -734,39 +734,6 @@ const destinations = [
 },
 
 {
-  name: "Puri",
-  city: "Puri",
-  state: "Odisha",
-  country: "India",
-
-  description:
-    "Sacred coastal city famous for Jagannath Temple, golden beaches and cultural festivals.",
-
-  bestTime: "October - February",
-  duration: "3 Days",
-  category: "Beach",
-  pexelsQuery: "Puri Beach Jagannath Temple",
-
-  images: [],
-
-  budget: {
-    min: 7000,
-    max: 18000,
-    currency: "INR",
-  },
-
-  rating: {
-    average: 4.6,
-    count: 3360,
-  },
-
-  location: {
-    latitude: 19.8135,
-    longitude: 85.8312,
-  },
-},
-
-{
   name: "Mahabalipuram",
   city: "Mahabalipuram",
   state: "Tamil Nadu",

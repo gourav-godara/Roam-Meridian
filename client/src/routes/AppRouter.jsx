@@ -23,8 +23,18 @@ import Profile from "../pages/Profile/Profile";
 import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
 import Wishlist from "../pages/Wishlist/Wishlist";
+import AdminLayout from "../layouts/AdminLayout";
+import AdminDashboard from "../pages/Admin/AdminDashboard";
+import AdminUsers from "../pages/Admin/AdminUsers";
+import AdminUserDetail from "../pages/Admin/AdminUserDetail";
+import AdminDestinations from "../pages/Admin/AdminDestinations";
+import AdminDestinationForm from "../pages/Admin/AdminDestinationForm";
+import AdminTrips from "../pages/Admin/AdminTrips";
+import AdminReviews from "../pages/Admin/AdminReviews";
+import AdminExpenses from "../pages/Admin/AdminExpenses";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -54,6 +64,20 @@ function AppRouter() {
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/reviews" element={<ReviewPage />} />
             <Route path="/profile" element={<Profile />} />
+          </Route>
+        </Route>
+
+        <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+            <Route path="/admin/destinations" element={<AdminDestinations />} />
+            <Route path="/admin/destinations/new" element={<AdminDestinationForm />} />
+            <Route path="/admin/destinations/:id/edit" element={<AdminDestinationForm />} />
+            <Route path="/admin/trips" element={<AdminTrips />} />
+            <Route path="/admin/reviews" element={<AdminReviews />} />
+            <Route path="/admin/expenses" element={<AdminExpenses />} />
           </Route>
         </Route>
 

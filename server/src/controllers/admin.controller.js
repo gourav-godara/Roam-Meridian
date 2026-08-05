@@ -17,6 +17,7 @@ const getStats = async (req, res, next) => {
       totalUsers,
       totalDestinations,
       totalTrips,
+      totalWishlists,
       totalReviews,
       totalExpenses,
       usersByRole,
@@ -29,7 +30,12 @@ const getStats = async (req, res, next) => {
     ] = await Promise.all([
       User.countDocuments(),
       Destination.countDocuments(),
-      Trip.countDocuments(),
+      Trip.countDocuments({
+  status: { $ne: "wishlist" },
+}),
+      Trip.countDocuments({
+  status: "wishlist",
+}),
       Review.countDocuments(),
       Expense.countDocuments(),
 
@@ -38,8 +44,19 @@ const getStats = async (req, res, next) => {
       ]),
 
       Trip.aggregate([
-        { $group: { _id: "$status", count: { $sum: 1 } } },
-      ]),
+  {
+    $group: {
+      _id: {
+        $cond: [
+          { $eq: ["$status", "wishlist"] },
+          "Wishlist",
+          "Trips",
+        ],
+      },
+      count: { $sum: 1 },
+    },
+  },
+]),
 
       Expense.aggregate([
         { $group: { _id: null, total: { $sum: "$amount" } } },
@@ -119,6 +136,7 @@ const getStats = async (req, res, next) => {
           users: totalUsers,
           destinations: totalDestinations,
           trips: totalTrips,
+          wishlists: totalWishlists,
           reviews: totalReviews,
           expenses: totalExpenses,
           totalExpenseAmount: expenseAgg[0]?.total || 0,

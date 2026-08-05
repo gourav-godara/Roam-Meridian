@@ -8,7 +8,6 @@ import StatsGrid from "../../components/dashboard/StatsGrid";
 import UpcomingTripCard from "../../components/dashboard/UpcomingTripCard";
 import ContinuePlanning from "../../components/dashboard/ContinuePlanning";
 import RecommendationCard from "../../components/dashboard/RecommendationCard";
-import TravelMap from "../../components/dashboard/TravelMap";
 import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
 import ExpenseCard from "../../components/dashboard/ExpenseCard";
 import NotificationBell from "../../components/dashboard/NotificationBell";
@@ -25,7 +24,6 @@ function Dashboard() {
     travelHistory,
     recentReviews,
     recommendations,
-    mapPins,
     activityTimeline,
     travelTip,
     loading,
@@ -149,7 +147,6 @@ function Dashboard() {
               </div>
             </div>
 
-            <TravelMap pins={mapPins} />
             <ActivityTimeline items={activityTimeline} />
           </aside>
         </div>
