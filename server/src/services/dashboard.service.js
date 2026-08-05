@@ -7,8 +7,9 @@ const Expense = require("../models/expense.model");
 
 const getDashboardData = async (userId) => {
   const trips = await Trip.find({
-    createdBy: userId,
-  }).populate("destinationId");
+  createdBy: userId,
+  status: { $ne: "wishlist" },
+}).populate("destinationId");
 
   const today = new Date();
 

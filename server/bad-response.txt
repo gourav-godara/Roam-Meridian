@@ -1,0 +1,182 @@
+{
+  "type": "generate",
+  "message": "Alright, let's make the magic happen! I've put together an ultra-budget 5-day Paris itinerary for 3 travelers that focuses on free sights, charming parks, affordable bakeries, and smart transit so you stay within your ₹1,00,000 limit.",
+  "scope": "full",
+  "dayNumber": null,
+  "trip": {
+    "destination": "Paris, France",
+    "summary": "An ultra-budget 5-day adventure through Paris, maximizing free sights, budget eats, and affordable central stays for three.",
+    "budget": 100000,
+    "bestTime": "April - October",
+    "budgetBreakdown": {
+      "stay": 40000,
+      "food": 30000,
+      "transport": 15000,
+      "activities": 15000
+    },
+    "weather": null,
+    "packingChecklist": [
+      "Comfortable walking shoes",
+      "Universal adapter",
+      "Light rain jacket",
+      "Reusable water bottle"
+    ],
+    "travelTips": [
+      "Use the Metro and buses with a Navigo Easy card to save on transport.",
+      "Grab fresh baguettes, cheese, and fruit from local markets for cheap picnics.",
+      "Many museums are free on the first Sunday of the month."
+    ],
+    "nearbyPlaces": [
+      "Versailles",
+      "Fontainebleau"
+    ],
+    "days": [
+      {
+        "dayNumber": 1,
+        "title": "Heart of Paris & Seine Stroll",
+        "overview": "Arrive, check into your budget stay, and take in the iconic sights along the River Seine.",
+        "estimatedCost": 20000,
+        "activities": [
+          {
+            "id": "d1-1",
+            "title": "Check-in at Budget Hostel/AirBnB",
+            "description": "Settle into your accommodation.",
+            "startTime": "14:00",
+            "duration": "1 hour",
+            "category": "stay",
+            "transport": "Metro",
+            "estimatedCost": 8000,
+            "notes": "Drop bags and freshen up.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1-2",
+            "title": "Walk around Île de la Cité & Notre-Dame",
+            "description": "Admire the exterior of Notre-Dame and stroll the historic heart of the city.",
+            "startTime": "15:30",
+            "duration": "2 hours",
+            "category": "activity",
+            "transport": "Walking",
+            "estimatedCost": 0,
+            "notes": "Free outdoor sightseeing.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1-3",
+            "title": "Dinner at a local Latin Quarter Bistro",
+            "description": "Enjoy an affordable set-menu dinner in the lively Latin Quarter.",
+            "startTime": "19:00",
+            "duration": "2 hours",
+            "category": "restaurant",
+            "transport": "Walking",
+            "estimatedCost": 4500,
+            "notes": "Look for 'Formule' deals.",
+            "coordinates": null,
+            "bookingLink": null
+          }
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "title": "Art, Parks & The Eiffel Tower",
+        "overview": "Catch classic views of the Eiffel Tower and explore the Tuileries Garden.",
+        "estimatedCost": 18000,
+        "activities": [
+          {
+            "id": "d2-1",
+            "title": "Eiffel Tower & Trocadéro Views",
+            "description": "Snap photos and enjoy the gardens surrounding the iconic tower.",
+            "startTime": "09:30",
+            "duration": "2 hours",
+            "category": "activity",
+            "transport": "Metro",
+            "estimatedCost": 0,
+            "notes": "Viewing from outside is completely free.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d2-2",
+            "title": "Picnic at Tuileries Garden",
+            "description": "Grab fresh baguettes, cheese, and pastries for a budget picnic near the Louvre.",
+            "startTime": "12:30",
+            "duration": "2 hours",
+            "category": "restaurant",
+            "transport": "Walking",
+            "estimatedCost": 2500,
+            "notes": "Buy ingredients from a local Monoprix or boulangerie.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d2-3",
+            "title": "Stroll down Champs-Élysées to Arc de Triomphe",
+            "description": "Walk Paris's most famous avenue and view the Arc de Triomphe.",
+            "startTime": "15:00",
+            "duration": "2.5 hours",
+            "category": "activity",
+            "transport": "Walking",
+            "estimatedCost": 0,
+            "notes": "Strolling the avenue is free.",
+            "coordinates": null,
+            "bookingLink": null
+          }
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "title": "Bohemian Montmartre",
+        "overview": "Discover the artistic hilltop village of Montmartre and Sacré-Cœur.",
+        "estimatedCost": 15000,
+        "activities": [
+          {
+            "id": "d3-1",
+            "title": "Visit Sacré-Cœur Basilica",
+            "description": "Climb up to Montmartre for panoramic views of Paris from the basilica steps.",
+            "startTime": "10:00",
+            "duration": "2 hours",
+            "category": "activity",
+            "transport": "Metro",
+            "estimatedCost": 0,
+            "notes": "Basilica entry is free; dome access has a small fee.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d3-2",
+            "title": "Explore Place du Tertre",
+            "description": "Watch local artists paint and sketch in the picturesque square.",
+            "startTime": "12:30",
+            "duration": "1.5 hours",
+            "category": "activity",
+            "transport": "Walking",
+            "estimatedCost": 0,
+            "notes": "Great atmosphere for walking.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d3-3",
+            "title": "Dinner in Montmartre",
+            "description": "Enjoy affordable crepes or traditional French comfort food.",
+            "startTime": "19:00",
+            "duration": "2 hours",
+            "category": "restaurant",
+            "transport": "Walking",
+            "estimatedCost": 4500,
+            "notes": "Try a local crêperie.",
+            "coordinates": null,
+            "bookingLink": null
+          }
+        ]
+      },
+      {
+        "dayNumber": 4,
+        "title": "Museums & The Marais",
+        "overview": "Wander through the historic Marais district and view world-class architecture.",
+        "estimatedCost": 16000,
+        "activities": [
+          {
+            "

@@ -77,7 +77,10 @@ function AdminDashboard() {
     }),
     signups: d.count,
   }));
-
+const totalStatusCount = Object.values(tripsByStatus).reduce(
+  (sum, value) => sum + value,
+  0
+);
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -87,10 +90,22 @@ function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
         <StatCard icon={FiUsers} label="Users" value={totals.users} accent="forest" />
         <StatCard icon={FiMapPin} label="Destinations" value={totals.destinations} accent="gold" />
-        <StatCard icon={FiBriefcase} label="Trips" value={totals.trips} accent="blue" />
+        <StatCard
+  icon={FiBriefcase}
+  label="Trips"
+  value={totals.trips}
+  accent="blue"
+/>
+
+<StatCard
+  icon={FiMapPin}
+  label="Wishlists"
+  value={totals.wishlists}
+  accent="forest"
+/>
         <StatCard icon={FiStar} label="Reviews" value={totals.reviews} accent="gold" />
         <StatCard
           icon={FiDollarSign}
@@ -157,9 +172,9 @@ function AdminDashboard() {
               <p className="text-sm text-muted">No trips yet.</p>
             )}
             {Object.entries(tripsByStatus).map(([status, count]) => {
-              const percent = totals.trips
-                ? Math.round((count / totals.trips) * 100)
-                : 0;
+              const percent = totalStatusCount
+  ? Math.round((count / totalStatusCount) * 100)
+  : 0;
               return (
                 <div key={status}>
                   <div className="flex justify-between text-xs mb-1">
@@ -170,7 +185,15 @@ function AdminDashboard() {
                   </div>
                   <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
                     <div
-                      className="h-full bg-forest rounded-full"
+  className={`h-full rounded-full ${
+    status.toLowerCase() === "wishlist"
+      ? "bg-pink-500"
+      : status.toLowerCase() === "completed"
+      ? "bg-green-600"
+      : status.toLowerCase() === "planning"
+      ? "bg-blue-500"
+      : "bg-forest"
+  }`}
                       style={{ width: `${percent}%` }}
                     />
                   </div>
