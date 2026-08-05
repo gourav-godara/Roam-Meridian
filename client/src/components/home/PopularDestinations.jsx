@@ -2,23 +2,24 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import DestinationCard from "../explore/DestinationCard";
 import { getAllDestinations } from "../../services/destinationApi";
-import { addToWishlist } from "../../services/tripApi";
-import useTrips from "../../hooks/useTrips";
+import useWishlist from "../../hooks/useWishlist";
 
 function PopularDestinations() {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState(null);
 
-  const { trips, refreshTrips } = useTrips();
+  const {
+    wishlist,
+    addItem,
+    removeItem,
+  } = useWishlist();
 
   const wishlistedIds = useMemo(() => {
     return new Set(
-      trips
-        .filter((trip) => trip.status === "wishlist")
-        .map((trip) => trip.destinationId?._id || trip.destinationId)
+      wishlist.map((destination) => destination._id)
     );
-  }, [trips]);
+  }, [wishlist]);
 
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -54,21 +55,21 @@ function PopularDestinations() {
   }, []);
 
   const handleToggleFavorite = async (id) => {
-    if (wishlistedIds.has(id) || savingId === id) return;
+    if (savingId === id) return;
 
     try {
       setSavingId(id);
-      await addToWishlist(id);
-      await refreshTrips();
-    } catch (error) {
-      if (error.response?.status === 409) {
-        await refreshTrips();
+
+      if (wishlistedIds.has(id)) {
+        await removeItem(id);
       } else {
-        alert(
-          error.response?.data?.message ||
-            "Unable to add this destination to your wishlist."
-        );
+        await addItem(id);
       }
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Unable to update wishlist."
+      );
     } finally {
       setSavingId(null);
     }
@@ -80,7 +81,10 @@ function PopularDestinations() {
     <section className="max-w-[1440px] mx-auto px-6 lg:px-12 py-16 sm:py-24">
       <div className="rounded-[2rem] border border-border bg-white shadow-sm p-6 sm:p-10">
         <div className="flex items-center justify-between mb-8 sm:mb-10">
-          <h2 className="font-display text-h3 sm:text-h2 text-ink">Popular Destinations</h2>
+          <h2 className="font-display text-h3 sm:text-h2 text-ink">
+            Popular Destinations
+          </h2>
+
           <Link
             to="/explore"
             className="text-sm sm:text-base font-medium text-forest hover:text-forest-hover shrink-0"
@@ -90,7 +94,9 @@ function PopularDestinations() {
         </div>
 
         {loading ? (
-          <p className="text-center text-gray-500 py-8">Loading destinations...</p>
+          <p className="text-center text-gray-500 py-8">
+            Loading destinations...
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {destinations.map((destination) => (
@@ -101,6 +107,7 @@ function PopularDestinations() {
                   isFavorite: wishlistedIds.has(destination.id),
                 }}
                 onToggleFavorite={handleToggleFavorite}
+                disabled={savingId === destination.id}
               />
             ))}
           </div>
