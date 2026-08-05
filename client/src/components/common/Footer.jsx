@@ -89,24 +89,6 @@ function Footer() {
               </ul>
             </div>
 
-            {/* Support */}
-            <div>
-              <h3 className="font-display text-lg font-semibold text-ink mb-5">
-                Support
-              </h3>
-
-              <ul className="space-y-3">
-                {supportLinks.map((link) => (
-                  <li
-                    key={link}
-                    className="text-gray-600 hover:text-forest cursor-pointer transition-colors"
-                  >
-                    {link}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
           </div>
 
         </div>
