@@ -419,26 +419,27 @@ console.log("Features:", response.data.features);
           />
           </div>
 
-          <aside className="hidden lg:block lg:sticky lg:top-28 h-fit">
+          <aside className="hidden lg:block">
 
-            {weather && (
-              <WeatherCard weather={weather} />
-            )}
+          {weather && (
+            <WeatherCard weather={weather} />
+          )}
 
+          <div className="mt-6 lg:sticky lg:top-28">
             <MapCard
-  latitude={destination.location.latitude}
-  longitude={destination.location.longitude}
-  name={destination.name}
-  nearbyPlaces={nearbyPlaces}
-  nearbyType={nearbyType}
-  setNearbyType={setNearbyType}
-  routeData={routeData}
-  onPlaceRoute={handlePlaceRoute}
-  loadingNearby={loadingNearby}
-  selectedPlace={selectedPlace}
-/>
+              latitude={destination.location.latitude}
+              longitude={destination.location.longitude}
+              name={destination.name}
+              nearbyPlaces={nearbyPlaces}
+              nearbyType={nearbyType}
+              setNearbyType={setNearbyType}
+              routeData={routeData}
+              onPlaceRoute={handlePlaceRoute}
+              loadingNearby={loadingNearby}
+            />
+          </div>
 
-          </aside>
+        </aside>
 
         </div>
 
