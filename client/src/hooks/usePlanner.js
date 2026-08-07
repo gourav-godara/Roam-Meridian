@@ -92,6 +92,56 @@ function usePlanner() {
     loadHistory();
   }, [loadHistory]);
 
+  useEffect(() => {
+  const loadConversation = async () => {
+    try {
+      const conversation = await plannerApi.getActiveConversation();
+
+      if (!conversation) return;
+
+      setConversationId(conversation._id);
+
+      const plan = buildPlanFromConversation(conversation);
+
+      setCurrentPlan(plan);
+
+      const restoredMessages = conversation.messages.map((m) => ({
+        id: crypto.randomUUID(),
+        role: m.role === "assistant" ? "ai" : "user",
+        text: m.content,
+        timestamp: new Date(m.createdAt),
+        plan:
+          m.tripSnapshot && m.role === "assistant"
+          ? buildPlanFromConversation({
+            currentTrip: m.tripSnapshot,
+            tripContext: conversation.tripContext,
+          })
+        : undefined,
+      }));
+
+      setMessages(restoredMessages);
+
+      const latestTripMessage = [...conversation.messages]
+        .reverse()
+        .find((m) => m.tripSnapshot);
+
+      if (latestTripMessage) {
+        setCurrentPlan(
+          buildPlanFromConversation({
+            currentTrip: latestTripMessage.tripSnapshot,
+            tripContext: conversation.tripContext,
+          })
+        );
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  loadConversation();
+}, []);
+
   const sendMessage = useCallback(
     async (text, tripParams) => {
       const userMessage = {

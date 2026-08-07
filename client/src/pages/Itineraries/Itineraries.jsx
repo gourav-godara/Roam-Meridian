@@ -98,23 +98,33 @@ function Itineraries() {
 
       <div className="flex justify-between items-center mb-8">
 
-        <div>
-          <h1 className="text-3xl font-bold">
-            My Trips
-          </h1>
+  <div>
+    <h1 className="text-3xl font-bold">
+      My Trips
+    </h1>
 
-          <p className="text-gray-500">
-            Manage all your planned journeys.
-          </p>
-        </div>
+    <p className="text-gray-500">
+      Manage all your planned journeys.
+    </p>
+  </div>
 
-        <Link to="/create-trip">
-          <Button leftIcon={FiPlus}>
-            Create Trip
-          </Button>
-        </Link>
+  <div className="text-right">
+    <p className="text-sm font-medium text-gray-800">
+      Need help planning?
+    </p>
 
-      </div>
+    <p className="text-xs text-gray-500 mb-3">
+      Create an itinerary with AI.
+    </p>
+
+    <Link to="/planner">
+      <Button>
+        AI Planner
+      </Button>
+    </Link>
+  </div>
+
+</div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-8">
 
@@ -146,22 +156,24 @@ function Itineraries() {
 
       </div>
             {filteredTrips.length === 0 ? (
-        <Card className="p-10 text-center">
+  <Card className="p-10 text-center">
 
-          <h2 className="text-xl font-semibold mb-2">
-            No matching trips found
-          </h2>
+    <h2 className="text-xl font-semibold mb-2">
+      No trips available
+    </h2>
 
-          <p className="text-gray-500 mb-5">
-            Try changing the search/filter or create a new trip.
-          </p>
+    <p className="text-gray-500 mb-5">
+      Create your first trip to start planning your journey.
+    </p>
 
-          <Link to="/planner">
-            <Button>Open AI Planner</Button>
-          </Link>
+    <Link to="/create-trip">
+      <Button leftIcon={FiPlus}>
+        Create Trip
+      </Button>
+    </Link>
 
-        </Card>
-      ) : (
+  </Card>
+) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
           {filteredTrips.map((trip) => (
