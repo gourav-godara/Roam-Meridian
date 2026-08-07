@@ -1,14 +1,10 @@
 import { useState } from "react";
-import { FiCopy, FiHeart, FiRefreshCw, FiSave } from "react-icons/fi";
+import { FiRefreshCw } from "react-icons/fi";
 import DayAccordion from "./DayAccordion";
-import Button from "../common/Button";
 
 function ItineraryCard({
   plan,
   onRegenerateDay,
-  onSave,
-  onFavorite,
-  onDuplicate,
 }) {
   const [regeneratingDay, setRegeneratingDay] = useState(null);
 
@@ -54,17 +50,6 @@ function ItineraryCard({
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => onFavorite(plan._id)}
-            aria-label="Favorite trip"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
-          >
-            <FiHeart
-              size={17}
-              className={plan.favorite ? "fill-white text-white" : "text-white"}
-            />
-          </button>
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-2">
@@ -98,29 +83,6 @@ function ItineraryCard({
       </header>
 
       <div className="p-5 sm:p-7">
-        <div className="mb-6 flex flex-wrap gap-2">
-          <Button variant="primary" size="sm" onClick={() => onSave(plan._id)}>
-            <FiSave size={14} />
-            Save trip
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onDuplicate(plan._id)}
-          >
-            <FiCopy size={14} />
-            Duplicate
-          </Button>
-
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="rounded-xl px-3 py-2 text-xs font-medium text-muted transition-colors hover:bg-mist hover:text-forest"
-          >
-            Copy itinerary
-          </button>
-        </div>
 
         <div className="flex flex-col gap-2">
           {plan.response.days.map((day) => (

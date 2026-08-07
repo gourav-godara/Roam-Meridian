@@ -220,7 +220,9 @@ async function handleUserMessage(
   console.log("Conversation saved");
   console.log("==========================");
 
-  return conversation;
+  const savedConversation = await Conversation.findById(conversation._id);
+
+  return savedConversation;
 }
 
 async function regenerate(userId, conversationId, { scope, dayNumber }) {
