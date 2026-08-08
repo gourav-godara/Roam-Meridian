@@ -94,7 +94,7 @@ const Expenses = () => {
   });
 
   return (
-    <div className="relative min-h-screen bg-bg pt-28 sm:pt-32 pb-16 overflow-hidden">
+    <div className="relative min-h-screen  pt-28 sm:pt-32 pb-16 overflow-hidden">
       {/* Ambient backdrop: a low-poly world map, tinted into the forest
           palette and faded into the page background at the edges so it
           reads as texture rather than a stray illustration. */}
@@ -107,8 +107,8 @@ const Expenses = () => {
       >
         <img src={worldMap} alt="" className="w-full h-auto" />
       </div>
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-bg via-transparent to-bg" />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-r from-bg via-transparent to-transparent" />
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b" />
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b" />
 
       <div className="relative max-w-[1200px] mx-auto px-6 lg:px-12">
         <motion.div
