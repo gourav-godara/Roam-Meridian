@@ -1,11 +1,11 @@
 {
   "type": "generate",
-  "message": "Here’s a packed 1‑day itinerary for Srinagar, Kashmir, keeping your ₹30,000 budget in mind. Enjoy the lake, gardens, and local flavors!",
+  "message": "Here’s a packed 1-day itinerary for Srinagar, Kashmir, keeping your ₹30,000 budget in mind. Enjoy the lake, gardens, and local flavors!",
   "scope": "full",
   "dayNumber": null,
   "trip": {
     "destination": "Kashmir (Srinagar)",
-    "summary": "A vibrant 1‑day journey through Srinagar, blending scenic lake views, historic gardens, and local culture.",
+    "summary": "A vibrant 1-day journey through Srinagar, blending scenic lake views, historic gardens, and local culture.",
     "budget": 30000,
     "bestTime": "October - March",
     "budgetBreakdown": {
@@ -16,23 +16,118 @@
     },
     "weather": null,
     "packingChecklist": [
-      "Comfortable walking shoes",
       "Light jacket",
+      "Warm layers",
+      "Comfortable walking shoes",
       "Sunscreen",
+      "Sunglasses",
       "Camera",
       "Cash in INR",
-      "Water bottle",
+      "Reusable water bottle",
+      "Basic first-aid kit",
       "Travel insurance documents"
     ],
     "travelTips": [
-      "Carry a small umbrella for sudden showers",
-      "Use local transport like auto‑rickshaws for short distances",
-      "Try local Kashmiri cuisine like Rogan Josh",
-      "Respect local customs at temples",
-      "Keep your valuables safe"
+      "Arrive early to beat the crowds at popular spots.",
+      "Carry a small cash stash for places that may not accept cards.",
+      "Try local Kashmiri cuisine like Rogan Josh and Kashmiri Kahwa.",
+      "Check local weather alerts before heading out.",
+      "Respect local customs at religious and cultural sites.",
+      "Keep your valuables safe while exploring crowded areas."
     ],
     "nearbyPlaces": [
-      "Srinagar",
       "Pahalgam",
       "Sonamarg",
-      "
+      "Gulmarg",
+      "Doodhpathri"
+    ],
+    "days": [
+      {
+        "dayNumber": 1,
+        "title": "Srinagar Lake, Gardens & Old City",
+        "overview": "Explore Srinagar's iconic Dal Lake, Mughal gardens, and historic old city while enjoying authentic Kashmiri food.",
+        "estimatedCost": 2500,
+        "activities": [
+          {
+            "id": "d1a1",
+            "title": "Shikara Ride on Dal Lake",
+            "description": "Start the day with a peaceful Shikara ride across the beautiful Dal Lake.",
+            "startTime": "08:00",
+            "duration": "1.5 hours",
+            "category": "activity",
+            "transport": "shikara",
+            "estimatedCost": 800,
+            "notes": "Morning rides offer pleasant weather and beautiful views.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1a2",
+            "title": "Visit Mughal Gardens",
+            "description": "Explore Nishat Bagh and Shalimar Bagh, known for their landscaped gardens and mountain views.",
+            "startTime": "10:00",
+            "duration": "2 hours",
+            "category": "activity",
+            "transport": "taxi",
+            "estimatedCost": 500,
+            "notes": "Wear comfortable shoes and carry water.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1a3",
+            "title": "Kashmiri Lunch",
+            "description": "Enjoy traditional Kashmiri dishes such as Rogan Josh, Yakhni, and rice.",
+            "startTime": "13:00",
+            "duration": "1.5 hours",
+            "category": "restaurant",
+            "transport": "walk",
+            "estimatedCost": 700,
+            "notes": "Try Kashmiri Kahwa after lunch.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1a4",
+            "title": "Explore Srinagar Old City",
+            "description": "Walk through the historic streets and experience Srinagar's traditional architecture, markets, and local culture.",
+            "startTime": "15:00",
+            "duration": "2 hours",
+            "category": "activity",
+            "transport": "auto-rickshaw",
+            "estimatedCost": 300,
+            "notes": "Keep valuables secure and respect local customs.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1a5",
+            "title": "Sunset by Dal Lake",
+            "description": "Relax near Dal Lake and enjoy the sunset over the surrounding mountains.",
+            "startTime": "17:30",
+            "duration": "1 hour",
+            "category": "activity",
+            "transport": "walk",
+            "estimatedCost": 0,
+            "notes": "A great time for photography.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1a6",
+            "title": "Dinner at a Local Kashmiri Restaurant",
+            "description": "Finish the day with authentic Kashmiri cuisine and traditional flavors.",
+            "startTime": "19:30",
+            "duration": "1.5 hours",
+            "category": "restaurant",
+            "transport": "walk",
+            "estimatedCost": 800,
+            "notes": "Try Rogan Josh, Dum Aloo, or Kashmiri Pulao.",
+            "coordinates": null,
+            "bookingLink": null
+          }
+        ]
+      }
+    ]
+  }
+}
