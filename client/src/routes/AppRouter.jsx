@@ -35,6 +35,13 @@ import AdminDestinationForm from "../pages/Admin/AdminDestinationForm";
 import AdminTrips from "../pages/Admin/AdminTrips";
 import AdminReviews from "../pages/Admin/AdminReviews";
 import AdminExpenses from "../pages/Admin/AdminExpenses";
+import TravelBooking from "../pages/TravelBooking/TravelBooking";
+import DashboardBookings from "../pages/Dashboard/DashboardBookings";
+import ItineraryGuideList from "../pages/ItineraryGuide/ItineraryGuideList";
+import ItineraryGuideDetail from "../pages/ItineraryGuide/ItineraryGuideDetail";
+import AdminItineraries from "../pages/Admin/AdminItineraries";
+import AdminItineraryForm from "../pages/Admin/AdminItineraryForm";
+import LogBooking from "../pages/TravelBooking/LogBooking";
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -53,8 +60,13 @@ function AppRouter() {
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/travel-booking" element={<TravelBooking />} />
+          <Route path="/travel-booking/log" element={<LogBooking />} />
+          <Route path="/itinerary-guide" element={<ItineraryGuideList />} />
+<Route path="/itinerary-guide/:id" element={<ItineraryGuideDetail />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/bookings" element={<DashboardBookings />} />
             <Route path="/planner" element={<AIPlanner />} />
 
             <Route path="/itineraries" element={<Itineraries />} />
@@ -78,6 +90,9 @@ function AppRouter() {
             <Route path="/admin/trips" element={<AdminTrips />} />
             <Route path="/admin/reviews" element={<AdminReviews />} />
             <Route path="/admin/expenses" element={<AdminExpenses />} />
+            <Route path="/admin/itineraries" element={<AdminItineraries />} />
+<Route path="/admin/itineraries/new" element={<AdminItineraryForm />} />
+<Route path="/admin/itineraries/:id/edit" element={<AdminItineraryForm />} />
           </Route>
         </Route>
 

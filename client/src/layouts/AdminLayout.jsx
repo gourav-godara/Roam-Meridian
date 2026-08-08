@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { to: "/admin/trips", label: "Trips", icon: FiBriefcase },
   { to: "/admin/reviews", label: "Reviews", icon: FiStar },
   { to: "/admin/expenses", label: "Expenses", icon: FiDollarSign },
+  { to: "/admin/itineraries", label: "Itineraries", icon: FiMapPin },
 ];
 
 function AdminLayout() {
