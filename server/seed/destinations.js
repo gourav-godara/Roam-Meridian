@@ -28,8 +28,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 5420,
+    average: 0,
+    count: 0 ,
   },
 
   location: {
@@ -62,8 +62,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 4830,
+    average: 0,
+    count: 0 ,
   },
 
   location: {
@@ -96,8 +96,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 6840,
+    average: 0,
+    count: 0 ,
   },
 
   location: {
@@ -130,8 +130,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3921,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -164,8 +164,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 2210,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -198,8 +198,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 1840,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -232,8 +232,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.6,
-    count: 3520,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -266,8 +266,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 4125,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -299,8 +299,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 4210,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -332,8 +332,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3980,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -365,8 +365,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3120,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -398,8 +398,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 3540,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -431,8 +431,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.6,
-    count: 2860,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -467,8 +467,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 8612,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -498,8 +498,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3120,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -530,8 +530,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 2870,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -562,8 +562,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 2910,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -594,8 +594,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.6,
-    count: 4012,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -626,8 +626,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 5260,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -659,8 +659,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.5,
-    count: 1850,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -691,8 +691,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 1980,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -723,8 +723,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 4180,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -756,8 +756,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.6,
-    count: 2280,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -791,8 +791,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 5600,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -823,8 +823,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 4720,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -855,8 +855,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3950,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -887,8 +887,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 8600,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -919,8 +919,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 2780,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -951,8 +951,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 2150,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -983,8 +983,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3660,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1015,8 +1015,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 7120,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1051,8 +1051,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 5200,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1083,8 +1083,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 7800,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1115,8 +1115,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 2950,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1147,8 +1147,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 2100,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1179,8 +1179,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 2550,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1211,8 +1211,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.7,
-    count: 3400,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1243,8 +1243,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 1800,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1275,8 +1275,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 1200,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1307,8 +1307,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 3950,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1340,8 +1340,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 2730,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1372,8 +1372,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 18420,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1405,8 +1405,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 17200,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1438,8 +1438,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 21450,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1471,8 +1471,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 26350,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1504,8 +1504,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 24500,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1537,8 +1537,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 22980,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1570,8 +1570,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 18120,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1603,8 +1603,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 28700,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1636,8 +1636,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.8,
-    count: 20140,
+    average: 0,
+    count: 0,
   },
 
   location: {
@@ -1669,8 +1669,8 @@ const destinations = [
   },
 
   rating: {
-    average: 4.9,
-    count: 17320,
+    average: 0,
+    count: 0,
   },
 
   location: {

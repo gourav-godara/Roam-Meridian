@@ -1,7 +1,6 @@
 const reviewService = require("../services/review.service");
 const Review = require("../models/review.model");
 const Trip = require("../models/trip.model");
-
 // Create Review
 const createReview = async (req, res, next) => {
   try {
