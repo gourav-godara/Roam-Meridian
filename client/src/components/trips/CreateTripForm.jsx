@@ -1,27 +1,57 @@
-import { useState } from "react";
+import Select from "react-select";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Card from "../common/Card";
 import Button from "../common/Button";
+
 import { createTrip } from "../../services/tripApi";
+import { getAllDestinations } from "../../services/destinationApi";
 
 function CreateTripForm({ plannerData = null }) {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
+  const [destinations, setDestinations] = useState([]);
+
   const [formData, setFormData] = useState({
     title: plannerData?.title || "",
-    destination: plannerData?.destination || "",
+
+    destinationId: plannerData?.destinationId || "",
 
     startDate: "",
     endDate: "",
 
     budget: plannerData?.budget || "",
+
     travelers: plannerData?.travelers || 1,
 
     collaborators: "",
   });
+
+  useEffect(() => {
+    const loadDestinations = async () => {
+      try {
+        const res = await getAllDestinations({
+          page: 1,
+          limit: 100,
+        });
+        setDestinations(res.data);
+      } catch (err) {
+        console.error("Failed to load destinations", err);
+      }
+    };
+
+    if (!plannerData) {
+      loadDestinations();
+    }
+  }, [plannerData]);
+
+  const destinationOptions = destinations.map((destination) => ({
+    value: destination._id,
+    label: destination.name,
+  }));
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,10 +74,9 @@ function CreateTripForm({ plannerData = null }) {
       const payload = {
         title: formData.title,
 
-        // Temporary destination until AI Planner integration
         destinationId:
           plannerData?.destinationId ||
-          "6a60c3e6ef1ab708d09eca39",
+          formData.destinationId,
 
         plannerId: plannerData?._id || null,
 
@@ -112,7 +141,6 @@ function CreateTripForm({ plannerData = null }) {
         }}
         className="space-y-5"
       >
-
         {/* Title */}
         <div>
           <label className="block text-sm font-medium mb-2">
@@ -136,26 +164,41 @@ function CreateTripForm({ plannerData = null }) {
             Destination
           </label>
 
-          <input
-            type="text"
-            name="destination"
-            value={formData.destination}
-            onChange={handleChange}
-            placeholder="Goa"
-            className="w-full border rounded-lg px-4 py-2"
-            disabled={!!plannerData}
-          />
+          {plannerData ? (
+            <input
+              type="text"
+              value={plannerData.destination}
+              className="w-full border rounded-lg px-4 py-2 bg-gray-100"
+              disabled
+            />
+          ) : (
+            <Select
+              options={destinationOptions}
+              placeholder="Search destination..."
+              value={
+                destinationOptions.find(
+                (option) => option.value === formData.destinationId
+                ) || null
+              }
+              onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+              destinationId: selected?.value || "",
+              }))
+              }
+              isSearchable
+            />
+          )}
 
           <p className="text-xs text-gray-500 mt-1">
             {plannerData
               ? "Imported automatically from AI Planner."
-              : "This field will automatically come from the AI Planner later."}
+              : "Select a destination from the list."}
           </p>
         </div>
 
         {/* Dates */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
           <div>
             <label className="block text-sm font-medium mb-2">
               Start Date
@@ -185,7 +228,6 @@ function CreateTripForm({ plannerData = null }) {
               required
             />
           </div>
-
         </div>
 
         {/* Budget */}
@@ -203,7 +245,8 @@ function CreateTripForm({ plannerData = null }) {
             required
           />
         </div>
-                {/* Travelers */}
+
+        {/* Travelers */}
         <div>
           <label className="block text-sm font-medium mb-2">
             Travelers
@@ -242,7 +285,6 @@ function CreateTripForm({ plannerData = null }) {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-3">
-
           <Button
             type="button"
             variant="secondary"
@@ -261,9 +303,7 @@ function CreateTripForm({ plannerData = null }) {
           >
             Create Trip
           </Button>
-
         </div>
-
       </form>
     </Card>
   );

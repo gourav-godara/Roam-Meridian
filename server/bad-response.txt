@@ -1,162 +1,133 @@
 {
   "type": "generate",
-  "message": "Here’s a 4‑day Manali adventure for you and your travel buddy! Let me know if you’d like to tweak anything.",
+  "message": "Here’s a packed 1-day itinerary for Srinagar, Kashmir, keeping your ₹30,000 budget in mind. Enjoy the lake, gardens, and local flavors!",
   "scope": "full",
   "dayNumber": null,
   "trip": {
-    "destination": "Manali, Himachal Pradesh",
-    "summary": "A balanced 4‑day escape to Manali that blends chill vibes, scenic walks, and a touch of adventure—all under ₹20,000 for two.",
-    "budget": 20000,
+    "destination": "Kashmir (Srinagar)",
+    "summary": "A vibrant 1-day journey through Srinagar, blending scenic lake views, historic gardens, and local culture.",
+    "budget": 30000,
     "bestTime": "October - March",
     "budgetBreakdown": {
-      "stay": 6000,
-      "food": 4000,
-      "transport": 2000,
-      "activities": 2000
+      "stay": 15000,
+      "food": 6500,
+      "transport": 0,
+      "activities": 9500
     },
     "weather": null,
     "packingChecklist": [
-      "Warm jackets and sweaters",
+      "Light jacket",
+      "Warm layers",
       "Comfortable walking shoes",
-      "Sunscreen & sunglasses",
+      "Sunscreen",
+      "Sunglasses",
+      "Camera",
+      "Cash in INR",
       "Reusable water bottle",
-      "Basic first‑aid kit",
+      "Basic first-aid kit",
       "Travel insurance documents"
     ],
     "travelTips": [
       "Arrive early to beat the crowds at popular spots.",
-      "Carry a small cash stash—many places in Manali don’t accept cards.",
-      "Stay hydrated; the altitude can be tricky for some.",
-      "Check local weather alerts; sudden showers can change plans."
+      "Carry a small cash stash for places that may not accept cards.",
+      "Try local Kashmiri cuisine like Rogan Josh and Kashmiri Kahwa.",
+      "Check local weather alerts before heading out.",
+      "Respect local customs at religious and cultural sites.",
+      "Keep your valuables safe while exploring crowded areas."
     ],
     "nearbyPlaces": [
-      "Kullu",
-      "Manikaran",
-      "Naggar",
-      "Rohtang Pass (permit required)"
+      "Pahalgam",
+      "Sonamarg",
+      "Gulmarg",
+      "Doodhpathri"
     ],
     "days": [
       {
         "dayNumber": 1,
-        "title": "Arrival & Chill in Old Manali",
-        "overview": "Check into your hotel, unwind, and explore the cozy streets of Old Manali.",
-        "estimatedCost": 1500,
+        "title": "Srinagar Lake, Gardens & Old City",
+        "overview": "Explore Srinagar's iconic Dal Lake, Mughal gardens, and historic old city while enjoying authentic Kashmiri food.",
+        "estimatedCost": 2500,
         "activities": [
           {
             "id": "d1a1",
-            "title": "Check‑in & Refresh",
-            "description": "Settle into your accommodation and grab a quick snack.",
-            "startTime": "10:00",
-            "duration": "1 hour",
-            "category": "stay",
-            "transport": null,
-            "estimatedCost": 500,
-            "notes": "Choose a budget guesthouse or homestay for authenticity.",
+            "title": "Shikara Ride on Dal Lake",
+            "description": "Start the day with a peaceful Shikara ride across the beautiful Dal Lake.",
+            "startTime": "08:00",
+            "duration": "1.5 hours",
+            "category": "activity",
+            "transport": "shikara",
+            "estimatedCost": 800,
+            "notes": "Morning rides offer pleasant weather and beautiful views.",
             "coordinates": null,
             "bookingLink": null
           },
           {
             "id": "d1a2",
-            "title": "Stroll along Mall Road",
-            "description": "Walk the main street, shop for souvenirs, and enjoy street food.",
-            "startTime": "12:00",
+            "title": "Visit Mughal Gardens",
+            "description": "Explore Nishat Bagh and Shalimar Bagh, known for their landscaped gardens and mountain views.",
+            "startTime": "10:00",
             "duration": "2 hours",
             "category": "activity",
-            "transport": "walk",
-            "estimatedCost": 200,
-            "notes": "Try the local momos and chai.",
+            "transport": "taxi",
+            "estimatedCost": 500,
+            "notes": "Wear comfortable shoes and carry water.",
             "coordinates": null,
             "bookingLink": null
           },
           {
             "id": "d1a3",
-            "title": "Dinner at a Local Eatery",
-            "description": "Sample Himachali thukpa and other regional dishes.",
-            "startTime": "19:00",
-            "duration": "1.5 hours",
-            "category": "restaurant",
-            "transport": "walk",
-            "estimatedCost": 800,
-            "notes": "Reserve a table early if you’re visiting on a weekend.",
-            "coordinates": null,
-            "bookingLink": null
-          }
-        ]
-      },
-      {
-        "dayNumber": 2,
-        "title": "Solang Valley & Adventure",
-        "overview": "A day of scenic beauty and mild adventure in Solang Valley.",
-        "estimatedCost": 2500,
-        "activities": [
-          {
-            "id": "d2a1",
-            "title": "Morning Drive to Solang",
-            "description": "Catch a local taxi or shared cab to Solang Valley.",
-            "startTime": "08:00",
-            "duration": "1 hour",
-            "category": "transport",
-            "transport": "shared taxi",
-            "estimatedCost": 400,
-            "notes": "Book a cab early; rides can be pricey during peak season.",
-            "coordinates": null,
-            "bookingLink": null
-          },
-          {
-            "id": "d2a2",
-            "title": "Paragliding Session",
-            "description": "Experience a short paragliding flight for panoramic views.",
-            "startTime": "10:00",
-            "duration": "1.5 hours",
-            "category": "activity",
-            "transport": null,
-            "estimatedCost": 1200,
-            "notes": "Safety gear provided; check weather before booking.",
-            "coordinates": null,
-            "bookingLink": null
-          },
-          {
-            "id": "d2a3",
-            "title": "Lunch at Solang",
-            "description": "Enjoy a packed lunch or a local café.",
+            "title": "Kashmiri Lunch",
+            "description": "Enjoy traditional Kashmiri dishes such as Rogan Josh, Yakhni, and rice.",
             "startTime": "13:00",
-            "duration": "1 hour",
+            "duration": "1.5 hours",
             "category": "restaurant",
             "transport": "walk",
+            "estimatedCost": 700,
+            "notes": "Try Kashmiri Kahwa after lunch.",
+            "coordinates": null,
+            "bookingLink": null
+          },
+          {
+            "id": "d1a4",
+            "title": "Explore Srinagar Old City",
+            "description": "Walk through the historic streets and experience Srinagar's traditional architecture, markets, and local culture.",
+            "startTime": "15:00",
+            "duration": "2 hours",
+            "category": "activity",
+            "transport": "auto-rickshaw",
             "estimatedCost": 300,
-            "notes": "Try the local cheese and butter naan.",
+            "notes": "Keep valuables secure and respect local customs.",
             "coordinates": null,
             "bookingLink": null
           },
           {
-            "id": "d2a4",
-            "title": "Return to Manali",
-            "description": "Head back to Manali for a relaxed evening.",
-            "startTime": "15:30",
+            "id": "d1a5",
+            "title": "Sunset by Dal Lake",
+            "description": "Relax near Dal Lake and enjoy the sunset over the surrounding mountains.",
+            "startTime": "17:30",
             "duration": "1 hour",
-            "category": "transport",
-            "transport": "shared taxi",
-            "estimatedCost": 400,
-            "notes": "Use the same cab or a different one if you prefer.",
+            "category": "activity",
+            "transport": "walk",
+            "estimatedCost": 0,
+            "notes": "A great time for photography.",
             "coordinates": null,
             "bookingLink": null
           },
           {
-            "id": "d2a5",
-            "title": "Dinner at a Riverside Café",
-            "description": "Wind down with a riverside dinner.",
+            "id": "d1a6",
+            "title": "Dinner at a Local Kashmiri Restaurant",
+            "description": "Finish the day with authentic Kashmiri cuisine and traditional flavors.",
             "startTime": "19:30",
             "duration": "1.5 hours",
             "category": "restaurant",
             "transport": "walk",
-            "estimatedCost": 600,
-            "notes": "Enjoy the view of the Beas River.",
+            "estimatedCost": 800,
+            "notes": "Try Rogan Josh, Dum Aloo, or Kashmiri Pulao.",
             "coordinates": null,
             "bookingLink": null
           }
         ]
-      },
-      {
-        "dayNumber": 3,
-        "title": "Naggar Castle & Cultural Immersion",
-        "overview":
+      }
+    ]
+  }
+}
