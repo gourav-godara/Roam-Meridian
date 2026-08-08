@@ -25,8 +25,8 @@ function buildDetails(base) {
     highlights.map((h, i) => [
       h,
       [
-        { id: `${seedPrefix}-hl${i}-1`, name: `${h} Spot Near ${base.name}`, distance: `${2 + i} km away`, rating: 4.5, image: thumb(`${seedPrefix}-hl${i}-1`) },
-        { id: `${seedPrefix}-hl${i}-2`, name: `${base.name} ${h} Corner`, distance: `${4 + i} km away`, rating: 4.3, image: thumb(`${seedPrefix}-hl${i}-2`) },
+        { id: `${seedPrefix}-hl${i}-1`, name: `${h} Spot Near ${base.name}`, distance: `${2 + i} km away`, rating: 0, image: thumb(`${seedPrefix}-hl${i}-1`) },
+        { id: `${seedPrefix}-hl${i}-2`, name: `${base.name} ${h} Corner`, distance: `${4 + i} km away`, rating: 0, image: thumb(`${seedPrefix}-hl${i}-2`) },
       ],
     ])
   );
@@ -59,10 +59,10 @@ function buildDetails(base) {
     weather: { temp: 18, condition: "Partly Cloudy", humidity: 55, wind: 10, feelsLike: 17 },
     mapImage: thumb(`${seedPrefix}-map`),
     attractions: [
-      { id: `${seedPrefix}-a1`, name: `${base.name} Viewpoint`, distance: "5 km from center", rating: 4.6, image: thumb(`${seedPrefix}-attr1`) },
-      { id: `${seedPrefix}-a2`, name: `${base.name} Old Town`, distance: "2 km from center", rating: 4.5, image: thumb(`${seedPrefix}-attr2`) },
-      { id: `${seedPrefix}-a3`, name: `${base.name} Market`, distance: "1.5 km from center", rating: 4.4, image: thumb(`${seedPrefix}-attr3`) },
-      { id: `${seedPrefix}-a4`, name: `${base.name} Lakeside`, distance: "8 km from center", rating: 4.7, image: thumb(`${seedPrefix}-attr4`) },
+      { id: `${seedPrefix}-a1`, name: `${base.name} Viewpoint`, distance: "5 km from center", rating: 0, image: thumb(`${seedPrefix}-attr1`) },
+      { id: `${seedPrefix}-a2`, name: `${base.name} Old Town`, distance: "2 km from center", rating: 0, image: thumb(`${seedPrefix}-attr2`) },
+      { id: `${seedPrefix}-a3`, name: `${base.name} Market`, distance: "1.5 km from center", rating: 0, image: thumb(`${seedPrefix}-attr3`) },
+      { id: `${seedPrefix}-a4`, name: `${base.name} Lakeside`, distance: "8 km from center", rating: 0, image: thumb(`${seedPrefix}-attr4`) },
     ],
     thingsToDo: [
       { id: `${seedPrefix}-t1`, title: `${base.category} Experience`, duration: "2-3 hrs", price: "₹1,500", image: thumb(`${seedPrefix}-td1`) },
@@ -71,19 +71,19 @@ function buildDetails(base) {
       { id: `${seedPrefix}-t4`, title: "Sunset Photography Spot", duration: "1 hr", price: "Free", image: thumb(`${seedPrefix}-td4`) },
     ],
     restaurants: [
-      { id: `${seedPrefix}-r1`, name: `${base.name} Kitchen`, cuisine: "Local · Multi-cuisine", rating: 4.5, cost: "₹900 for two", image: thumb(`${seedPrefix}-r1`) },
-      { id: `${seedPrefix}-r2`, name: "The Corner Cafe", cuisine: "Cafe · Continental", rating: 4.4, cost: "₹700 for two", image: thumb(`${seedPrefix}-r2`) },
-      { id: `${seedPrefix}-r3`, name: "Spice Route", cuisine: "Indian · Regional", rating: 4.6, cost: "₹1,100 for two", image: thumb(`${seedPrefix}-r3`) },
+      { id: `${seedPrefix}-r1`, name: `${base.name} Kitchen`, cuisine: "Local · Multi-cuisine", rating: 0, cost: "₹900 for two", image: thumb(`${seedPrefix}-r1`) },
+      { id: `${seedPrefix}-r2`, name: "The Corner Cafe", cuisine: "Cafe · Continental", rating: 0, cost: "₹700 for two", image: thumb(`${seedPrefix}-r2`) },
+      { id: `${seedPrefix}-r3`, name: "Spice Route", cuisine: "Indian · Regional", rating: 0, cost: "₹1,100 for two", image: thumb(`${seedPrefix}-r3`) },
     ],
     hotels: [
-      { id: `${seedPrefix}-h1`, name: `${base.name} Grand Stay`, rating: 4.6, pricePerNight: `₹${Math.round(base.price * 0.35).toLocaleString("en-IN")}`, image: thumb(`${seedPrefix}-h1`) },
-      { id: `${seedPrefix}-h2`, name: "Riverside Cottage", rating: 4.4, pricePerNight: `₹${Math.round(base.price * 0.25).toLocaleString("en-IN")}`, image: thumb(`${seedPrefix}-h2`) },
-      { id: `${seedPrefix}-h3`, name: "Heritage Boutique Hotel", rating: 4.7, pricePerNight: `₹${Math.round(base.price * 0.5).toLocaleString("en-IN")}`, image: thumb(`${seedPrefix}-h3`) },
+      { id: `${seedPrefix}-h1`, name: `${base.name} Grand Stay`, rating: 0, pricePerNight: `₹${Math.round(base.price * 0.35).toLocaleString("en-IN")}`, image: thumb(`${seedPrefix}-h1`) },
+      { id: `${seedPrefix}-h2`, name: "Riverside Cottage", rating: 0, pricePerNight: `₹${Math.round(base.price * 0.25).toLocaleString("en-IN")}`, image: thumb(`${seedPrefix}-h2`) },
+      { id: `${seedPrefix}-h3`, name: "Heritage Boutique Hotel", rating: 0, pricePerNight: `₹${Math.round(base.price * 0.5).toLocaleString("en-IN")}`, image: thumb(`${seedPrefix}-h3`) },
     ],
     reviews: [
-      { id: `${seedPrefix}-rv1`, name: "Ananya Sharma", rating: 5, date: "2 weeks ago", avatar: avatar(`${seedPrefix}-1`), text: `${base.name} exceeded expectations — the ${base.category.toLowerCase()} experience here is unforgettable.` },
-      { id: `${seedPrefix}-rv2`, name: "Rahul Mehta", rating: 4, date: "1 month ago", avatar: avatar(`${seedPrefix}-2`), text: "Great trip overall, though it does get crowded during peak season." },
-      { id: `${seedPrefix}-rv3`, name: "Priya Nair", rating: 5, date: "1 month ago", avatar: avatar(`${seedPrefix}-3`), text: "Would visit again in a heartbeat. Highly recommend for a short getaway." },
+      { id: `${seedPrefix}-rv1`, name: "Ananya Sharma", rating: 0, date: "2 weeks ago", avatar: avatar(`${seedPrefix}-1`), text: `${base.name} exceeded expectations — the ${base.category.toLowerCase()} experience here is unforgettable.` },
+      { id: `${seedPrefix}-rv2`, name: "Rahul Mehta", rating: 0, date: "1 month ago", avatar: avatar(`${seedPrefix}-2`), text: "Great trip overall, though it does get crowded during peak season." },
+      { id: `${seedPrefix}-rv3`, name: "Priya Nair", rating: 0, date: "1 month ago", avatar: avatar(`${seedPrefix}-3`), text: "Would visit again in a heartbeat. Highly recommend for a short getaway." },
     ],
     aiItinerary: {
       days: [
