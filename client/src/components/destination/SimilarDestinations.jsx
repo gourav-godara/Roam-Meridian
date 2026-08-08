@@ -89,9 +89,7 @@ function SimilarDestinations({ currentDestinationId }) {
                   <FiStar className="fill-yellow-400 text-yellow-400" />
 
                   <span className="font-semibold">
-                    {item.rating?.average?.toFixed?.(1) ??
-                      item.rating ??
-                      "4.8"}
+                    {(item.rating?.average ?? 0).toFixed(1)}
                   </span>
                 </div>
 

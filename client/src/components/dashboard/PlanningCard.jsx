@@ -6,7 +6,7 @@ function PlanningCard({ item }) {
   const [saved, setSaved] = useState(false);
 
   return (
-    <Link to={`/dashboard/trips/${item.id}`} className="block group">
+    <Link to={`/trips/${item.id}`} className="block group">
       <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
         <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         <button
