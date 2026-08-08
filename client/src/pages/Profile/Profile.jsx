@@ -115,18 +115,6 @@ const Profile = () => {
 
   return (
     <div className="relative min-h-screen bg-bg pb-16 overflow-hidden">
-      {/* Ambient background — faint world map, fixed so it doesn't scroll
-          with content. Very low opacity: it's texture, not a photo. */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${mapBackground})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.3,
-        }}
-      />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-bg via-transparent to-bg" />
 
       <div className="relative max-w-4xl mx-auto px-6 pt-10">
         {/* Page heading */}

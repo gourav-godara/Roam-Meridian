@@ -108,21 +108,13 @@ function Itineraries() {
     </p>
   </div>
 
-  <div className="text-right">
-    <p className="text-sm font-medium text-gray-800">
-      Need help planning?
-    </p>
-
-    <p className="text-xs text-gray-500 mb-3">
-      Create an itinerary with AI.
-    </p>
-
-    <Link to="/planner">
-      <Button>
-        AI Planner
+    <Link to="/create-trip">
+      <Button leftIcon={FiPlus}>
+        Create Trip
       </Button>
     </Link>
-  </div>
+
+  
 
 </div>
 
@@ -158,19 +150,21 @@ function Itineraries() {
             {filteredTrips.length === 0 ? (
   <Card className="p-10 text-center">
 
-    <h2 className="text-xl font-semibold mb-2">
-      No trips available
-    </h2>
-
-    <p className="text-gray-500 mb-5">
-      Create your first trip to start planning your journey.
+    <div className="text-right">
+    <p className="text-sm font-medium text-gray-800">
+      Need help planning?
     </p>
 
-    <Link to="/create-trip">
-      <Button leftIcon={FiPlus}>
-        Create Trip
+    <p className="text-xs text-gray-500 mb-3">
+      Create an itinerary with AI.
+    </p>
+
+    <Link to="/planner">
+      <Button>
+        AI Planner
       </Button>
     </Link>
+  </div>
 
   </Card>
 ) : (
