@@ -94,12 +94,12 @@ const Expenses = () => {
   });
 
   return (
-    <div className="relative min-h-screen  pt-28 sm:pt-32 pb-16 overflow-hidden">
+    <div className="relative min-h-screen pt-28 sm:pt-32 pb-16 overflow-hidden">
       {/* Ambient backdrop: a low-poly world map, tinted into the forest
           palette and faded into the page background at the edges so it
           reads as texture rather than a stray illustration. */}
       <div
-        className="fixed top-0 right-0 w-[70vw] max-w-[900px] pointer-events-none opacity-[0.07]"
+        className="absolute top-0 right-0 w-[70vw] max-w-[900px] pointer-events-none opacity-[0.07]"
         style={{
           filter:
             "sepia(1) saturate(2) hue-rotate(60deg) brightness(0.55)",
@@ -107,8 +107,6 @@ const Expenses = () => {
       >
         <img src={worldMap} alt="" className="w-full h-auto" />
       </div>
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b" />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b" />
 
       <div className="relative max-w-[1200px] mx-auto px-6 lg:px-12">
         <motion.div
