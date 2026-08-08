@@ -114,7 +114,10 @@ const getDashboardData = async (userId) => {
           new Date(upcomingTrips[0].startDate).toLocaleDateString() +
           " - " +
           new Date(upcomingTrips[0].endDate).toLocaleDateString(),
-        image: upcomingTrips[0].coverImage,
+        image:
+  upcomingTrips[0].coverImage ||
+  upcomingTrips[0].destinationId?.images?.[0] ||
+  "https://placehold.co/400x300",
         companions: [],
         extraCompanions: upcomingTrips[0].collaborators.length,
         status: upcomingTrips[0].status,
@@ -140,7 +143,10 @@ const getDashboardData = async (userId) => {
         ? `${trip.destinationId.city}, ${trip.destinationId.country}`
         : "Destination unavailable",
       progress: calculateProgress(trip),
-      image: trip.coverImage || "https://placehold.co/400x300",
+      image:
+  trip.coverImage ||
+  trip.destinationId?.images?.[0] ||
+  "https://placehold.co/400x300",
     }));
 
   const recommendations = destinations.map((destination) => ({

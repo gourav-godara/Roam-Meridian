@@ -7,7 +7,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node seed/seedDestinations.js",
-    "seed:itineraries": "node seed/seedItineraries.js"
+    "fix:ratings": "node seed/fixDestinationRatings.js"
   },
   "keywords": [],
   "author": "",
@@ -35,3 +35,4 @@
     "nodemon": "^3.1.14"
   }
 }
+

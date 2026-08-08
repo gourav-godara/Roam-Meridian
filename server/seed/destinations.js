@@ -29,7 +29,7 @@ const destinations = [
 
   rating: {
     average: 0,
-    count: 0 ,
+    count: 0,
   },
 
   location: {
@@ -63,7 +63,7 @@ const destinations = [
 
   rating: {
     average: 0,
-    count: 0 ,
+    count: 0,
   },
 
   location: {
@@ -97,7 +97,7 @@ const destinations = [
 
   rating: {
     average: 0,
-    count: 0 ,
+    count: 0,
   },
 
   location: {
