@@ -108,7 +108,7 @@ const Expenses = () => {
         <img src={worldMap} alt="" className="w-full h-auto" />
       </div>
       <div className="fixed inset-0 pointer-events-none bg-gradient-to-b " />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b" />
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b " />
 
       <div className="relative max-w-[1200px] mx-auto px-6 lg:px-12">
         <motion.div
