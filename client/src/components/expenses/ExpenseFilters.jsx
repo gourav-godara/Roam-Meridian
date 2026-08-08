@@ -10,7 +10,7 @@ const ExpenseFilters = ({
   setStatus,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-border p-4">
+    <div className="bg-surface rounded-2xl border border-border p-4 shadow-sm">
       <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
         <div className="relative w-full lg:w-1/3">
           <FiSearch
@@ -22,7 +22,7 @@ const ExpenseFilters = ({
             placeholder="Search expenses..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-forest/40 transition-colors"
+            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest/40 transition-colors"
           />
         </div>
 
@@ -30,7 +30,7 @@ const ExpenseFilters = ({
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-forest/40 transition-colors bg-white"
+            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest/40 transition-colors bg-surface"
           >
             <option value="All">All Categories</option>
             <option value="Accommodation">Accommodation</option>
@@ -50,7 +50,7 @@ const ExpenseFilters = ({
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:border-forest/40 transition-colors bg-white"
+            className="w-full appearance-none px-4 py-2.5 rounded-xl border border-border text-sm outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest/40 transition-colors bg-surface"
           >
             <option value="All">All Status</option>
             <option value="Pending">Pending</option>
@@ -64,7 +64,7 @@ const ExpenseFilters = ({
 
         <button
           onClick={onAddExpense}
-          className="w-full lg:w-auto flex items-center justify-center gap-2 bg-forest hover:bg-forest-dark text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shrink-0"
+          className="w-full lg:w-auto flex items-center justify-center gap-2 bg-forest hover:bg-forest-hover text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shrink-0 shadow-sm hover:shadow-hover"
         >
           <FiPlus size={16} />
           Add Expense
