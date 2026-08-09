@@ -1,38 +1,324 @@
+
+
 {
-  "type": "generate",
-  "message": "Here’s a packed 1‑day itinerary for Srinagar, Kashmir, keeping your ₹30,000 budget in mind. Enjoy the lake, gardens, and local flavors!",
-  "scope": "full",
+  "type": "chat",
+  "message": "Hello again! 😊 How can I assist you with your trip planning today?"
+  ,
+  "scope": null,
   "dayNumber": null,
-  "trip": {
-    "destination": "Kashmir (Srinagar)",
-    "summary": "A vibrant 1‑day journey through Srinagar, blending scenic lake views, historic gardens, and local culture.",
-    "budget": 30000,
-    "bestTime": "October - March",
-    "budgetBreakdown": {
-      "stay": 15000,
-      "food": 6500,
-      "transport": 0,
-      "activities": 9500
-    },
-    "weather": null,
-    "packingChecklist": [
-      "Comfortable walking shoes",
-      "Light jacket",
-      "Sunscreen",
-      "Camera",
-      "Cash in INR",
-      "Water bottle",
-      "Travel insurance documents"
-    ],
-    "travelTips": [
-      "Carry a small umbrella for sudden showers",
-      "Use local transport like auto‑rickshaws for short distances",
-      "Try local Kashmiri cuisine like Rogan Josh",
-      "Respect local customs at temples",
-      "Keep your valuables safe"
-    ],
-    "nearbyPlaces": [
-      "Srinagar",
-      "Pahalgam",
-      "Sonamarg",
-      "
+  "trip": null,
+  "day": null
+  ,
+  "budgetBreakdown": {}
+  ,
+  "weather": null
+  ,
+  "packingChecklist": []
+  ,
+  "travelTips": []
+  ,
+  "nearbyPlaces": []
+  ,
+  "days": []
+  ,
+  "estimatedCost": 0
+  ,
+  "bestTime": ""
+  ,
+  "destination": ""
+  ,
+  "summary": ""
+  ,
+  "travelers": 0
+  ,
+  "travelStyle": ""
+  ,
+  "interests": []
+  ,
+  "constraints": []
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview": ""
+  ,
+  "coordinates": null
+  ,
+  "bookingLink": null
+  ,
+  "startTime": ""
+  ,
+  "duration": ""
+  ,
+  "category": ""
+  ,
+  "notes": ""
+  ,
+  "transport": ""
+  ,
+  "estimatedCost": 0
+  ,
+  "id": ""
+  ,
+  "title": ""
+  ,
+  "overview":</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</</
