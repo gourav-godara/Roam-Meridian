@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiMapPin, FiSend, FiSliders } from "react-icons/fi";
+import { useEffect, useRef } from "react";
+import { FiMapPin, FiSend } from "react-icons/fi";
 import Button from "../common/Button";
 
 function MessageInput({
@@ -8,9 +8,7 @@ function MessageInput({
   onSend,
   disabled,
   tripParams,
-  onTripParamsChange,
 }) {
-  const [showDetails, setShowDetails] = useState(false);
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -35,101 +33,8 @@ function MessageInput({
     }
   };
 
-  const updateParam = (key, nextValue) => {
-    onTripParamsChange({
-      ...tripParams,
-      [key]: nextValue,
-    });
-  };
-
   return (
-    <div className="border-t border-border bg-white px-4 py-4 sm:px-6">
-      {showDetails && (
-        <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
-          <label className="col-span-2 rounded-xl border border-border bg-bg px-3 py-2 sm:col-span-1">
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted">
-              Destination
-            </span>
-
-            <input
-              value={tripParams.destination}
-              onChange={(event) =>
-                updateParam("destination", event.target.value)
-              }
-              className="mt-0.5 w-full bg-transparent text-sm text-ink outline-none"
-            />
-          </label>
-
-          <label className="rounded-xl border border-border bg-bg px-3 py-2">
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted">
-              Days
-            </span>
-
-            <input
-              type="number"
-              min="1"
-              value={tripParams.days}
-              onChange={(event) =>
-                updateParam("days", Number(event.target.value))
-              }
-              className="mt-0.5 w-full bg-transparent text-sm text-ink outline-none"
-            />
-          </label>
-
-          <label className="rounded-xl border border-border bg-bg px-3 py-2">
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted">
-              Budget (₹)
-            </span>
-
-            <input
-              type="number"
-              min="0"
-              value={tripParams.budget}
-              onChange={(event) =>
-                updateParam("budget", Number(event.target.value))
-              }
-              className="mt-0.5 w-full bg-transparent text-sm text-ink outline-none"
-            />
-          </label>
-
-          <label className="rounded-xl border border-border bg-bg px-3 py-2">
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted">
-              Travelers
-            </span>
-
-            <input
-              type="number"
-              min="1"
-              value={tripParams.travelers}
-              onChange={(event) =>
-                updateParam("travelers", Number(event.target.value))
-              }
-              className="mt-0.5 w-full bg-transparent text-sm text-ink outline-none"
-            />
-          </label>
-
-          <label className="rounded-xl border border-border bg-bg px-3 py-2">
-            <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted">
-              Style
-            </span>
-
-            <select
-              value={tripParams.travelStyle}
-              onChange={(event) =>
-                updateParam("travelStyle", event.target.value)
-              }
-              className="mt-0.5 w-full bg-transparent text-sm text-ink outline-none"
-            >
-              <option>Balanced</option>
-              <option>Budget</option>
-              <option>Luxury</option>
-              <option>Adventure</option>
-              <option>Relaxed</option>
-            </select>
-          </label>
-        </div>
-      )}
-
+    <div className="border-t border-border bg-white px-4 py-5 sm:px-6 ">
       <div className="flex items-end gap-2 rounded-2xl border border-border bg-bg px-3 py-2 transition-all focus-within:border-forest/40 focus-within:ring-4 focus-within:ring-forest/5">
         <textarea
           ref={textareaRef}
@@ -149,33 +54,6 @@ function MessageInput({
         >
           <FiSend size={14} />
         </Button>
-      </div>
-
-      <div className="mt-2 flex items-center justify-between gap-3 px-1">
-        <button
-          type="button"
-          onClick={() => setShowDetails((isOpen) => !isOpen)}
-          className="inline-flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-forest"
-        >
-          <FiSliders size={13} />
-          Trip details
-          <FiChevronDown
-            size={12}
-            className={
-              showDetails
-                ? "rotate-180 transition-transform"
-                : "transition-transform"
-            }
-          />
-        </button>
-
-        <span className="hidden items-center gap-1 text-[11px] text-gray-400 sm:inline-flex">
-          <FiMapPin size={11} />
-          {tripParams.destination} · {tripParams.days} days · ₹
-          {tripParams.budget.toLocaleString("en-IN")}
-        </span>
-
-        <span className="text-[11px] text-gray-400">Enter to send</span>
       </div>
     </div>
   );

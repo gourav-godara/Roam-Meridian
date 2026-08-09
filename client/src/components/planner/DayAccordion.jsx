@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { FiChevronDown, FiRefreshCw } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
 
-function DayAccordion({ day, onRegenerate, regenerating }) {
+function DayAccordion({ day }) {
   const [open, setOpen] = useState(day.day === 1);
 
   return (
@@ -124,23 +124,10 @@ function DayAccordion({ day, onRegenerate, regenerating }) {
                 )}
               </div>
 
-              <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
+              <div className="mt-2 flex items-center justify-end gap-3 px-1">
                 <p className="text-sm font-semibold text-forest">
                   Estimated: ₹{day.estimatedCost?.toLocaleString("en-IN") || 0}
                 </p>
-
-                <button
-                  type="button"
-                  onClick={() => onRegenerate(day.day)}
-                  disabled={regenerating}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-forest disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <FiRefreshCw
-                    size={13}
-                    className={regenerating ? "animate-spin" : ""}
-                  />
-                  Try another version
-                </button>
               </div>
             </div>
           </motion.div>

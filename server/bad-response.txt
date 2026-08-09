@@ -1,3 +1,5 @@
+
+
 {
   "type": "generate",
   "message": "Here’s a packed 1-day itinerary for Srinagar, Kashmir, keeping your ₹30,000 budget in mind. Enjoy the lake, gardens, and local flavors!",
