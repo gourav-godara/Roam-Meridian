@@ -75,10 +75,37 @@ const getStats = async (req, res, next) => {
 ]),
 
       Expense.aggregate([
-        { $group: { _id: null, total: { $sum: "$amount" } } },
-      ]),
+  { $group: { _id: null, total: { $sum: "$amount" } } },
+]),
 
-      User.find().sort({ createdAt: -1 }).limit(5).select("name email createdAt role"),
+// Destinations ranked by how many trips reference them
+Trip.aggregate([
+  { $match: { status: { $ne: "wishlist" } } },
+  { $group: { _id: "$destinationId", tripCount: { $sum: 1 } } },
+  { $sort: { tripCount: -1 } },
+  { $limit: 5 },
+  {
+    $lookup: {
+      from: "destinations",
+      localField: "_id",
+      foreignField: "_id",
+      as: "destination",
+    },
+  },
+  { $unwind: "$destination" },
+  {
+    $project: {
+      _id: "$destination._id",
+      name: "$destination.name",
+      city: "$destination.city",
+      country: "$destination.country",
+      image: { $arrayElemAt: ["$destination.images", 0] },
+      tripCount: 1,
+    },
+  },
+]),
+
+User.find().sort({ createdAt: -1 }).limit(5).select("name email createdAt role"),
       Trip.find()
         .sort({ createdAt: -1 })
         .limit(5)

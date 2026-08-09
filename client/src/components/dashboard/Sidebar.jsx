@@ -40,7 +40,7 @@ function Sidebar({ user, tip, open, onClose }) {
 
       <aside
         className={`
-          fixed lg:static top-24 lg:top-0 left-0 h-[calc(100%-6rem)] lg:h-full z-40
+          fixed lg:static top-24 lg:top-0 left-0 min-h-screen lg:min-h-screen z-40
           w-72 lg:w-64 shrink-0 bg-surface border-r border-border
           flex flex-col px-4 py-6 overflow-y-auto
           transition-transform duration-300 ease-in-out

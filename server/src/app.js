@@ -14,11 +14,13 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const tripRoutes = require("./routes/trip.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const adminRoutes = require("./routes/admin.routes");
+const travelOptionRoutes = require("./routes/travelOption.routes");
+const bookingRoutes = require("./routes/booking.routes");
 const app = express();
 const weatherRoutes = require("./routes/weather.routes");
 const errorMiddleware = require("./middleware/errorMiddleware"); // ← added
 const mapsRoutes = require("./routes/maps.routes");
-
+const itineraryRoutes = require("./routes/itinerary.routes");
 // ================= Middleware =================
 
 app.use(express.json());
@@ -53,9 +55,11 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/weather", weatherRoutes);
-app.use("/api/users", userRoutes);
 app.use("/api/maps", mapsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/travel-options", travelOptionRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/itineraries", itineraryRoutes);
 // Export App
 app.get("/", (req, res) => {
   res.send("Server is working!");

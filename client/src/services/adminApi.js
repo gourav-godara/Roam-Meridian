@@ -88,3 +88,10 @@ export {
   updateDestination,
   deleteDestination,
 } from "./destinationApi";
+export {
+  getAllItineraries,
+  getItineraryById,
+  createItinerary,
+  updateItinerary,
+  deleteItinerary,
+} from "./itineraryApi";

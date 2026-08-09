@@ -49,7 +49,7 @@ function NearbyRestaurants({ items = [], onPlaceRoute }) {
                   onClick={() => {
                     console.log(restaurant);
                     onPlaceRoute?.(restaurant)}}
-                  className="w-full rounded-xl bg-green-700 text-white py-2 hover:bg-green-800"
+                  className="w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover"
                 >
                   Show Route
                 </button>

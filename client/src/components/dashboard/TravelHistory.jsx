@@ -106,17 +106,20 @@ function TravelHistory({ trips = [] }) {
                   <div className="flex gap-3 mt-6">
 
                     <Link
-                      to={`/trip/${trip._id}`}
-                      className="flex-1 py-2 rounded-xl bg-green-700 text-white text-center font-medium hover:bg-green-800"
-                    >
-                      View Trip
-                    </Link>
+  to="/itineraries"
+  className="flex-1 py-2 rounded-xl bg-green-700 text-white text-center font-medium hover:bg-green-800"
+>
+  View Trip
+</Link>
 
                     {!trip.rating && (
-                      <button className="flex-1 py-2 rounded-xl border border-green-700 text-green-700 hover:bg-green-50">
-                        Rate Trip
-                      </button>
-                    )}
+  <Link
+    to={`/reviews?tripId=${trip._id}`}
+    className="flex-1 py-2 rounded-xl border border-green-700 text-green-700 text-center hover:bg-green-50"
+  >
+    Rate Trip
+  </Link>
+)}
 
                   </div>
                 </div>

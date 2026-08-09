@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AddExpenseModal from "../../components/expenses/AddExpenseModal";
 import useExpenses from "../../hooks/useExpenses";
 import ExpenseSummary from "../../components/expenses/ExpenseSummary";
@@ -10,6 +11,7 @@ import { calculateSettlements } from "../../utils/calculateSettlements";
 import { settleExpense } from "../../services/expenseApi";
 import { useToast } from "../../context/ToastContext";
 import useAuth from "../../hooks/useAuth";
+import worldMap from "../../assets/world-map.png";
 
 const Expenses = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -65,7 +67,7 @@ const Expenses = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8]">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-forest/20 border-t-forest rounded-full animate-spin" />
           <p className="text-sm text-muted">Loading expenses...</p>
@@ -76,7 +78,7 @@ const Expenses = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8]">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <p className="text-red-600 text-sm">{error}</p>
       </div>
     );
@@ -92,15 +94,53 @@ const Expenses = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] pt-28 sm:pt-32 pb-16">
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
-        <h1 className="font-display text-3xl sm:text-4xl text-ink mb-8">
-          Expense Split
-        </h1>
+    <div className="relative min-h-screen pt-28 sm:pt-32 pb-16 overflow-hidden">
+      {/* Ambient backdrop: a low-poly world map, tinted into the forest
+          palette and faded into the page background at the edges so it
+          reads as texture rather than a stray illustration. */}
+      <div
+        className="absolute top-0 right-0 w-[70vw] max-w-[900px] pointer-events-none opacity-[0.07]"
+        style={{
+          filter:
+            "sepia(1) saturate(2) hue-rotate(60deg) brightness(0.55)",
+        }}
+      >
+        <img src={worldMap} alt="" className="w-full h-auto" />
+      </div>
 
-        <ExpenseSummary summary={summary} />
+      <div className="relative max-w-[1200px] mx-auto px-6 lg:px-12">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8"
+        >
+          <p className="text-xs font-semibold tracking-[0.15em] text-gold uppercase mb-2">
+            Trip Finances
+          </p>
+          <h1 className="font-display text-3xl sm:text-4xl text-ink">
+            Expense Split
+          </h1>
+          <p className="text-muted mt-2 text-sm sm:text-base">
+            Track spending, split fairly, and settle up with your travel
+            crew.
+          </p>
+        </motion.div>
 
-        <div className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+        >
+          <ExpenseSummary summary={summary} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="mt-6"
+        >
           <ExpenseFilters
             onAddExpense={() => setOpenModal(true)}
             search={search}
@@ -110,7 +150,7 @@ const Expenses = () => {
             status={status}
             setStatus={setStatus}
           />
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
           <AddExpenseModal
