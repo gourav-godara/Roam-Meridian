@@ -99,7 +99,7 @@ function SimilarDestinations({ currentDestinationId }) {
               </div>
 
               <button
-                className="mt-5 w-full py-2.5 rounded-xl bg-green-700 text-white font-semibold hover:bg-green-800 transition"
+                className="mt-5 w-full py-2.5 rounded-xl bg-forest text-white font-semibold hover:bg-green-800 transition"
               >
                 Explore Destination
               </button>

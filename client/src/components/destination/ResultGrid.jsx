@@ -81,7 +81,7 @@ function ResultGrid({
                       event.stopPropagation();
                       onItemClick(item);
                     }}
-                    className="mt-3 text-left text-sm font-semibold text-forest"
+                    className="w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover"
                   >
                     Show Route
                   </button>

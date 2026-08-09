@@ -78,7 +78,7 @@ function MapCard({
           href={googleMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl bg-green-700 text-white hover:bg-green-800 transition text-sm font-medium"
+          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl bg-forest text-white hover:bg-forest-hover transition text-sm font-medium"
         >
           Open in Google Maps
         </a>
@@ -162,7 +162,7 @@ function MapCard({
             "_blank"
           )
         }
-        className="mt-4 w-full rounded-xl bg-green-700 text-white py-2 hover:bg-green-800 transition"
+        className="mt-4 w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover transition"
       >
         Get Directions in Google Maps
       </button>
