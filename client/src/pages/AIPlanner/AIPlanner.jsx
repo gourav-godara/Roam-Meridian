@@ -64,23 +64,25 @@ function AIPlanner() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-30">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-5 px-4 sm:px-6 lg:px-10 xl:grid-cols-[minmax(0,1fr)_310px]">
-        <section className="flex min-h-[calc(100vh-145px)] flex-col overflow-hidden rounded-[2rem] border border-border bg-white shadow-sm">
+    <div className="h-screen overflow-hidden bg-bg">
+      <div className="mx-auto grid h-full max-w-[1440px] grid-cols-1 gap-5 px-4 sm:px-6 lg:px-10 xl:grid-cols-[minmax(0,1fr)_310px]">
+        <section className="flex h-[calc(100vh-80px)] min-h-0 flex-col overflow-hidden rounded-[2rem] border border-border bg-[#f8faf7] shadow-sm">
           <PlannerHeader />
 
           {messages.length > 0 && <SuggestionChips onSelect={setDraft} />}
 
-          <ChatWindow
-            messages={messages}
-            generating={generating}
-            messagesEndRef={messagesEndRef}
-            onRegenerateDay={regenerateDay}
-            onSave={savePlan}
-            onFavorite={toggleFavorite}
-            onDuplicate={duplicatePlan}
-            onPromptSelect={setDraft}
-          />
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ChatWindow
+              messages={messages}
+              generating={generating}
+              messagesEndRef={messagesEndRef}
+              onRegenerateDay={regenerateDay}
+              onSave={savePlan}
+              onFavorite={toggleFavorite}
+              onDuplicate={duplicatePlan}
+              onPromptSelect={setDraft}
+            />
+          </div>
 
           <MessageInput
             value={draft}

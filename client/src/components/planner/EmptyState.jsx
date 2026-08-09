@@ -1,5 +1,5 @@
 import { FiCompass } from "react-icons/fi";
-import kmmerer from "../../assets/Gemini_Generated_Image_cyjzm0cyjzm0cyjz.png";
+import image from "../../assets/AiPlanner-image.png";
 
 const TRAVEL_MOODS = [
   {
@@ -21,28 +21,28 @@ const TRAVEL_MOODS = [
 
 function EmptyState({ onPromptSelect = () => {} }) {
   return (
-    <div className="relative flex min-h-[560px] flex-1 overflow-hidden">
+    <div className="relative flex min-h-full flex-1 overflow-hidden">
       <img
-        src={kmmerer}
+        src={image}
         alt="Hot air balloons floating over a landscape"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full  object-cover object-center"
       />
 
       <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/10" />
 
-      <div className="relative z-10 flex w-full flex-col justify-between px-6 py-8 sm:px-10 sm:py-10 lg:px-14">
+      <div className="relative z-10 flex w-full flex-col justify-between px-6 py-5 sm:px-8 sm:py-6 lg:px-10">
         <div className="max-w-xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-forest/15 bg-white/75 px-3 py-1.5 text-xs font-semibold text-forest backdrop-blur-sm">
             <FiCompass size={14} />
             YOUR AI TRAVEL COMPANION
           </div>
 
-          <h2 className="mt-6 font-display text-4xl leading-[1.05] text-ink sm:text-5xl lg:text-6xl">
+          <h2 className="mt-4 font-display text-3xl leading-[1.05] text-ink sm:text-4xl lg:text-5xl">
             Make the journey
             <span className="block italic text-forest">yours.</span>
           </h2>
 
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-muted sm:text-base">
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
             Tell Roam Meridian where your curiosity is taking you. We’ll shape
             your ideas into a thoughtful trip, built around your time, budget,
             and travel style.
@@ -51,13 +51,13 @@ function EmptyState({ onPromptSelect = () => {} }) {
           <button
             type="button"
             onClick={() => onPromptSelect("Help me plan an unforgettable trip")}
-            className="mt-6 rounded-2xl bg-forest px-5 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-forest-hover hover:shadow-lg"
+            className="mt-4 rounded-2xl bg-forest px-5 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-forest-hover hover:shadow-lg"
           >
             Start planning with AI
           </button>
         </div>
 
-        <div className="mt-12">
+        <div className="mt-6">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-forest">
             Choose your travel mood
           </p>
