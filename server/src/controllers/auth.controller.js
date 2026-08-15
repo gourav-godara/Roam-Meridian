@@ -113,7 +113,7 @@ const createAccount = async (req, res) => {
 
             process.env.JWT_SECRET,
             {
-                expiresIn: "7d",
+                expiresIn: "30d",
             }
         );
 
@@ -230,7 +230,7 @@ const loginUser = async (req, res) => {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "7d",
+                expiresIn: "30d",
             }
         );
         console.log("===== LOGIN CONTROLLER =====");
@@ -300,7 +300,7 @@ const googleLogin = async (req, res) => {
 
             process.env.JWT_SECRET,
             {
-                expiresIn: "7d",
+                expiresIn: "30d",
             }
         );
 
