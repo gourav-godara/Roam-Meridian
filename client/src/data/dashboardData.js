@@ -49,8 +49,8 @@ export const recentBookings = [
 ];
 
 export const recommendations = [
-  { id: 1, name: "Udaipur", location: "Rajasthan", rating: 4.6, budget: "₹15,000", image: "https://picsum.photos/seed/udaipur/300/200" },
-  { id: 2, name: "Coorg", location: "Karnataka", rating: 4.8, budget: "₹11,200", image: "https://picsum.photos/seed/coorg/300/200" },
+  { id: 1, name: "Udaipur", location: "Rajasthan", rating: 0, budget: "₹15,000", image: "https://picsum.photos/seed/udaipur/300/200" },
+  { id: 2, name: "Coorg", location: "Karnataka", rating: 0, budget: "₹11,200", image: "https://picsum.photos/seed/coorg/300/200" },
 ];
 
 export const mapPins = [

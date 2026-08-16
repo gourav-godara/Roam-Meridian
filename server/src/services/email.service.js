@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 const sendOTPEmail = async (email, otp) => {
     try {
         await transporter.sendMail({
-            from: `Roam Meridian" <${process.env.EMAIL_USER}>`,
+            from: `"Roam Meridian" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: "Roam Meridian - OTP Verification",
             html: `

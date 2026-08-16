@@ -436,6 +436,7 @@ console.log("Features:", response.data.features);
               routeData={routeData}
               onPlaceRoute={handlePlaceRoute}
               loadingNearby={loadingNearby}
+              selectedPlace={selectedPlace}
             />
           </div>
 

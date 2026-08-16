@@ -89,9 +89,7 @@ function SimilarDestinations({ currentDestinationId }) {
                   <FiStar className="fill-yellow-400 text-yellow-400" />
 
                   <span className="font-semibold">
-                    {item.rating?.average?.toFixed?.(1) ??
-                      item.rating ??
-                      "4.8"}
+                    {(item.rating?.average ?? 0).toFixed(1)}
                   </span>
                 </div>
 
@@ -101,7 +99,7 @@ function SimilarDestinations({ currentDestinationId }) {
               </div>
 
               <button
-                className="mt-5 w-full py-2.5 rounded-xl bg-green-700 text-white font-semibold hover:bg-green-800 transition"
+                className="mt-5 w-full py-2.5 rounded-xl bg-forest text-white font-semibold hover:bg-green-800 transition"
               >
                 Explore Destination
               </button>

@@ -8,9 +8,11 @@ import logo from "../../assets/logo.png";
 
 const NAV_LINKS = [
   { to: "/explore", label: "Explore" },
+  { to: "/travel-booking", label: "Travel Booking" },
   { to: "/planner", label: "AI Planner" },
   { to: "/itineraries", label: "Trips" },
   { to: "/about", label: "About Us" },
+  { to: "/itinerary-guide", label: "Itinerary" },
 ];
 
 function Navbar() {

@@ -6,7 +6,7 @@ function DestinationHeader({ location, name, description, rating, reviewCount, c
       <p className="text-base font-semibold text-forest tracking-wide">{location}</p>
 
       <div className="flex items-center justify-between gap-4 mt-2">
-        <h1 className="font-display text-6xl lg:text-7xl text-ink leading-none">{name}</h1>
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl text-ink leading-tight lg:leading-none break-words">{name}</h1>
         <span className="flex items-center gap-2 text-lg shrink-0">
           <FiStar size={22} className="fill-gold text-gold" />
           <span className="font-semibold text-ink">{rating.toFixed(1)}</span>

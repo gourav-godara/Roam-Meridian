@@ -171,7 +171,7 @@ useEffect(() => {
 
     <button
       onClick={onWriteReview}
-      className="px-5 py-2 rounded-xl bg-green-700 text-white hover:bg-green-800"
+      className="px-5 py-2 rounded-xl bg-forest text-white hover:bg-forest-hover"
     >
       Write Review
     </button>

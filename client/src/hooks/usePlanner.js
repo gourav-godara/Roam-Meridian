@@ -57,20 +57,23 @@ function usePlanner() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [conversationId, setConversationId] = useState(null);
+  const [hasStartedChat, setHasStartedChat] = useState(
+    sessionStorage.getItem("plannerStarted") === "true",
+  );
   const { showToast } = useToast();
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     });
   }, []);
 
   useEffect(() => {
-    if (!generating) {
-      scrollToBottom();
-    }
+    scrollToBottom();
   }, [messages, generating, scrollToBottom]);
 
   const loadHistory = useCallback(
@@ -92,8 +95,62 @@ function usePlanner() {
     loadHistory();
   }, [loadHistory]);
 
+  useEffect(() => {
+    const loadConversation = async () => {
+      try {
+        const conversation = await plannerApi.getActiveConversation();
+
+        if (!conversation) return;
+
+        setConversationId(conversation._id);
+
+        const plan = buildPlanFromConversation(conversation);
+
+        setCurrentPlan(plan);
+
+        const restoredMessages = conversation.messages.map((m) => ({
+          id: crypto.randomUUID(),
+          role: m.role === "assistant" ? "ai" : "user",
+          text: m.content,
+          timestamp: new Date(m.createdAt),
+          plan:
+            m.tripSnapshot && m.role === "assistant"
+              ? buildPlanFromConversation({
+                  currentTrip: m.tripSnapshot,
+                  tripContext: conversation.tripContext,
+                })
+              : undefined,
+        }));
+
+        if (hasStartedChat) {
+          setMessages(restoredMessages);
+        }
+
+        const latestTripMessage = [...conversation.messages]
+          .reverse()
+          .find((m) => m.tripSnapshot);
+
+        if (latestTripMessage) {
+          setCurrentPlan(
+            buildPlanFromConversation({
+              currentTrip: latestTripMessage.tripSnapshot,
+              tripContext: conversation.tripContext,
+            }),
+          );
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadConversation();
+  }, [hasStartedChat]);
+
   const sendMessage = useCallback(
     async (text, tripParams) => {
+      sessionStorage.setItem("plannerStarted", "true");
+      setHasStartedChat(true);
+
       const userMessage = {
         id: Date.now(),
         role: "user",
