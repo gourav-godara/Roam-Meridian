@@ -5,7 +5,7 @@ const sendOTPEmail = async (email, otp) => {
         await axios.post(
             "https://api.resend.com/emails",
             {
-                from: "Roam Meridian <onboarding@resend.dev>",
+                from: process.env.RESEND_FROM_EMAIL,
                 to: email,
                 subject: "Roam Meridian - OTP Verification",
                 html: `
