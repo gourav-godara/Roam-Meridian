@@ -1,39 +1,33 @@
-const axios = require("axios");
+const nodemailer = require("nodemailer");
 
-// Uses Resend's HTTPS API instead of raw SMTP. Gmail SMTP is frequently
-// throttled/blocked from cloud host IPs (like Render's), causing the
-// connection to hang for minutes before timing out. An HTTP API call
-// doesn't have that problem.
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
 const sendOTPEmail = async (email, otp) => {
     try {
-        await axios.post(
-            "https://api.resend.com/emails",
-            {
-                from: process.env.RESEND_FROM_EMAIL, // e.g. "Roam Meridian <onboarding@resend.dev>"
-                to: email,
-                subject: "Roam Meridian - OTP Verification",
-                html: `
-                    <div style="font-family: Arial, sans-serif;">
-                        <h2>Roam Meridian</h2>
-                        <p>Your OTP for verification is:</p>
-                        <h1 style="letter-spacing: 4px;">${otp}</h1>
-                        <p>This OTP is valid for <strong>5 minutes</strong></p>
-                        <p>If you did not request this, you can ignore this email.</p>
-                    </div>
-                `,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-                    "Content-Type": "application/json",
-                },
-                timeout: 10000,
-            }
-        );
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Roam Meridian - OTP Verification",
+            html: `
+                <div style="font-family: Arial, sans-serif;">
+                    <h2>Roam Meridian</h2>
+                    <p>Your OTP for verification is:</p>
+                    <h1 style="letter-spacing: 4px;">${otp}</h1>
+                    <p>This OTP is valid for <strong>5 minutes</strong></p>
+                    <p>If you did not request this, you can ignore this email.</p>
+                </div>
+            `,
+        });
 
         console.log("OTP email sent successfully.");
     } catch (error) {
-        console.error("Email Error:", error.response?.data || error.message);
+        console.error("Email Error:", error);
         throw error;
     }
 };
