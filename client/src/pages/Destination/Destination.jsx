@@ -75,18 +75,18 @@ function Destination() {
         const response = await getReviews(id);
 
         const mapped = (response.data || []).map((review) => ({
-          id: review._id,
-          name: review.user?.name || "Traveler",
-          avatar:
-            review.user?.avatar ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              review.user?.name || "T"
-            )}`,
-          date: new Date(review.createdAt).toLocaleDateString(),
-          rating: review.rating,
-          text: review.reviewText,
-          images: review.images || [],
-        }));
+      id: review._id,
+      name: review.user?.name || "Traveler",
+      avatar:
+        review.user?.avatar ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          review.user?.name || "T"
+        )}`,
+      date: new Date(review.createdAt).toLocaleDateString(),
+      rating: review.rating,
+      text: review.reviewText,
+      images: review.images || [],
+    }));
 
         setReviews(mapped);
       } catch (error) {

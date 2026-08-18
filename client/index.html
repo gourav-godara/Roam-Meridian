@@ -4,9 +4,103 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+    <title>Roam Meridian</title>
+    <style>
+      /*
+        Initial boot splash — pure CSS/HTML so it paints instantly,
+        before React, Tailwind, or any JS bundle has loaded.
+        #initial-splash is removed by main.jsx once the app has
+        mounted (see the removeInitialSplash() call).
+      */
+      #initial-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #F8F7F4;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+      }
+      #initial-splash.splash-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .splash-compass {
+        position: relative;
+        width: 88px;
+        height: 88px;
+      }
+      .splash-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 9999px;
+        border: 2px solid rgba(44, 70, 58, 0.15);
+      }
+      .splash-ring-spin {
+        position: absolute;
+        inset: 0;
+        border-radius: 9999px;
+        border: 2px solid transparent;
+        border-top-color: #C89B3C;
+        border-right-color: #C89B3C;
+        animation: splash-spin 0.9s linear infinite;
+      }
+      .splash-needle {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: splash-needle-swing 1.6s ease-in-out infinite;
+        transform-origin: 50% 50%;
+      }
+      .splash-word {
+        margin-top: 22px;
+        font-family: Georgia, "Times New Roman", serif;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        font-size: 13px;
+        color: #2C463A;
+        animation: splash-pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes splash-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes splash-needle-swing {
+        0%, 100% { transform: rotate(-10deg); }
+        50% { transform: rotate(10deg); }
+      }
+      @keyframes splash-pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .splash-ring-spin,
+        .splash-needle,
+        .splash-word {
+          animation: none !important;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="initial-splash">
+      <div class="splash-compass">
+        <div class="splash-ring"></div>
+        <div class="splash-ring-spin"></div>
+        <div class="splash-needle">
+          <svg width="36" height="36" viewBox="0 0 34 34">
+            <circle cx="17" cy="17" r="2.5" fill="#2C463A" />
+            <path d="M17 3 L21 17 L17 15 L13 17 Z" fill="#C89B3C" />
+            <path d="M17 31 L13 17 L17 19 L21 17 Z" fill="#2C463A" />
+          </svg>
+        </div>
+      </div>
+      <p class="splash-word">Roam Meridian</p>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

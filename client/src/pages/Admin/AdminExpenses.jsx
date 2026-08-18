@@ -3,14 +3,12 @@ import { FiSearch } from "react-icons/fi";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getAllExpensesAdmin } from "../../services/adminApi";
 import Pagination from "../../components/admin/Pagination";
-import StatusBadge from "../../components/admin/StatusBadge";
 
 function AdminExpenses() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -24,7 +22,6 @@ function AdminExpenses() {
       try {
         const res = await getAllExpensesAdmin({
           search: debouncedSearch || undefined,
-          status: status || undefined,
           page,
           limit: 15,
         });
@@ -47,11 +44,11 @@ function AdminExpenses() {
     return () => {
       ignore = true;
     };
-  }, [debouncedSearch, status, page]);
+  }, [debouncedSearch, page]);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status]);
+  }, [debouncedSearch]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -74,16 +71,6 @@ function AdminExpenses() {
             className="w-full border border-border rounded-xl pl-9 pr-4 py-2.5 text-sm outline-none focus:border-forest/40"
           />
         </div>
-
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border border-border rounded-xl px-4 py-2.5 text-sm bg-white outline-none focus:border-forest/40"
-        >
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Settled">Settled</option>
-        </select>
       </div>
 
       <div className="bg-white rounded-2xl border border-border overflow-hidden">
@@ -105,7 +92,6 @@ function AdminExpenses() {
                   <th className="px-4 py-3 font-medium">Paid By</th>
                   <th className="px-4 py-3 font-medium">Participants</th>
                   <th className="px-4 py-3 font-medium">Amount</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -126,9 +112,6 @@ function AdminExpenses() {
                     </td>
                     <td className="px-4 py-3 text-ink font-medium">
                       ₹{expense.amount?.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge value={expense.status} />
                     </td>
                   </tr>
                 ))}

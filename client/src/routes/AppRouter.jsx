@@ -25,6 +25,7 @@ import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import ScrollToTop from "../components/common/ScrollToTop";
+import RouteLoader from "./RouteLoader";
 import Wishlist from "../pages/Wishlist/Wishlist";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
@@ -46,6 +47,7 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <RouteLoader />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
