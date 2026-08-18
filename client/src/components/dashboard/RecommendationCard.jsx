@@ -18,13 +18,6 @@ function RecommendationCard({ item }) {
           <span className="text-xs text-muted">{item.budget}</span>
         </div>
       </div>
-      <button
-        onClick={(e) => { e.preventDefault(); setSaved((v) => !v); }}
-        aria-label="Save"
-        className="shrink-0"
-      >
-        <FiHeart size={16} className={saved ? "fill-forest-light text-forest-light" : "text-gray-300"} />
-      </button>
     </Link>
   );
 }
