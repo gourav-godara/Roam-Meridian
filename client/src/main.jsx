@@ -20,3 +20,16 @@ createRoot(document.getElementById("root")).render(
     </GoogleOAuthProvider>
   </StrictMode>
 );
+
+// Remove the static boot splash (from index.html) once React has
+// mounted and painted. A short delay lets the app's first paint
+// settle so the fade-out feels intentional rather than abrupt.
+const splash = document.getElementById("initial-splash");
+if (splash) {
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      splash.classList.add("splash-hidden");
+      setTimeout(() => splash.remove(), 450);
+    }, 300);
+  });
+}

@@ -86,16 +86,6 @@ const ExpenseCard = ({
             <p className="text-muted text-sm mt-0.5">{expense.category}</p>
           </div>
         </div>
-
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 ${
-            expense.status === "Settled"
-              ? "bg-forest/10 text-forest"
-              : "bg-gold/15 text-gold"
-          }`}
-        >
-          {expense.status}
-        </span>
       </div>
 
       <div className="mt-4 pl-14">

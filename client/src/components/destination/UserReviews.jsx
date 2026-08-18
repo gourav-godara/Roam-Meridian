@@ -7,6 +7,7 @@ import {
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
+import { API_BASE_URL } from "../../services/api";
 function UserReviews({ items, onWriteReview }) {
   const totalReviews = items.length;
 
@@ -244,7 +245,7 @@ useEffect(() => {
     {review.images.map((img, index) => (
       <img
   key={index}
-  src={`${import.meta.env.VITE_API_URL}${img}`}
+  src={`${API_BASE_URL}${img}`}
   alt=""
   onClick={() =>
     openViewer(review.images, index)
@@ -291,7 +292,7 @@ useEffect(() => {
 
       <motion.img
         key={viewerImages[viewerIndex]}
-        src={`${import.meta.env.VITE_API_URL}${viewerImages[viewerIndex]}`}
+        src={`${API_BASE_URL}${viewerImages[viewerIndex]}`}
         className="max-w-[90vw] max-h-[90vh] rounded-xl"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}

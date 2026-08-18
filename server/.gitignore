@@ -6,3 +6,6 @@ node_modules/
 
 # Logs
 *.log
+
+# User-uploaded files (auto-created at runtime by upload.middleware.js)
+uploads/

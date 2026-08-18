@@ -10,7 +10,6 @@ import ContinuePlanning from "../../components/dashboard/ContinuePlanning";
 import RecommendationCard from "../../components/dashboard/RecommendationCard";
 import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
 import ExpenseCard from "../../components/dashboard/ExpenseCard";
-import NotificationBell from "../../components/dashboard/NotificationBell";
 import TravelHistory from "../../components/dashboard/TravelHistory";
 import RecentReviews from "../../components/dashboard/RecentReviews";
 
@@ -80,30 +79,22 @@ function Dashboard() {
       />
 
       <main className="flex-1 min-w-0 flex flex-col gap-6 p-4 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden w-10 h-10 rounded-xl border border-border bg-surface flex items-center justify-center shrink-0 hover:bg-mist transition-colors"
-              aria-label="Open sidebar"
-            >
-              <PiSidebarSimpleBold size={19} className="text-ink" />
-            </button>
-            <div>
-              <h1 className="font-display text-lg sm:text-h3 text-ink">
-                {greeting}, {firstName} 👋
-              </h1>
-              <p className="text-xs sm:text-sm text-muted mt-1">
-                Ready for your next adventure?
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
           <button
-            aria-label="Notifications"
-            className="relative w-10 h-10 rounded-full border border-border flex items-center justify-center shrink-0"
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden w-10 h-10 rounded-xl border border-border bg-surface flex items-center justify-center shrink-0 hover:bg-mist transition-colors"
+            aria-label="Open sidebar"
           >
-            <NotificationBell />
+            <PiSidebarSimpleBold size={19} className="text-ink" />
           </button>
+          <div>
+            <h1 className="font-display text-lg sm:text-h3 text-ink">
+              {greeting}, {firstName} 👋
+            </h1>
+            <p className="text-xs sm:text-sm text-muted mt-1">
+              Ready for your next adventure?
+            </p>
+          </div>
         </div>
 
         <motion.div

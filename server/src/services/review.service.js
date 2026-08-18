@@ -37,8 +37,10 @@ const createReview = async (reviewData) => {
     destination: reviewData.destination,
   });
 
-  if (existingReview) {
-    throw new Error("You have already reviewed this itinerary.");
+   if (existingReview) {
+    const err = new Error("You have already reviewed this itinerary.");
+    err.status = 400;
+    throw err;
   }
 
   const review = await Review.create(reviewData);
