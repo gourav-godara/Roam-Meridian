@@ -74,18 +74,20 @@ function ResultGrid({
                   )}
                 </div>
 
-                {onItemClick && (
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onItemClick(item);
-                    }}
-                    className="w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover"
-                  >
-                    Show Route
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (item.latitude && item.longitude) {
+                      const url = `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`;
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    }
+                    onItemClick?.(item);
+                  }}
+                  className="w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover transition text-sm font-medium mt-3"
+                >
+                  Open in Google Maps
+                </button>
               </div>
             </motion.article>
           ))}

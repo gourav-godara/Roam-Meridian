@@ -2,10 +2,11 @@ const axios = require("axios");
 const { getRoute } = require("../services/route.service");
 const { getNearbyPlaces } = require("../services/nearby.service");
 const { getOrSet } = require("../utils/cache");
+const { hasNonLatin, translateToEnglish } = require("../utils/translator");
 
 const fetchLocation = async (city, state, country) => {
     return getOrSet(
-        `geocode:${city},${state},${country}`.toLowerCase(),
+        `geocode:en:${city},${state},${country}`.toLowerCase(),
         24 * 60 * 60 * 1000, // 24 hours — coordinates for a place don't change
         async () => {
             const response = await axios.get(
@@ -15,9 +16,11 @@ const fetchLocation = async (city, state, country) => {
                         q: `${city}, ${state}, ${country}`,
                         format: "json",
                         limit: 1,
+                        "accept-language": "en",
                     },
                     headers: {
                         "User-Agent": "RoamMeridian/1.0",
+                        "Accept-Language": "en",
                     },
                 }
             );
@@ -28,17 +31,21 @@ const fetchLocation = async (city, state, country) => {
 
             const location = response.data[0];
 
+            let address = location.display_name || "";
+            if (hasNonLatin(address)) {
+                address = await translateToEnglish(address);
+            }
+
             return {
                 latitude: location.lat,
                 longitude: location.lon,
-                address: location.display_name,
+                address,
             };
         }
     );
 };
 
 const reverseGeocode = async (latitude, longitude) => {
-
     const response = await axios.get(
         "https://nominatim.openstreetmap.org/reverse",
         {
@@ -46,20 +53,40 @@ const reverseGeocode = async (latitude, longitude) => {
                 lat: latitude,
                 lon: longitude,
                 format: "json",
+                "accept-language": "en",
             },
             headers: {
                 "User-Agent": "RoamMeridian/1.0",
+                "Accept-Language": "en",
             },
         }
     );
 
-    const address = response.data.address;
+    const address = response.data?.address || {};
+
+    let displayName = response.data?.display_name || "";
+    let city = address.city || address.town || address.village || "";
+    let state = address.state || "";
+    let country = address.country || "";
+
+    if (hasNonLatin(displayName)) {
+        displayName = await translateToEnglish(displayName);
+    }
+    if (hasNonLatin(city)) {
+        city = await translateToEnglish(city);
+    }
+    if (hasNonLatin(state)) {
+        state = await translateToEnglish(state);
+    }
+    if (hasNonLatin(country)) {
+        country = await translateToEnglish(country);
+    }
 
     return {
-        address: response.data.display_name,
-        city: address.city || address.town || address.village || "",
-        state: address.state || "",
-        country: address.country || "",
+        address: displayName,
+        city,
+        state,
+        country,
     };
 };
 
