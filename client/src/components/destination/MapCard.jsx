@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { FiMaximize2, FiX } from "react-icons/fi";
 import LeafletMap from "../maps/LeafletMap";
 
-
 function MapCard({
   latitude,
   longitude,
@@ -11,9 +10,6 @@ function MapCard({
   nearbyPlaces = [],
   nearbyType,
   setNearbyType,
-  routeData,
-  selectedPlace,
-  onPlaceRoute,
   loadingNearby,
 }) {
   const [isMapExpanded, setIsMapExpanded] = useState(false);
@@ -30,14 +26,6 @@ function MapCard({
   ];
 
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-
-  const handleNavigate = (place) => {
-  console.log("Navigate place:", place);
-
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}&travelmode=driving`;
-
-  window.open(url, "_blank");
-};
 
   // Prevent page behind fullscreen map from scrolling
   useEffect(() => {
@@ -73,7 +61,7 @@ function MapCard({
       </div>
 
       {/* Google Maps buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 mb-4">
         <a
           href={googleMapsUrl}
           target="_blank"
@@ -82,7 +70,6 @@ function MapCard({
         >
           Open in Google Maps
         </a>
-
       </div>
 
       {/* Normal map */}
@@ -120,122 +107,78 @@ function MapCard({
             longitude={Number(longitude)}
             name={name}
             nearbyPlaces={nearbyPlaces}
-            routeData={routeData}
-            onPlaceRoute={onPlaceRoute}
-            onNavigate={handleNavigate}
           />
         )}
       </div>
 
       {/* Nearby places count */}
       <p className="text-sm text-gray-500 mt-3">
-        Found {nearbyPlaces.length} nearby{" "}
-        {nearbyType.replaceAll("_", " ")}.
+        Found {nearbyPlaces.length} nearby {nearbyType.replaceAll("_", " ")}.
       </p>
 
-      {/* Route information */}
-      {routeData && (
-  <div className="mt-5 rounded-xl bg-green-50 border border-green-200 p-4">
-    <h3 className="font-semibold mb-2">
-      Route Information
-    </h3>
-
-    <p>
-      Distance:{" "}
-      <strong>
-        {(routeData.distance / 1000).toFixed(2)} km
-      </strong>
-    </p>
-
-    <p>
-      Estimated Time:{" "}
-      <strong>
-        {Math.round(routeData.duration / 60)} mins
-      </strong>
-    </p>
-
-    {selectedPlace && (
-      <button
-        onClick={() =>
-          window.open(
-            `https://www.google.com/maps/dir/?api=1&destination=${selectedPlace.latitude},${selectedPlace.longitude}&travelmode=driving`,
-            "_blank"
-          )
-        }
-        className="mt-4 w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover transition"
-      >
-        Get Directions in Google Maps
-      </button>
-    )}
-  </div>
-)}
-
-            {/* Fullscreen map */}
+      {/* Fullscreen map */}
       {isMapExpanded &&
         createPortal(
           <div
             className="fixed inset-0 bg-white flex flex-col"
             style={{ zIndex: 999999 }}
           >
-          {/* Fullscreen header */}
-          <div className="relative z-[1000] flex items-center justify-between px-4 sm:px-6 py-4 border-b bg-white">
-            <div className="min-w-0">
-              <h2 className="text-lg font-semibold text-ink">
-                Explore {name}
-              </h2>
+            {/* Fullscreen header */}
+            <div className="relative z-[1000] flex items-center justify-between px-4 sm:px-6 py-4 border-b bg-white">
+              <div className="min-w-0">
+                <h2 className="text-lg font-semibold text-ink">
+                  Explore {name}
+                </h2>
 
-              <p className="text-xs text-gray-500">
-                Drag and zoom to explore nearby places
-              </p>
+                <p className="text-xs text-gray-500">
+                  Drag and zoom to explore nearby places
+                </p>
+              </div>
+
+              {/* Close fullscreen button */}
+              <button
+                type="button"
+                onClick={() => setIsMapExpanded(false)}
+                aria-label="Close expanded map"
+                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-100 transition"
+              >
+                <FiX size={24} />
+              </button>
             </div>
 
-            {/* Close fullscreen button */}
-            <button
-              type="button"
-              onClick={() => setIsMapExpanded(false)}
-              aria-label="Close expanded map"
-              className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-100 transition"
-            >
-              <FiX size={24} />
-            </button>
-          </div>
-
-          {/* Filters in fullscreen */}
-          <div className="relative z-[1000] bg-white border-b px-4 sm:px-6 py-3">
-            <div className="flex gap-2 overflow-x-auto">
-              {placeTypes.map((type) => (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => setNearbyType(type.value)}
-                  className={`shrink-0 whitespace-nowrap px-3 py-2 rounded-full text-xs font-medium border transition ${
-                    nearbyType === type.value
-                      ? "bg-ink text-white border-ink"
-                      : "bg-white text-ink border-border hover:bg-gray-100"
-                  }`}
-                >
-                  {type.label}
-                </button>
-              ))}
+            {/* Filters in fullscreen */}
+            <div className="relative z-[1000] bg-white border-b px-4 sm:px-6 py-3">
+              <div className="flex gap-2 overflow-x-auto">
+                {placeTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    type="button"
+                    onClick={() => setNearbyType(type.value)}
+                    className={`shrink-0 whitespace-nowrap px-3 py-2 rounded-full text-xs font-medium border transition ${
+                      nearbyType === type.value
+                        ? "bg-ink text-white border-ink"
+                        : "bg-white text-ink border-border hover:bg-gray-100"
+                    }`}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Fullscreen Leaflet map */}
-          <div className="flex-1 min-h-0">
-            <LeafletMap
-              latitude={Number(latitude)}
-              longitude={Number(longitude)}
-              name={name}
-              nearbyPlaces={nearbyPlaces}
-              routeData={routeData}
-              onPlaceRoute={onPlaceRoute}
-              onNavigate={handleNavigate}
-              height="100%"
-            />
-          </div>
-        </div>,
-        document.body
-      )}
+            {/* Fullscreen Leaflet map */}
+            <div className="flex-1 min-h-0">
+              <LeafletMap
+                latitude={Number(latitude)}
+                longitude={Number(longitude)}
+                name={name}
+                nearbyPlaces={nearbyPlaces}
+                height="100%"
+              />
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
