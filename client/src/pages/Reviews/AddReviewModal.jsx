@@ -14,7 +14,27 @@ const AddReviewModal = ({
   const [reviewText, setReviewText] = useState("");
   const [itinerary, setItinerary] = useState("");
   const [formError, setFormError] = useState("");
+    const [images, setImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    setImages((prev) => [...prev, ...files]);
+
+    const previews = files.map((file) => URL.createObjectURL(file));
+
+    setPreviewImages((prev) => [...prev, ...previews]);
+  };
+
+  const removeImage = (index) => {
+    // Release the blob URL being discarded so repeated add/remove cycles
+    // don't leak memory for the life of the page.
+    URL.revokeObjectURL(previewImages[index]);
+
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+  };
   // Previously editingReview was accepted as a prop but never actually
   // used to populate the form — clicking "Edit" opened a blank form
   // instead of the review's existing content.
@@ -29,9 +49,21 @@ const AddReviewModal = ({
       setReviewText("");
       setItinerary("");
     }
+        // Editing an existing review only updates text/rating (images aren't
+    // editable after the fact), so always clear any staged photo picks.
+    previewImages.forEach((url) => URL.revokeObjectURL(url));
+    setImages([]);
+    setPreviewImages([]);
     setFormError("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingReview, isOpen]);
-
+    // Revoke any remaining preview URLs when the modal unmounts for good.
+  useEffect(() => {
+    return () => {
+      previewImages.forEach((url) => URL.revokeObjectURL(url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
@@ -60,6 +92,7 @@ const AddReviewModal = ({
       rating,
       reviewText,
       itinerary,
+      images,
     });
   };
 
@@ -144,7 +177,50 @@ const AddReviewModal = ({
               {reviewText.length}/1000
             </p>
           </div>
+                        {!editingReview && (
+            <div>
+              <label className="font-medium">Photos</label>
 
+              {previewImages.length > 0 && (
+                <div className="flex gap-3 flex-wrap mt-3">
+                  {previewImages.map((image, index) => (
+                    <div key={image} className="relative">
+                      <img
+                        src={image}
+                        alt=""
+                        className="w-20 h-20 rounded-xl object-cover"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-xs leading-none"
+                        aria-label="Remove photo"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+                id="addReviewImages"
+              />
+
+              <label
+                htmlFor="addReviewImages"
+                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 mt-3 text-sm"
+              >
+                📷 Add Photos
+              </label>
+            </div>
+          )}
           <div className="flex justify-end gap-4">
             <button
               type="button"

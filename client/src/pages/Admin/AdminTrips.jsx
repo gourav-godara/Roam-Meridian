@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiSearch, FiTrash2, FiExternalLink } from "react-icons/fi";
+import { FiSearch, FiTrash2} from "react-icons/fi";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useToast } from "../../context/ToastContext";
 import { getAllTripsAdmin, deleteTripAdmin } from "../../services/adminApi";
@@ -146,17 +146,8 @@ function AdminTrips() {
                       <StatusBadge value={trip.status} />
                     </td>
                     <td className="px-4 py-3 text-ink">₹{trip.budget?.toLocaleString()}</td>
-                    <td className="px-4 py-3">
+                                        <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={`/trips/${trip._id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          title="View trip"
-                          className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-ink hover:bg-gray-100"
-                        >
-                          <FiExternalLink size={14} />
-                        </a>
                         <button
                           onClick={() => setConfirmTarget(trip)}
                           disabled={busyId === trip._id}

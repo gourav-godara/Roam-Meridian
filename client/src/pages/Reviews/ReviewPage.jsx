@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useReview from "../../hooks/useReview";
 import useAuth from "../../hooks/useAuth";
 import { getTrips } from "../../services/tripApi";
 import { useToast } from "../../context/ToastContext";
+import { API_BASE_URL } from "../../services/api";
 
 import ReviewStats from "../../components/review/ReviewStats";
 import ReviewFilter from "../../components/review/ReviewFilter";
@@ -35,6 +37,49 @@ const ReviewPage = () => {
   const [editingReview, setEditingReview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [completedTrips, setCompletedTrips] = useState([]);
+    // Fullscreen photo viewer for a review's uploaded images.
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerImages, setViewerImages] = useState([]);
+  const [viewerIndex, setViewerIndex] = useState(0);
+
+  const openViewer = (images, index) => {
+    setViewerImages(images);
+    setViewerIndex(index);
+    setViewerOpen(true);
+  };
+
+  const nextImage = () => {
+    setViewerIndex((prev) => (prev + 1) % viewerImages.length);
+  };
+
+  const previousImage = () => {
+    setViewerIndex(
+      (prev) => (prev - 1 + viewerImages.length) % viewerImages.length
+    );
+  };
+
+  useEffect(() => {
+    if (!viewerOpen) return;
+
+    const handleKey = (e) => {
+      if (e.key === "Escape") setViewerOpen(false);
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") previousImage();
+    };
+
+    window.addEventListener("keydown", handleKey);
+
+    return () => window.removeEventListener("keydown", handleKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewerOpen, viewerIndex]);
+
+  useEffect(() => {
+    document.body.style.overflow = viewerOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [viewerOpen]);
 
   useEffect(() => {
     let ignore = false;
@@ -101,7 +146,7 @@ const ReviewPage = () => {
   const handleSubmit = async (formData) => {
     setSubmitting(true);
 
-    const success = editingReview
+        const success = editingReview
       ? await editReview(editingReview._id, {
           rating: formData.rating,
           reviewText: formData.reviewText,
@@ -110,6 +155,7 @@ const ReviewPage = () => {
           rating: formData.rating,
           reviewText: formData.reviewText,
           itinerary: formData.itinerary,
+          images: formData.images,
         });
 
     setSubmitting(false);
@@ -230,6 +276,7 @@ const ReviewPage = () => {
           currentUserId={user?.id}
           onEdit={handleOpenEdit}
           onDelete={handleDelete}
+          onOpenImage={openViewer}
         />
       </div>
 
@@ -241,6 +288,57 @@ const ReviewPage = () => {
         trips={completedTrips}
         submitting={submitting}
       />
+            <AnimatePresence>
+        {viewerOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/95 z-[300] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <button
+              onClick={() => setViewerOpen(false)}
+              className="absolute top-6 right-6 text-white"
+              aria-label="Close"
+            >
+              <FiX size={36} />
+            </button>
+
+            {viewerImages.length > 1 && (
+              <button
+                onClick={previousImage}
+                className="absolute left-6 text-white"
+                aria-label="Previous photo"
+              >
+                <FiChevronLeft size={50} />
+              </button>
+            )}
+
+            <motion.img
+              key={viewerImages[viewerIndex]}
+              src={`${API_BASE_URL}${viewerImages[viewerIndex]}`}
+              className="max-w-[90vw] max-h-[90vh] rounded-xl"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+            />
+
+            {viewerImages.length > 1 && (
+              <button
+                onClick={nextImage}
+                className="absolute right-6 text-white"
+                aria-label="Next photo"
+              >
+                <FiChevronRight size={50} />
+              </button>
+            )}
+
+            <div className="absolute bottom-8 text-white">
+              {viewerIndex + 1} / {viewerImages.length}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
