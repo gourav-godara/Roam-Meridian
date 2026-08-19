@@ -1,5 +1,6 @@
 import { FiStar, FiThumbsUp, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { API_BASE_URL } from "../../services/api";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24, scale: 0.98 },
@@ -16,7 +17,7 @@ const cardVariants = {
   },
 };
 
-const ReviewCard = ({ review, currentUserId, onEdit, onDelete }) => {
+const ReviewCard = ({ review, currentUserId, onEdit, onDelete, onOpenImage }) => {
   const isOwner =
     !currentUserId ||
     !review.user?._id ||
@@ -81,19 +82,20 @@ const ReviewCard = ({ review, currentUserId, onEdit, onDelete }) => {
       </p>
 
       {review.images?.length > 0 && (
-        <div className="relative flex gap-2.5 mt-4 overflow-x-auto">
-          {review.images.map((image, index) => (
-            <motion.img
-              key={index}
-              src={image}
-              alt="Review"
-              whileHover={{ scale: 1.08 }}
-              transition={{ duration: 0.2 }}
-              className="w-20 h-20 rounded-xl object-cover shrink-0 cursor-pointer"
-            />
-          ))}
-        </div>
-      )}
+  <div className="relative flex gap-2.5 mt-4 overflow-x-auto">
+    {review.images.map((image, index) => (
+      <motion.img
+        key={index}
+        src={`${API_BASE_URL}${image}`}
+        alt="Review"
+        whileHover={{ scale: 1.08 }}
+        transition={{ duration: 0.2 }}
+        onClick={() => onOpenImage?.(review.images, index)}
+        className="w-20 h-20 rounded-xl object-cover shrink-0 cursor-pointer"
+      />
+    ))}
+  </div>
+)}
 
       <div className="relative flex justify-between items-center mt-5 pt-4 border-t border-border">
         <motion.span

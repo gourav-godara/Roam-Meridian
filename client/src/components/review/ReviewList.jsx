@@ -15,6 +15,7 @@ const ReviewList = ({
   currentUserId,
   onEdit,
   onDelete,
+  onOpenImage,
 }) => {
   if (!reviews || reviews.length === 0) {
     return <EmptyReview onWriteReview={onWriteReview} />;
@@ -36,6 +37,7 @@ const ReviewList = ({
             currentUserId={currentUserId}
             onEdit={onEdit}
             onDelete={onDelete}
+            onOpenImage={onOpenImage}
           />
         ))}
       </AnimatePresence>
