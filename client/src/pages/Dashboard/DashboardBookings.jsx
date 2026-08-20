@@ -127,7 +127,7 @@ function DashboardBookings() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pt-28 sm:pt-32 pb-16">
+    <div className="min-h-screen pt-28 sm:pt-32 pb-16">
       <div className="max-w-[900px] mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between gap-4 flex-wrap mb-8">
           <div>

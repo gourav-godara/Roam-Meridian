@@ -114,7 +114,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-bg pb-16 overflow-hidden">
+    <div className="relative min-h-screen pb-16 overflow-hidden">
 
       <div className="relative max-w-4xl mx-auto px-6 pt-10">
         {/* Page heading */}

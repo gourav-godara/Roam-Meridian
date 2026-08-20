@@ -74,7 +74,7 @@ function TravelBooking() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pt-28 sm:pt-32 pb-16">
+    <div className="min-h-screen pt-28 sm:pt-32 pb-16">
       <div className="max-w-[1000px] mx-auto px-6 lg:px-12">
         <div className="mb-8">
           <h1 className="font-display text-3xl sm:text-4xl text-ink">

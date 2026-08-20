@@ -9,7 +9,7 @@ import AboutCTA from "../../components/about/AboutCTA";
 
 function About() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
+    <div className="min-h-screen">
       <AboutHero />
       <WhyRoamMeridian />
       <OurPhilosophy />
