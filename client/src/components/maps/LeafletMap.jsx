@@ -3,7 +3,6 @@ import {
   TileLayer,
   Marker,
   Popup,
-  Polyline,
   useMap,
 } from "react-leaflet";
 import { useEffect } from "react";
@@ -19,23 +18,17 @@ const defaultIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-function FitBounds({ latitude, longitude, routePositions }) {
+function FitBounds({ latitude, longitude }) {
   const map = useMap();
 
   useEffect(() => {
-    if (routePositions.length > 0) {
-      map.fitBounds(routePositions, {
-        padding: [50, 50],
-      });
-    } else {
-      map.setView([latitude, longitude], 13);
-    }
+    map.setView([latitude, longitude], 13);
 
     // Helps Leaflet calculate its size correctly
     setTimeout(() => {
       map.invalidateSize();
     }, 100);
-  }, [map, latitude, longitude, routePositions]);
+  }, [map, latitude, longitude]);
 
   return null;
 }
@@ -45,14 +38,8 @@ function LeafletMap({
   longitude,
   name,
   nearbyPlaces = [],
-  routeData,
-  onPlaceRoute,
-  onNavigate,
   height = "400px",
 }) {
-  const routePositions =
-    routeData?.geometry?.coordinates?.map(([lng, lat]) => [lat, lng]) || [];
-
   return (
     <MapContainer
       center={[latitude, longitude]}
@@ -69,16 +56,9 @@ function LeafletMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <FitBounds
-        latitude={latitude}
-        longitude={longitude}
-        routePositions={routePositions}
-      />
+      <FitBounds latitude={latitude} longitude={longitude} />
 
-      <Marker
-        position={[latitude, longitude]}
-        icon={defaultIcon}
-      >
+      <Marker position={[latitude, longitude]} icon={defaultIcon}>
         <Popup>
           <strong>{name}</strong>
         </Popup>
@@ -87,54 +67,48 @@ function LeafletMap({
       {nearbyPlaces.map((place, index) => (
         <Marker
           key={`${place.name}-${index}`}
-          position={[
-            Number(place.latitude),
-            Number(place.longitude),
-          ]}
+          position={[Number(place.latitude), Number(place.longitude)]}
           icon={defaultIcon}
         >
           <Popup>
-  <strong>{place.name}</strong>
-  <br />
-  {place.address}
-  <br />
+            <strong>{place.name}</strong>
+            <br />
+            {place.address}
+            <br />
 
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "8px",
-      marginTop: "8px",
-    }}
-  >
-    <button
-      type="button"
-      onClick={() => onPlaceRoute(place)}
-    >
-      Show Route
-    </button>
-
-    <button
-      type="button"
-      onClick={() => onNavigate(place)}
-    >
-      Navigate with Google Maps
-    </button>
-  </div>
-</Popup>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+                marginTop: "8px",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  if (place.latitude && place.longitude) {
+                    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
+                    window.open(url, "_blank", "noopener,noreferrer");
+                  }
+                }}
+                style={{
+                  backgroundColor: "#1b4332",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "6px 10px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: "500",
+                }}
+              >
+                Open in Google Maps
+              </button>
+            </div>
+          </Popup>
         </Marker>
       ))}
-
-      {routePositions.length > 0 && (
-        <Polyline
-          positions={routePositions}
-          pathOptions={{
-            color: "#16a34a",
-            weight: 6,
-            opacity: 1,
-          }}
-        />
-      )}
     </MapContainer>
   );
 }

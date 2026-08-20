@@ -44,14 +44,18 @@ function NearbyRestaurants({ items = [], onPlaceRoute }) {
               )}
 
               <div className="mt-auto pt-5">
-                
                 <button
+                  type="button"
                   onClick={() => {
-                    console.log(restaurant);
-                    onPlaceRoute?.(restaurant)}}
-                  className="w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover"
+                    if (restaurant.latitude && restaurant.longitude) {
+                      const url = `https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`;
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    }
+                    onPlaceRoute?.(restaurant);
+                  }}
+                  className="w-full rounded-xl bg-forest text-white py-2 hover:bg-forest-hover transition text-sm font-medium"
                 >
-                  Show Route
+                  Open in Google Maps
                 </button>
               </div>
             </div>
