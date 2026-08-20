@@ -169,7 +169,7 @@ function ItineraryGuideDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-bg pt-28 sm:pt-32 pb-16">
+    <div className="min-h-screen pt-28 sm:pt-32 pb-16">
       <div className="max-w-[900px] mx-auto px-6">
         <button
           onClick={() => navigate("/itinerary-guide")}

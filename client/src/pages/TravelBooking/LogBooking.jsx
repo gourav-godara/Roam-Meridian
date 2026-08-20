@@ -69,7 +69,7 @@ function LogBooking() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pt-28 sm:pt-32 pb-16">
+    <div className="min-h-screen pt-28 sm:pt-32 pb-16">
       <div className="max-w-[600px] mx-auto px-6 lg:px-12">
         <div className="bg-white rounded-3xl border border-border p-6 sm:p-8">
           <div className="w-14 h-14 rounded-full bg-forest/10 text-forest flex items-center justify-center mb-4">

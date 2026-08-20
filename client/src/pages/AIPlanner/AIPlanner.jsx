@@ -64,7 +64,7 @@ function AIPlanner() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-bg">
+    <div className="h-screen overflow-hidden">
       <div className="mx-auto grid h-full max-w-[1440px] grid-cols-1 gap-5 px-4 sm:px-6 lg:px-10 xl:grid-cols-[minmax(0,1fr)_310px]">
         <section className="flex h-[calc(100vh-80px)] min-h-0 flex-col overflow-hidden rounded-[2rem] border border-border bg-[#f8faf7] shadow-sm">
           <PlannerHeader />

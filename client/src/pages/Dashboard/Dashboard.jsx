@@ -70,7 +70,7 @@ function Dashboard() {
     hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col lg:flex-row">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       <Sidebar
         user={user}
         tip={travelTip}

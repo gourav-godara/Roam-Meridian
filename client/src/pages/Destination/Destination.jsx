@@ -329,7 +329,7 @@ console.log("Features:", response.data.features);
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="min-h-screen bg-bg"
+      className="min-h-screen"
     >
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12 pt-6 pb-20">
 

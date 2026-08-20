@@ -12,6 +12,7 @@ import {
 } from "react-icons/fi";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import PageBackdrop from "../components/common/PageBackdrop";
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Overview", icon: FiGrid, end: true },
@@ -32,9 +33,10 @@ function AdminLayout() {
 
   return (
     <>
+      <PageBackdrop variant="admin" />
       <Navbar />
 
-      <div className="min-h-screen bg-bg flex pt-24">
+      <div className="min-h-screen flex pt-24">
         {sidebarOpen && (
           <div
             className="lg:hidden fixed inset-0 bg-black/40 z-40"

@@ -106,7 +106,7 @@ function ItineraryGuideList() {
   }, [debouncedSearch, theme]);
 
   return (
-    <div className="min-h-screen bg-bg pt-28 sm:pt-32 pb-16">
+   <div className="min-h-screen pt-28 sm:pt-32 pb-16">
       <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: -8 }}

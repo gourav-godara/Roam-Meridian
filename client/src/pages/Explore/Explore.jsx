@@ -170,7 +170,7 @@ const wishlistedIds = useMemo(() => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
+    <div className="min-h-screen">
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12 pt-6 pb-16">
         <ExploreHeader
           query={query}
