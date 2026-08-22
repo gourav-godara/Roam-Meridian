@@ -40,21 +40,30 @@ const getDashboardData = async (userId) => {
 
   // paidBy/participants can each be a real User or a name-only trip
   // companion (see Trip.companions), disambiguated per-entry by
-  // paidByModel / participants[].model. Only the "User" side can ever
-  // match this dashboard's userId, and Mongoose can't .populate() a
-  // mixed refPath array the simple way, so we populate just the User
-  // rows and treat everything else (companions, or a since-deleted
-  // user) as an unresolvable participant that's skipped in the
-  // owe/owed math below rather than crashing on a missing _id.
+  // paidByModel / participants[].model. refPath populate always tries to
+  // resolve *every* model name present, including "Companion" — which
+  // isn't a real collection and throws "Schema hasn't been registered"
+  // the moment any expense has a companion payer/participant, taking the
+  // whole dashboard request down with it. Pinning model: "User" means
+  // Mongoose only ever resolves against the User collection; a
+  // Companion-tagged id then just comes back unpopulated (raw ObjectId),
+  // which is treated as an unresolvable participant and skipped in the
+  // owe/owed math below rather than crashing.
   const expenses = await Expense.find({
     $or: [
       { paidBy: userId, paidByModel: "User" },
       { participants: { $elemMatch: { id: userId, model: "User" } } },
     ],
   })
-    .populate({ path: "paidBy", select: "name", strictPopulate: false })
+    .populate({
+      path: "paidBy",
+      model: "User",
+      select: "name",
+      strictPopulate: false,
+    })
     .populate({
       path: "participants.id",
+      model: "User",
       select: "name",
       strictPopulate: false,
     });

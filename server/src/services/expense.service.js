@@ -52,11 +52,27 @@ const attachCompanionNames = async (expense) => {
   return doc;
 };
 
+// refPath populate always tries to resolve *every* model name it finds
+// across the documents being populated — including "Companion", which
+// isn't a real collection (companions live embedded in Trip.companions,
+// resolved by hand in attachCompanionNames below). If any document in the
+// batch has a Companion-tagged paidBy/participant, a plain refPath
+// populate throws "Schema hasn't been registered for model Companion" and
+// takes the whole request down with it. Pinning model: "User" here tells
+// Mongoose to only ever resolve against the User collection — a
+// Companion-tagged id then just comes back unpopulated (still the raw
+// ObjectId), which attachCompanionNames already handles.
 const populateExpense = (query) =>
   query
-    .populate({ path: "paidBy", select: "name email", strictPopulate: false })
+    .populate({
+      path: "paidBy",
+      model: "User",
+      select: "name email",
+      strictPopulate: false,
+    })
     .populate({
       path: "participants.id",
+      model: "User",
       select: "name email",
       strictPopulate: false,
     })

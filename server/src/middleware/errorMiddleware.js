@@ -19,16 +19,19 @@ const errorMiddleware = (err, req, res, next) => {
   }
 
   const status = err.status || 500;
+  const isProduction = process.env.NODE_ENV === "production";
 
-  // ⚠️ TEMPORARY DEBUG MODE — this always exposes the real error message
-  // and a short stack trace, even in production, so we can see what's
-  // actually failing without Render dashboard log access. REVERT THIS
-  // FILE once the bug is found — never leave error details exposed to
-  // the client in production long-term.
+  // In production, don't leak internal error messages/stack traces for
+  // unexpected (5xx) errors — only pass through messages we set ourselves
+  // on purpose (e.g. validation errors with a status already attached).
+  const message =
+    isProduction && status === 500
+      ? "Internal Server Error"
+      : err.message || "Internal Server Error";
+
   res.status(status).json({
     success: false,
-    message: err.message || "Internal Server Error",
-    debugStack: (err.stack || "").split("\n").slice(0, 8),
+    message,
   });
 };
 

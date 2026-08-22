@@ -528,15 +528,25 @@ const getAllExpenses = async (req, res, next) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     // participants can be a real User or a name-only trip companion (see
-    // Trip.companions) — populate() only resolves the User side via
-    // refPath; a companion entry is left as the raw { id, model } and
-    // shown as "Companion" below rather than crashing on a plain
-    // populate("participants", ...) against a mixed-ref array.
+    // Trip.companions). refPath populate always tries to resolve *every*
+    // model name present across the batch, including "Companion" — which
+    // isn't a real collection and throws "Schema hasn't been registered"
+    // the moment any expense in this page has a companion payer/participant,
+    // taking the whole request down. Pinning model: "User" on both populate
+    // calls means Mongoose only ever resolves against the User collection;
+    // a Companion-tagged id then just comes back unpopulated (raw
+    // ObjectId), which is resolved by name below via companionNameById.
     const [expenses, total] = await Promise.all([
       Expense.find(filter)
-        .populate("paidBy", "name email")
+        .populate({
+          path: "paidBy",
+          model: "User",
+          select: "name email",
+          strictPopulate: false,
+        })
         .populate({
           path: "participants.id",
+          model: "User",
           select: "name email",
           strictPopulate: false,
         })
@@ -552,7 +562,11 @@ const getAllExpenses = async (req, res, next) => {
     const tripIdsNeedingCompanions = [
       ...new Set(
         expenses
-          .filter((e) => (e.participants || []).some((p) => p.model === "Companion"))
+          .filter(
+            (e) =>
+              e.paidByModel === "Companion" ||
+              (e.participants || []).some((p) => p.model === "Companion")
+          )
           .map((e) => (e.trip?._id || e.trip)?.toString())
           .filter(Boolean)
       ),
@@ -572,6 +586,18 @@ const getAllExpenses = async (req, res, next) => {
 
     const expensesForAdmin = expenses.map((expense) => {
       const doc = expense.toObject();
+
+      doc.paidBy =
+        doc.paidByModel === "Companion"
+          ? {
+              _id: doc.paidBy,
+              name: companionNameById[doc.paidBy?.toString()] || "Unknown companion",
+              isCompanion: true,
+            }
+          : doc.paidBy
+          ? { ...doc.paidBy, isCompanion: false }
+          : null;
+
       doc.participants = (doc.participants || []).map((p) =>
         p.model === "Companion"
           ? {
@@ -610,3 +636,4 @@ module.exports = {
   deleteReview,
   getAllExpenses,
 };
+
