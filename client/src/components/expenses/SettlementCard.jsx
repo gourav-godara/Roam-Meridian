@@ -56,12 +56,6 @@ const SettlementCard = ({ settlements = [], onSettle, currentUserId }) => {
           ) : (
             <AnimatePresence mode="popLayout">
               {settlements.map((item, index) => {
-                // The backend only allows the payer ("to") to mark a
-                // settlement resolved — showing this button on debts YOU owe
-                // (where someone else is the payer) previously led to a
-                // confusing 403 when clicked.
-                const canSettle = item.to._id === currentUserId;
-
                 return (
                   <motion.div
                     key={`${item.expenseId}-${index}`}
@@ -82,18 +76,18 @@ const SettlementCard = ({ settlements = [], onSettle, currentUserId }) => {
                       ₹{item.amount.toFixed(2)}
                     </p>
 
-                    {canSettle ? (
-                      <button
-                        onClick={() => onSettle(item.expenseId)}
-                        className="mt-3 w-full bg-forest hover:bg-forest-hover text-white py-2 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        Mark Settled
-                      </button>
-                    ) : (
-                      <p className="mt-3 text-xs text-gray-400 text-center">
-                        Waiting for {item.to.name} to mark this settled.
-                      </p>
-                    )}
+                    {/* Any member of the trip can mark a settlement
+                        resolved, not just the payer — the payer might be a
+                        companion with no account to click this themselves,
+                        and any member may be the one confirming money
+                        changed hands. The backend enforces trip membership
+                        on the request itself. */}
+                    <button
+                      onClick={() => onSettle(item.expenseId)}
+                      className="mt-3 w-full bg-forest hover:bg-forest-hover text-white py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Mark Settled
+                    </button>
                   </motion.div>
                 );
               })}

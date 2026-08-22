@@ -40,47 +40,59 @@ const getDashboardData = async (userId) => {
 
   // paidBy/participants can each be a real User or a name-only trip
   // companion (see Trip.companions), disambiguated per-entry by
-  // paidByModel / participants[].model. refPath populate always tries to
-  // resolve *every* model name present, including "Companion" — which
-  // isn't a real collection and throws "Schema hasn't been registered"
-  // the moment any expense has a companion payer/participant, taking the
-  // whole dashboard request down with it. Pinning model: "User" means
-  // Mongoose only ever resolves against the User collection; a
-  // Companion-tagged id then just comes back unpopulated (raw ObjectId),
-  // which is treated as an unresolvable participant and skipped in the
-  // owe/owed math below rather than crashing.
+  // paidByModel / participants[].model. Mongoose populate can't safely
+  // handle this mix: refPath tries to resolve every model name it sees
+  // (throwing on "Companion", which isn't a real collection), and pinning
+  // model: "User" avoids the crash but silently nulls out any
+  // Companion-tagged id (populate always overwrites the field with its
+  // query result, including a "not found" null — which would wrongly
+  // wipe out a real User's paidBy too if a query ever mixed model types
+  // in one populate call). So paidBy is left as a raw ObjectId here and
+  // resolved by hand below via a plain User lookup — the dashboard's
+  // owe/owed math only cares about the User side anyway, since
+  // companions have no account to owe/be owed against.
   const expenses = await Expense.find({
     $or: [
       { paidBy: userId, paidByModel: "User" },
       { participants: { $elemMatch: { id: userId, model: "User" } } },
     ],
-  })
-    .populate({
-      path: "paidBy",
-      model: "User",
-      select: "name",
-      strictPopulate: false,
-    })
-    .populate({
-      path: "participants.id",
-      model: "User",
-      select: "name",
-      strictPopulate: false,
+  }).lean();
+
+  const userIdsInExpenses = new Set();
+  expenses.forEach((expense) => {
+    if (expense.paidByModel === "User" && expense.paidBy) {
+      userIdsInExpenses.add(expense.paidBy.toString());
+    }
+    (expense.participants || []).forEach((p) => {
+      if (p.model === "User" && p.id) {
+        userIdsInExpenses.add(p.id.toString());
+      }
     });
+  });
+
+  const expenseUsers = userIdsInExpenses.size
+    ? await User.find({ _id: { $in: [...userIdsInExpenses] } }, "name")
+    : [];
+  const expenseUserById = {};
+  expenseUsers.forEach((u) => {
+    expenseUserById[u._id.toString()] = { _id: u._id, name: u.name };
+  });
+
+  expenses.forEach((expense) => {
+    expense.paidBy =
+      expense.paidByModel === "User" && expense.paidBy
+        ? expenseUserById[expense.paidBy.toString()] || null
+        : null;
+    expense.participants = (expense.participants || [])
+      .filter((p) => p.model === "User" && p.id)
+      .map((p) => expenseUserById[p.id.toString()])
+      .filter(Boolean);
+  });
 
   const totalSpent = expenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
-
-  // A participant's populated id is only a real user doc when the
-  // subdocument's model is "User" — for a companion entry, participants.id
-  // is left as the raw ObjectId (refPath skips it), so isUserParticipant
-  // is the guard that keeps the math below from ever calling .toString()
-  // on the wrong shape or counting a companion as someone who can owe/be
-  // owed in-app.
-  const isUserParticipant = (participant) =>
-    participant.model === "User" && participant.id && participant.id._id;
 
   let youOwe = 0;
   let youAreOwed = 0;
@@ -88,16 +100,13 @@ const getDashboardData = async (userId) => {
   expenses.forEach((expense) => {
     if (expense.status === "Settled") return;
 
-    // paidBy can be null if paidByModel is "Companion" (not populated) or
-    // that user was later deleted — guard against it instead of letting
+    // paidBy can be null here if the payer was a companion, or a real
+    // user who was since deleted — guard against it instead of letting
     // `.toString()` throw and silently blanking the whole dashboard for
     // this user.
-    if (expense.paidByModel !== "User" || !expense.paidBy) return;
+    if (!expense.paidBy) return;
 
-    const allParticipants = expense.participants || [];
-    // Companions can't owe/be owed in-app (no account), so only real users
-    // count toward the split here.
-    const participants = allParticipants.filter(isUserParticipant);
+    const participants = expense.participants || [];
 
     if (participants.length === 0) return;
 
@@ -107,7 +116,7 @@ const getDashboardData = async (userId) => {
     // payer's own share back to them in full — payer paid the amount but
     // got reimbursed for the whole thing, not just the others' shares.
     const payerIsParticipant = participants.some(
-      (participant) => participant.id._id.toString() === userId.toString()
+      (participant) => participant._id.toString() === userId.toString()
     );
     const shareCount = payerIsParticipant
       ? participants.length
@@ -119,14 +128,14 @@ const getDashboardData = async (userId) => {
     if (paidByMe) {
       // Others owe me their share each
       participants.forEach((participant) => {
-        if (participant.id._id.toString() !== userId.toString()) {
+        if (participant._id.toString() !== userId.toString()) {
           youAreOwed += share;
         }
       });
     } else {
       // I owe the payer my share, if I'm one of the participants
       const iAmParticipant = participants.some(
-        (participant) => participant.id._id.toString() === userId.toString()
+        (participant) => participant._id.toString() === userId.toString()
       );
 
       if (iAmParticipant) {
@@ -335,3 +344,4 @@ const getDashboardData = async (userId) => {
 module.exports = {
   getDashboardData,
 };
+
