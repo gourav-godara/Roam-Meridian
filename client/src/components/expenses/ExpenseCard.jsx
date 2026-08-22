@@ -27,9 +27,6 @@ const ExpenseCard = ({
 }) => {
   const { showToast } = useToast();
 
-  // The backend only allows the original payer to edit/delete/settle an
-  // expense — previously Edit/Delete were shown to every participant, so
-  // anyone else would click them and get a confusing 403 with no context.
   const isPayer = expense.paidBy?._id === currentUserId;
 
   const meta = CATEGORY_META[expense.category] || CATEGORY_META.Other;
@@ -135,31 +132,28 @@ const ExpenseCard = ({
         </div>
       </div>
 
-      {isPayer ? (
-        <div className="flex justify-end gap-2 mt-5 pt-4 border-t border-border">
-          <button
-            onClick={handleEdit}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-forest/5 text-forest hover:bg-forest/10 transition-colors text-sm font-medium"
-          >
-            <FiEdit2 size={13} />
-            Edit
-          </button>
-          <button
-            onClick={handleDelete}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium"
-          >
-            <FiTrash2 size={13} />
-            Delete
-          </button>
-        </div>
-      ) : (
-        <div className="mt-5 pt-4 border-t border-border">
-          <p className="text-xs text-gray-400">
-            Only {expense.paidBy?.name || "the payer"} can edit or delete this
-            expense.
-          </p>
-        </div>
-      )}
+      {/* Any member of this trip can edit/delete/settle an expense — not
+          just whoever paid, since the payer might be a companion with no
+          account to act on their own behalf. The backend enforces trip
+          membership on every request; these buttons are always shown to
+          anyone who can see the expense at all (which already implies
+          they're on the trip). */}
+      <div className="flex justify-end gap-2 mt-5 pt-4 border-t border-border">
+        <button
+          onClick={handleEdit}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-forest/5 text-forest hover:bg-forest/10 transition-colors text-sm font-medium"
+        >
+          <FiEdit2 size={13} />
+          Edit
+        </button>
+        <button
+          onClick={handleDelete}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-medium"
+        >
+          <FiTrash2 size={13} />
+          Delete
+        </button>
+      </div>
     </motion.div>
   );
 };

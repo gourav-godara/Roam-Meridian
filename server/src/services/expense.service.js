@@ -1,109 +1,128 @@
 const Expense = require("../models/expense.model");
 const Trip = require("../models/trip.model");
+const User = require("../models/user.model");
 
-// paidBy/participants can point at a real User (populated normally via
-// refPath) or at a name-only companion embedded in Trip.companions
-// (Mongoose can't populate into an embedded subdocument, so those are
-// resolved by hand here). Every expense in/out of this service goes
-// through this so callers always see a consistent { _id, name } shape
-// for both kinds of person.
-const attachCompanionNames = async (expense) => {
-  if (!expense) return expense;
+// paidBy/participants can each point at a real User or at a name-only
+// companion embedded in Trip.companions. Mongoose populate can't safely
+// handle this mix: refPath tries to resolve every model name it sees
+// (throwing on "Companion", which isn't a real collection), and pinning
+// model: "User" avoids the crash but silently nulls out any
+// Companion-tagged id (populate always overwrites the field with its
+// query result, including a "not found" null). So instead of populate,
+// every person (User or Companion) on an expense is resolved by hand
+// here, in one batched pass — this is the single place that shapes
+// paidBy/participants into the consistent { _id, name, isCompanion }
+// callers rely on.
+const resolvePeople = async (expenses) => {
+  const list = Array.isArray(expenses) ? expenses : [expenses];
+  const docs = list.filter(Boolean).map((e) => (e.toObject ? e.toObject() : e));
 
-  const doc = expense.toObject ? expense.toObject() : expense;
+  const userIds = new Set();
+  const companionIds = new Set();
+  const tripIds = new Set();
 
-  const companionIds = [];
-  if (doc.paidByModel === "Companion" && doc.paidBy) {
-    companionIds.push(doc.paidBy.toString());
-  }
-  (doc.participants || []).forEach((p) => {
-    if (p.model === "Companion" && p.id) {
-      companionIds.push(p.id.toString());
+  docs.forEach((doc) => {
+    if (doc.paidByModel === "Companion" && doc.paidBy) {
+      companionIds.add(doc.paidBy.toString());
+    } else if (doc.paidBy) {
+      userIds.add(doc.paidBy.toString());
+    }
+    (doc.participants || []).forEach((p) => {
+      const id = p.id?._id || p.id;
+      if (!id) return;
+      if (p.model === "Companion") {
+        companionIds.add(id.toString());
+      } else {
+        userIds.add(id.toString());
+      }
+    });
+    if (companionIds.size > 0) {
+      const tripId = doc.trip?._id || doc.trip;
+      if (tripId) tripIds.add(tripId.toString());
     }
   });
 
-  let companionMap = {};
-  if (companionIds.length > 0 && doc.trip) {
-    const tripId = doc.trip._id || doc.trip;
-    const trip = await Trip.findById(tripId, "companions");
-    (trip?.companions || []).forEach((c) => {
-      companionMap[c._id.toString()] = c.name;
+  const [users, trips] = await Promise.all([
+    userIds.size > 0
+      ? User.find({ _id: { $in: [...userIds] } }, "name email")
+      : [],
+    tripIds.size > 0
+      ? Trip.find({ _id: { $in: [...tripIds] } }, "companions")
+      : [],
+  ]);
+
+  const userById = {};
+  users.forEach((u) => {
+    userById[u._id.toString()] = { _id: u._id, name: u.name, email: u.email };
+  });
+
+  const companionById = {};
+  trips.forEach((trip) => {
+    (trip.companions || []).forEach((c) => {
+      companionById[c._id.toString()] = c.name;
     });
-  }
+  });
 
-  if (doc.paidByModel === "Companion") {
-    doc.paidBy = {
-      _id: doc.paidBy,
-      name: companionMap[doc.paidBy?.toString()] || "Unknown companion",
-      isCompanion: true,
-    };
-  }
+  const resolvePerson = (id, model) => {
+    const idStr = id?.toString();
+    if (!idStr) return null;
+    if (model === "Companion") {
+      return {
+        _id: id,
+        name: companionById[idStr] || "Unknown companion",
+        isCompanion: true,
+      };
+    }
+    return userById[idStr]
+      ? { ...userById[idStr], isCompanion: false }
+      : { _id: id, name: "Unknown user", isCompanion: false };
+  };
 
-  doc.participants = (doc.participants || []).map((p) =>
-    p.model === "Companion"
-      ? {
-          _id: p.id,
-          name: companionMap[p.id?.toString()] || "Unknown companion",
-          isCompanion: true,
-        }
-      : { _id: p.id?._id || p.id, name: p.id?.name, isCompanion: false }
-  );
+  const resolved = docs.map((doc) => ({
+    ...doc,
+    paidBy: doc.paidBy ? resolvePerson(doc.paidBy, doc.paidByModel) : null,
+    participants: (doc.participants || []).map((p) =>
+      resolvePerson(p.id?._id || p.id, p.model)
+    ),
+  }));
 
-  return doc;
+  return Array.isArray(expenses) ? resolved : resolved[0];
 };
 
-// refPath populate always tries to resolve *every* model name it finds
-// across the documents being populated — including "Companion", which
-// isn't a real collection (companions live embedded in Trip.companions,
-// resolved by hand in attachCompanionNames below). If any document in the
-// batch has a Companion-tagged paidBy/participant, a plain refPath
-// populate throws "Schema hasn't been registered for model Companion" and
-// takes the whole request down with it. Pinning model: "User" here tells
-// Mongoose to only ever resolve against the User collection — a
-// Companion-tagged id then just comes back unpopulated (still the raw
-// ObjectId), which attachCompanionNames already handles.
-const populateExpense = (query) =>
-  query
-    .populate({
-      path: "paidBy",
-      model: "User",
-      select: "name email",
-      strictPopulate: false,
-    })
-    .populate({
-      path: "participants.id",
-      model: "User",
-      select: "name email",
-      strictPopulate: false,
-    })
-    .populate("trip", "title");
+const populateExpense = (query) => query.populate("trip", "title");
 
 // Create Expense
 const createExpense = async (expenseData) => {
   const expense = await Expense.create(expenseData);
 
   const populated = await populateExpense(Expense.findById(expense._id));
-  return attachCompanionNames(populated);
+  return resolvePeople(populated);
 };
 
-// Get All Expenses (paid by the user or shared with them)
+// Get All Expenses: ones the user paid, is a participant in, or created
+// the trip for (so an expense split entirely between companions — no
+// real user attached as payer or participant — is still visible to
+// whoever created the trip, instead of vanishing from everyone's list).
 const getAllExpenses = async (userId) => {
+  const myTripIds = await Trip.find({ createdBy: userId }, "_id");
+
   const expenses = await populateExpense(
     Expense.find({
       $or: [
         { paidBy: userId, paidByModel: "User" },
         { participants: { $elemMatch: { id: userId, model: "User" } } },
+        { trip: { $in: myTripIds.map((t) => t._id) } },
       ],
     }).sort({ createdAt: -1 })
   );
 
-  return Promise.all(expenses.map(attachCompanionNames));
+  return resolvePeople(expenses);
 };
 
 // Get Expense By ID
 const getExpenseById = async (id) => {
   const expense = await populateExpense(Expense.findById(id));
-  return attachCompanionNames(expense);
+  return resolvePeople(expense);
 };
 
 // Update Expense
@@ -114,7 +133,7 @@ const updateExpense = async (id, data) => {
       runValidators: true,
     })
   );
-  return attachCompanionNames(expense);
+  return resolvePeople(expense);
 };
 
 // Delete Expense

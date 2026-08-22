@@ -148,12 +148,9 @@ const getExpenseById = async (req, res, next) => {
       });
     }
 
-    const isPayer = expense.paidBy._id.toString() === req.user.id;
-    const isParticipant = expense.participants.some(
-      (p) => p._id.toString() === req.user.id
-    );
+    const trip = await Trip.findById(expense.trip._id || expense.trip);
 
-    if (!isPayer && !isParticipant) {
+    if (!trip || !isTripMember(trip, req.user.id)) {
       return res.status(403).json({
         success: false,
         message: "Access denied.",
@@ -169,7 +166,8 @@ const getExpenseById = async (req, res, next) => {
   }
 };
 
-// Update Expense (only the payer can edit)
+// Update Expense (any member of the trip can edit — not just the payer,
+// since the payer might be a companion with no account to log in with)
 const updateExpense = async (req, res, next) => {
   try {
     const expense = await expenseService.getExpenseById(req.params.id);
@@ -181,10 +179,12 @@ const updateExpense = async (req, res, next) => {
       });
     }
 
-    if (expense.paidBy._id.toString() !== req.user.id) {
+    const trip = await Trip.findById(expense.trip._id || expense.trip);
+
+    if (!trip || !isTripMember(trip, req.user.id)) {
       return res.status(403).json({
         success: false,
-        message: "You can only modify your own expenses.",
+        message: "You must be part of this trip to edit its expenses.",
       });
     }
 
@@ -193,39 +193,35 @@ const updateExpense = async (req, res, next) => {
     // the trip so a companion/user can't be substituted in from outside it.
     const updates = { ...req.body };
 
-    if (updates.paidBy !== undefined || updates.participants !== undefined) {
-      const trip = await Trip.findById(expense.trip._id || expense.trip);
-
-      if (updates.paidBy !== undefined) {
-        const paidByPerson = normalizePerson(updates.paidBy);
-        if (!paidByPerson || !isValidPerson(trip, paidByPerson)) {
-          return res.status(400).json({
-            success: false,
-            message: "The selected payer must be a member of this trip.",
-          });
-        }
-        updates.paidBy = paidByPerson.id;
-        updates.paidByModel = paidByPerson.model;
+    if (updates.paidBy !== undefined) {
+      const paidByPerson = normalizePerson(updates.paidBy);
+      if (!paidByPerson || !isValidPerson(trip, paidByPerson)) {
+        return res.status(400).json({
+          success: false,
+          message: "The selected payer must be a member of this trip.",
+        });
       }
+      updates.paidBy = paidByPerson.id;
+      updates.paidByModel = paidByPerson.model;
+    }
 
-      if (updates.participants !== undefined) {
-        const participantPeople = (updates.participants || [])
-          .map(normalizePerson)
-          .filter(Boolean);
-        const invalidParticipant = participantPeople.find(
-          (person) => !isValidPerson(trip, person)
-        );
-        if (invalidParticipant) {
-          return res.status(400).json({
-            success: false,
-            message: "All participants must be members of this trip.",
-          });
-        }
-        updates.participants = participantPeople.map((p) => ({
-          id: p.id,
-          model: p.model,
-        }));
+    if (updates.participants !== undefined) {
+      const participantPeople = (updates.participants || [])
+        .map(normalizePerson)
+        .filter(Boolean);
+      const invalidParticipant = participantPeople.find(
+        (person) => !isValidPerson(trip, person)
+      );
+      if (invalidParticipant) {
+        return res.status(400).json({
+          success: false,
+          message: "All participants must be members of this trip.",
+        });
       }
+      updates.participants = participantPeople.map((p) => ({
+        id: p.id,
+        model: p.model,
+      }));
     }
 
     const updatedExpense = await expenseService.updateExpense(
@@ -242,7 +238,7 @@ const updateExpense = async (req, res, next) => {
   }
 };
 
-// Delete Expense (only the payer can delete)
+// Delete Expense (any member of the trip can delete — not just the payer)
 const deleteExpense = async (req, res, next) => {
   try {
     const expense = await expenseService.getExpenseById(req.params.id);
@@ -254,10 +250,12 @@ const deleteExpense = async (req, res, next) => {
       });
     }
 
-    if (expense.paidBy._id.toString() !== req.user.id) {
+    const trip = await Trip.findById(expense.trip._id || expense.trip);
+
+    if (!trip || !isTripMember(trip, req.user.id)) {
       return res.status(403).json({
         success: false,
-        message: "You can only delete your own expenses.",
+        message: "You must be part of this trip to delete its expenses.",
       });
     }
 
@@ -272,7 +270,10 @@ const deleteExpense = async (req, res, next) => {
   }
 };
 
-// Settle Expense (only the payer can mark it settled)
+// Settle Expense (any member of the trip can mark it settled — not just
+// the payer, since the payer might be a companion with no account, and
+// even when the payer is a real user, any trip member may be the one
+// physically confirming the money changed hands)
 const settleExpense = async (req, res, next) => {
   try {
     const expense = await expenseService.getExpenseById(req.params.id);
@@ -284,10 +285,12 @@ const settleExpense = async (req, res, next) => {
       });
     }
 
-    if (expense.paidBy._id.toString() !== req.user.id) {
+    const trip = await Trip.findById(expense.trip._id || expense.trip);
+
+    if (!trip || !isTripMember(trip, req.user.id)) {
       return res.status(403).json({
         success: false,
-        message: "Only the payer can settle this expense.",
+        message: "You must be part of this trip to settle its expenses.",
       });
     }
 
@@ -334,3 +337,4 @@ module.exports = {
   deleteExpense,
   settleExpense,
 };
+

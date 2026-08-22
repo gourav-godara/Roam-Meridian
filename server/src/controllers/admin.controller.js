@@ -527,56 +527,70 @@ const getAllExpenses = async (req, res, next) => {
     const limitNumber = parseInt(limit) || 20;
     const skip = (pageNumber - 1) * limitNumber;
 
-    // participants can be a real User or a name-only trip companion (see
-    // Trip.companions). refPath populate always tries to resolve *every*
-    // model name present across the batch, including "Companion" — which
-    // isn't a real collection and throws "Schema hasn't been registered"
-    // the moment any expense in this page has a companion payer/participant,
-    // taking the whole request down. Pinning model: "User" on both populate
-    // calls means Mongoose only ever resolves against the User collection;
-    // a Companion-tagged id then just comes back unpopulated (raw
-    // ObjectId), which is resolved by name below via companionNameById.
+    // paidBy/participants can each be a real User or a name-only trip
+    // companion (see Trip.companions). Mongoose populate can't safely
+    // handle this mix: refPath tries to resolve every model name it sees
+    // (throwing on "Companion", which isn't a real collection), and
+    // pinning model: "User" avoids the crash but silently nulls out any
+    // Companion-tagged id (populate always overwrites the field with its
+    // query result, including a "not found" null). So every person here
+    // is resolved by hand below, in one batched pass across the page.
     const [expenses, total] = await Promise.all([
       Expense.find(filter)
-        .populate({
-          path: "paidBy",
-          model: "User",
-          select: "name email",
-          strictPopulate: false,
-        })
-        .populate({
-          path: "participants.id",
-          model: "User",
-          select: "name email",
-          strictPopulate: false,
-        })
         .populate("trip", "title")
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limitNumber),
+        .limit(limitNumber)
+        .lean(),
       Expense.countDocuments(filter),
     ]);
 
-    // Companion names live on the trip, not the expense, so resolve them
-    // in one batched lookup per page rather than per-row.
-    const tripIdsNeedingCompanions = [
-      ...new Set(
-        expenses
-          .filter(
-            (e) =>
-              e.paidByModel === "Companion" ||
-              (e.participants || []).some((p) => p.model === "Companion")
+    const userIds = new Set();
+    const companionIds = new Set();
+    const tripIdsNeedingCompanions = new Set();
+
+    expenses.forEach((expense) => {
+      if (expense.paidByModel === "Companion" && expense.paidBy) {
+        companionIds.add(expense.paidBy.toString());
+      } else if (expense.paidBy) {
+        userIds.add(expense.paidBy.toString());
+      }
+      (expense.participants || []).forEach((p) => {
+        if (!p.id) return;
+        if (p.model === "Companion") {
+          companionIds.add(p.id.toString());
+        } else {
+          userIds.add(p.id.toString());
+        }
+      });
+      if (companionIds.size > 0) {
+        const tripId = expense.trip?._id || expense.trip;
+        if (tripId) tripIdsNeedingCompanions.add(tripId.toString());
+      }
+    });
+
+    const [users, tripsWithCompanions] = await Promise.all([
+      userIds.size
+        ? User.find({ _id: { $in: [...userIds] } }, "name email")
+        : [],
+      tripIdsNeedingCompanions.size
+        ? Trip.find(
+            { _id: { $in: [...tripIdsNeedingCompanions] } },
+            "companions"
           )
-          .map((e) => (e.trip?._id || e.trip)?.toString())
-          .filter(Boolean)
-      ),
-    ];
-    const tripsWithCompanions = tripIdsNeedingCompanions.length
-      ? await Trip.find(
-          { _id: { $in: tripIdsNeedingCompanions } },
-          "companions"
-        )
-      : [];
+        : [],
+    ]);
+
+    const userById = {};
+    users.forEach((u) => {
+      userById[u._id.toString()] = {
+        _id: u._id,
+        name: u.name,
+        email: u.email,
+        isCompanion: false,
+      };
+    });
+
     const companionNameById = {};
     tripsWithCompanions.forEach((trip) => {
       (trip.companions || []).forEach((c) => {
@@ -584,31 +598,26 @@ const getAllExpenses = async (req, res, next) => {
       });
     });
 
-    const expensesForAdmin = expenses.map((expense) => {
-      const doc = expense.toObject();
+    const resolvePerson = (id, model) => {
+      const idStr = id?.toString();
+      if (!idStr) return null;
+      if (model === "Companion") {
+        return {
+          _id: id,
+          name: companionNameById[idStr] || "Unknown companion",
+          isCompanion: true,
+        };
+      }
+      return userById[idStr] || { _id: id, name: "Unknown user", isCompanion: false };
+    };
 
-      doc.paidBy =
-        doc.paidByModel === "Companion"
-          ? {
-              _id: doc.paidBy,
-              name: companionNameById[doc.paidBy?.toString()] || "Unknown companion",
-              isCompanion: true,
-            }
-          : doc.paidBy
-          ? { ...doc.paidBy, isCompanion: false }
-          : null;
-
-      doc.participants = (doc.participants || []).map((p) =>
-        p.model === "Companion"
-          ? {
-              _id: p.id,
-              name: companionNameById[p.id?.toString()] || "Unknown companion",
-              isCompanion: true,
-            }
-          : { _id: p.id?._id, name: p.id?.name, email: p.id?.email, isCompanion: false }
-      );
-      return doc;
-    });
+    const expensesForAdmin = expenses.map((doc) => ({
+      ...doc,
+      paidBy: doc.paidBy ? resolvePerson(doc.paidBy, doc.paidByModel) : null,
+      participants: (doc.participants || []).map((p) =>
+        resolvePerson(p.id, p.model)
+      ),
+    }));
 
     res.status(200).json({
       success: true,
@@ -636,4 +645,5 @@ module.exports = {
   deleteReview,
   getAllExpenses,
 };
+
 
