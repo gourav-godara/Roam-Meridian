@@ -27,8 +27,33 @@ function CreateTripForm({ plannerData = null }) {
 
     travelers: plannerData?.travelers || 1,
 
-    collaborators: "",
+    // Name-only trip companions (no account needed) — just who's coming,
+    // so they can be picked as expense participants later.
+    companions: [],
   });
+
+  const [companionInput, setCompanionInput] = useState("");
+
+  const addCompanion = () => {
+    const name = companionInput.trim();
+    if (!name) return;
+    if (formData.companions.includes(name)) {
+      setCompanionInput("");
+      return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      companions: [...prev.companions, name],
+    }));
+    setCompanionInput("");
+  };
+
+  const removeCompanion = (name) => {
+    setFormData((prev) => ({
+      ...prev,
+      companions: prev.companions.filter((c) => c !== name),
+    }));
+  };
 
   useEffect(() => {
     const loadDestinations = async () => {
@@ -66,11 +91,6 @@ function CreateTripForm({ plannerData = null }) {
     try {
       setLoading(true);
 
-      const collaboratorIds = formData.collaborators
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-
       const payload = {
         title: formData.title,
 
@@ -87,7 +107,7 @@ function CreateTripForm({ plannerData = null }) {
 
         budget: Number(formData.budget),
 
-        collaborators: collaboratorIds,
+        companions: formData.companions,
 
         coverImage: plannerData?.coverImage || "",
 
@@ -263,24 +283,56 @@ function CreateTripForm({ plannerData = null }) {
           />
         </div>
 
-        {/* Collaborators */}
+        {/* Companions */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Collaborators
+            Trip Companions
           </label>
 
-          <input
-            type="text"
-            name="collaborators"
-            value={formData.collaborators}
-            onChange={handleChange}
-            placeholder="Enter collaborator IDs separated by commas"
-            className="w-full border rounded-lg px-4 py-2"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={companionInput}
+              onChange={(e) => setCompanionInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addCompanion();
+                }
+              }}
+              placeholder="Enter a name and press Add"
+              className="w-full border rounded-lg px-4 py-2"
+            />
+
+            <Button type="button" variant="secondary" onClick={addCompanion}>
+              Add
+            </Button>
+          </div>
 
           <p className="text-xs text-gray-500 mt-1">
-            AI Planner will later provide collaborator selection automatically.
+            Just add the names of people joining this trip — they don't need
+            an account. You'll be able to split expenses with them later.
           </p>
+
+          {formData.companions.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {formData.companions.map((name) => (
+                <span
+                  key={name}
+                  className="bg-teal-100 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
+                >
+                  {name}
+                  <button
+                    type="button"
+                    onClick={() => removeCompanion(name)}
+                    aria-label={`Remove ${name}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Buttons */}

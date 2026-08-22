@@ -13,6 +13,29 @@ const isTripMember = (trip, userId) => {
   );
 };
 
+const isTripCompanion = (trip, companionId) => {
+  const id = companionId.toString();
+  return trip.companions.some((companion) => companion._id.toString() === id);
+};
+
+// Normalizes a "who" field from the request body into { id, model }.
+// Accepts either a bare id string (assumed to be a User — keeps old
+// clients working) or an explicit { id, type } / { id, model } object,
+// which is how the client now tags companions vs. real users.
+const normalizePerson = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return { id: value, model: "User" };
+  const model = value.type === "companion" || value.model === "Companion"
+    ? "Companion"
+    : "User";
+  return { id: value.id || value._id, model };
+};
+
+const isValidPerson = (trip, person) =>
+  person.model === "Companion"
+    ? isTripCompanion(trip, person.id)
+    : isTripMember(trip, person.id);
+
 // Create Expense
 const createExpense = async (req, res, next) => {
   try {
@@ -33,23 +56,25 @@ const createExpense = async (req, res, next) => {
     }
 
     // Who actually paid can be specified (e.g. logging an expense someone
-    // else covered) — previously this was silently overwritten with the
-    // logged-in user's id no matter what the form sent, so the "Paid By"
-    // dropdown in AddExpenseModal had no real effect. Default to the
-    // logged-in user if nothing was sent, but validate whoever is named
-    // is actually a member of this trip.
-    const paidBy = req.body.paidBy || req.user.id;
+    // else covered) — defaults to the logged-in user. The payer can be a
+    // real trip member or a name-only companion, but either way must
+    // actually belong to this trip.
+    const paidByPerson =
+      normalizePerson(req.body.paidBy) || { id: req.user.id, model: "User" };
 
-    if (!isTripMember(trip, paidBy)) {
+    if (!isValidPerson(trip, paidByPerson)) {
       return res.status(400).json({
         success: false,
         message: "The selected payer must be a member of this trip.",
       });
     }
 
-    const participants = req.body.participants || [];
-    const invalidParticipant = participants.find(
-      (participantId) => !isTripMember(trip, participantId)
+    const participantPeople = (req.body.participants || [])
+      .map(normalizePerson)
+      .filter(Boolean);
+
+    const invalidParticipant = participantPeople.find(
+      (person) => !isValidPerson(trip, person)
     );
 
     if (invalidParticipant) {
@@ -61,18 +86,31 @@ const createExpense = async (req, res, next) => {
 
     const expense = await expenseService.createExpense({
       ...req.body,
-      paidBy,
+      paidBy: paidByPerson.id,
+      paidByModel: paidByPerson.model,
+      participants: participantPeople.map((p) => ({
+        id: p.id,
+        model: p.model,
+      })),
     });
 
-    const participantIds = participants.filter((id) => id !== req.user.id);
+    // Only real users can receive in-app notifications — companions have
+    // no account to notify.
+    const participantUserIds = participantPeople
+      .filter((p) => p.model === "User")
+      .map((p) => p.id.toString())
+      .filter((id) => id !== req.user.id);
 
-    if (participantIds.length > 0) {
-      await notificationService.createNotificationsForUsers(participantIds, {
-        type: "expense",
-        message: `${expense.paidBy.name} added a new expense "${expense.title}" (₹${expense.amount})`,
-        link: "/expenses",
-        relatedId: expense._id,
-      });
+    if (participantUserIds.length > 0) {
+      await notificationService.createNotificationsForUsers(
+        participantUserIds,
+        {
+          type: "expense",
+          message: `${expense.paidBy.name} added a new expense "${expense.title}" (₹${expense.amount})`,
+          link: "/expenses",
+          relatedId: expense._id,
+        }
+      );
     }
 
     res.status(201).json({
@@ -150,9 +188,49 @@ const updateExpense = async (req, res, next) => {
       });
     }
 
+    // Re-normalize paidBy/participants the same way createExpense does, in
+    // case the edit form changed who's involved — and re-validate against
+    // the trip so a companion/user can't be substituted in from outside it.
+    const updates = { ...req.body };
+
+    if (updates.paidBy !== undefined || updates.participants !== undefined) {
+      const trip = await Trip.findById(expense.trip._id || expense.trip);
+
+      if (updates.paidBy !== undefined) {
+        const paidByPerson = normalizePerson(updates.paidBy);
+        if (!paidByPerson || !isValidPerson(trip, paidByPerson)) {
+          return res.status(400).json({
+            success: false,
+            message: "The selected payer must be a member of this trip.",
+          });
+        }
+        updates.paidBy = paidByPerson.id;
+        updates.paidByModel = paidByPerson.model;
+      }
+
+      if (updates.participants !== undefined) {
+        const participantPeople = (updates.participants || [])
+          .map(normalizePerson)
+          .filter(Boolean);
+        const invalidParticipant = participantPeople.find(
+          (person) => !isValidPerson(trip, person)
+        );
+        if (invalidParticipant) {
+          return res.status(400).json({
+            success: false,
+            message: "All participants must be members of this trip.",
+          });
+        }
+        updates.participants = participantPeople.map((p) => ({
+          id: p.id,
+          model: p.model,
+        }));
+      }
+    }
+
     const updatedExpense = await expenseService.updateExpense(
       req.params.id,
-      req.body
+      updates
     );
 
     res.json({
@@ -224,7 +302,9 @@ const settleExpense = async (req, res, next) => {
       status: "Settled",
     });
 
+    // Only notify real users — companions have no account to notify.
     const participantIds = expense.participants
+      .filter((p) => !p.isCompanion)
       .map((p) => p._id.toString())
       .filter((id) => id !== req.user.id);
 

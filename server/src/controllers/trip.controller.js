@@ -64,6 +64,7 @@ const createTrip = async (req, res) => {
     budget,
     itinerary,
     collaborators,
+    companions,
     coverImage,
     isPublic,
     status,
@@ -90,6 +91,11 @@ const createTrip = async (req, res) => {
       plannerId: plannerId || null,
       createdBy: req.user.id,
       collaborators: collaborators || [],
+      // Name-only companions (no account) added by the trip creator, e.g.
+      // for splitting expenses with a friend who isn't on the site.
+      companions: (companions || [])
+        .map((c) => (typeof c === "string" ? { name: c } : c))
+        .filter((c) => c.name && c.name.trim()),
       coverImage: coverImage || "",
       startDate,
       endDate,
@@ -215,6 +221,7 @@ const updateTrip = async (req, res) => {
       "coverImage",
       "isPublic",
       "collaborators",
+      "companions",
       "itinerary",
     ];
 
@@ -225,6 +232,12 @@ const updateTrip = async (req, res) => {
         updates[field] = req.body[field];
       }
     });
+
+    if (updates.companions) {
+      updates.companions = updates.companions
+        .map((c) => (typeof c === "string" ? { name: c } : c))
+        .filter((c) => c.name && c.name.trim());
+    }
 
     if (
       updates.startDate &&

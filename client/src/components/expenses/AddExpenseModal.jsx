@@ -27,9 +27,35 @@ const AddExpenseModal = ({
   const [formError, setFormError] = useState("");
 
   const selectedTrip = trips.find((trip) => trip._id === formData.trip);
+
+  // Everyone who can be picked as "Paid By" or a participant: the trip
+  // creator and collaborators (real accounts), plus name-only companions
+  // the creator added when setting up the trip. Each is tagged with
+  // isCompanion so we know which model to send it as.
   const tripMembers = selectedTrip
-    ? [selectedTrip.createdBy, ...(selectedTrip.collaborators || [])]
+    ? [
+        { ...selectedTrip.createdBy, isCompanion: false },
+        ...(selectedTrip.collaborators || []).map((c) => ({
+          ...c,
+          isCompanion: false,
+        })),
+        ...(selectedTrip.companions || []).map((c) => ({
+          _id: c._id,
+          name: c.name,
+          isCompanion: true,
+        })),
+      ]
     : [];
+
+  // Builds the { id, type } shape the API expects for paidBy/participants,
+  // given a member id string from this list.
+  const toPersonPayload = (memberId) => {
+    const member = tripMembers.find((m) => m._id === memberId);
+    return {
+      id: memberId,
+      type: member?.isCompanion ? "companion" : "user",
+    };
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,10 +86,16 @@ const AddExpenseModal = ({
     setSubmitting(true);
 
     try {
+      const payload = {
+        ...formData,
+        paidBy: toPersonPayload(formData.paidBy),
+        participants: formData.participants.map(toPersonPayload),
+      };
+
       if (editingExpense) {
-        await updateExpense(editingExpense._id, formData);
+        await updateExpense(editingExpense._id, payload);
       } else {
-        await createExpense(formData);
+        await createExpense(payload);
       }
 
       showToast(

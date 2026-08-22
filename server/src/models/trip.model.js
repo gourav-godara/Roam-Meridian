@@ -75,6 +75,20 @@ const tripSchema = new mongoose.Schema(
             },
         ],
 
+        // Trip companions added by name only (no account required). Used
+        // to split expenses with people who aren't registered users of the
+        // site — e.g. a friend without an account who still joined the trip.
+        companions: [
+            {
+                name: {
+                    type: String,
+                    required: true,
+                    trim: true,
+                    maxlength: 100,
+                },
+            },
+        ],
+
         coverImage: {
             type: String,
             default: "",

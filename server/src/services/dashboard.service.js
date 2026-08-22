@@ -119,7 +119,9 @@ const getDashboardData = async (userId) => {
   upcomingTrips[0].destinationId?.images?.[0] ||
   "https://placehold.co/400x300",
         companions: [],
-        extraCompanions: upcomingTrips[0].collaborators.length,
+        extraCompanions:
+          upcomingTrips[0].collaborators.length +
+          (upcomingTrips[0].companions?.length || 0),
         status: upcomingTrips[0].status,
       }
     : null;

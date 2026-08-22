@@ -8,8 +8,7 @@ import {
   FiEdit2,
   FiTrash2,
   FiPlus,
-  FiSave,
-  FiX,
+  FiSave
 } from "react-icons/fi";
 
 import Button from "../../components/common/Button";
@@ -19,12 +18,7 @@ import useTrip from "../../hooks/useTrip";
 import Card from "../../components/common/Card";
 import Avatar from "../../components/common/Avatar";
 
-const STATUS_STYLES = {
-  draft: "bg-gray-100 text-gray-600",
-  planning: "bg-amber-100 text-amber-700",
-  ongoing: "bg-green-100 text-green-700",
-  completed: "bg-blue-100 text-blue-700",
-};
+
 
 function TripDetail() {
   const { id } = useParams();
@@ -428,6 +422,33 @@ function TripDetail() {
                 />
 
                 <span>{user.name}</span>
+              </div>
+            ))}
+
+          </div>
+        </>
+      )}
+
+      {/* Companions (name-only, no account) */}
+      {trip.companions?.length > 0 && (
+        <>
+          <h2 className="text-xl font-semibold mb-4">
+            Companions
+          </h2>
+
+          <div className="flex gap-4 flex-wrap mb-8">
+
+            {trip.companions.map((companion) => (
+              <div
+                key={companion._id}
+                className="flex items-center gap-2 bg-white border rounded-full px-3 py-2"
+              >
+                <Avatar
+                  user={{ name: companion.name }}
+                  size={32}
+                />
+
+                <span>{companion.name}</span>
               </div>
             ))}
 

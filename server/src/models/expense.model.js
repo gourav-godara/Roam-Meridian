@@ -9,18 +9,35 @@ const expenseSchema = new mongoose.Schema(
     required: true,
 },
 
-    // User who paid the expense
+    // User who paid the expense. Either a real registered user, or a
+    // name-only trip companion (see Trip.companions) — paidByModel says
+    // which one this id refers to.
     paidBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
       required: true,
+      refPath: "paidByModel",
     },
 
-    // Users who are sharing this expense
+    paidByModel: {
+      type: String,
+      enum: ["User", "Companion"],
+      default: "User",
+    },
+
+    // People sharing this expense. Each entry is either a real registered
+    // user or a name-only trip companion, disambiguated per-entry by model.
     participants: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        id: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+          refPath: "participants.model",
+        },
+        model: {
+          type: String,
+          enum: ["User", "Companion"],
+          default: "User",
+        },
       },
     ],
 

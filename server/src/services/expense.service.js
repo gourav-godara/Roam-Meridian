@@ -1,43 +1,104 @@
 const Expense = require("../models/expense.model");
+const Trip = require("../models/trip.model");
+
+// paidBy/participants can point at a real User (populated normally via
+// refPath) or at a name-only companion embedded in Trip.companions
+// (Mongoose can't populate into an embedded subdocument, so those are
+// resolved by hand here). Every expense in/out of this service goes
+// through this so callers always see a consistent { _id, name } shape
+// for both kinds of person.
+const attachCompanionNames = async (expense) => {
+  if (!expense) return expense;
+
+  const doc = expense.toObject ? expense.toObject() : expense;
+
+  const companionIds = [];
+  if (doc.paidByModel === "Companion" && doc.paidBy) {
+    companionIds.push(doc.paidBy.toString());
+  }
+  (doc.participants || []).forEach((p) => {
+    if (p.model === "Companion" && p.id) {
+      companionIds.push(p.id.toString());
+    }
+  });
+
+  let companionMap = {};
+  if (companionIds.length > 0 && doc.trip) {
+    const tripId = doc.trip._id || doc.trip;
+    const trip = await Trip.findById(tripId, "companions");
+    (trip?.companions || []).forEach((c) => {
+      companionMap[c._id.toString()] = c.name;
+    });
+  }
+
+  if (doc.paidByModel === "Companion") {
+    doc.paidBy = {
+      _id: doc.paidBy,
+      name: companionMap[doc.paidBy?.toString()] || "Unknown companion",
+      isCompanion: true,
+    };
+  }
+
+  doc.participants = (doc.participants || []).map((p) =>
+    p.model === "Companion"
+      ? {
+          _id: p.id,
+          name: companionMap[p.id?.toString()] || "Unknown companion",
+          isCompanion: true,
+        }
+      : { _id: p.id?._id || p.id, name: p.id?.name, isCompanion: false }
+  );
+
+  return doc;
+};
+
+const populateExpense = (query) =>
+  query
+    .populate({ path: "paidBy", select: "name email", strictPopulate: false })
+    .populate({
+      path: "participants.id",
+      select: "name email",
+      strictPopulate: false,
+    })
+    .populate("trip", "title");
 
 // Create Expense
 const createExpense = async (expenseData) => {
   const expense = await Expense.create(expenseData);
 
-  return await Expense.findById(expense._id)
-    .populate("paidBy", "name email")
-    .populate("participants", "name email")
-    .populate("trip", "title")
+  const populated = await populateExpense(Expense.findById(expense._id));
+  return attachCompanionNames(populated);
 };
 
 // Get All Expenses (paid by the user or shared with them)
 const getAllExpenses = async (userId) => {
-  return await Expense.find({
-    $or: [{ paidBy: userId }, { participants: userId }],
-  })
-    .populate("paidBy", "name email")
-    .populate("participants", "name email")
-    .populate("trip", "title")
-    .sort({ createdAt: -1 });
+  const expenses = await populateExpense(
+    Expense.find({
+      $or: [
+        { paidBy: userId, paidByModel: "User" },
+        { participants: { $elemMatch: { id: userId, model: "User" } } },
+      ],
+    }).sort({ createdAt: -1 })
+  );
+
+  return Promise.all(expenses.map(attachCompanionNames));
 };
 
 // Get Expense By ID
 const getExpenseById = async (id) => {
-  return await Expense.findById(id)
-    .populate("paidBy", "name email")
-    .populate("participants", "name email")
-    .populate("trip", "title")
+  const expense = await populateExpense(Expense.findById(id));
+  return attachCompanionNames(expense);
 };
 
 // Update Expense
 const updateExpense = async (id, data) => {
-  return await Expense.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  })
-    .populate("paidBy", "name email")
-    .populate("participants", "name email")
-    .populate("trip", "title")
+  const expense = await populateExpense(
+    Expense.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    })
+  );
+  return attachCompanionNames(expense);
 };
 
 // Delete Expense
