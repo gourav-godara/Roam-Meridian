@@ -38,16 +38,40 @@ const getDashboardData = async (userId) => {
     .sort({ createdAt: -1 })
     .limit(5);
 
+  // paidBy/participants can each be a real User or a name-only trip
+  // companion (see Trip.companions), disambiguated per-entry by
+  // paidByModel / participants[].model. Only the "User" side can ever
+  // match this dashboard's userId, and Mongoose can't .populate() a
+  // mixed refPath array the simple way, so we populate just the User
+  // rows and treat everything else (companions, or a since-deleted
+  // user) as an unresolvable participant that's skipped in the
+  // owe/owed math below rather than crashing on a missing _id.
   const expenses = await Expense.find({
-    $or: [{ paidBy: userId }, { participants: userId }],
+    $or: [
+      { paidBy: userId, paidByModel: "User" },
+      { participants: { $elemMatch: { id: userId, model: "User" } } },
+    ],
   })
-    .populate("paidBy", "name")
-    .populate("participants", "name");
+    .populate({ path: "paidBy", select: "name", strictPopulate: false })
+    .populate({
+      path: "participants.id",
+      select: "name",
+      strictPopulate: false,
+    });
 
   const totalSpent = expenses.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
+
+  // A participant's populated id is only a real user doc when the
+  // subdocument's model is "User" — for a companion entry, participants.id
+  // is left as the raw ObjectId (refPath skips it), so isUserParticipant
+  // is the guard that keeps the math below from ever calling .toString()
+  // on the wrong shape or counting a companion as someone who can owe/be
+  // owed in-app.
+  const isUserParticipant = (participant) =>
+    participant.model === "User" && participant.id && participant.id._id;
 
   let youOwe = 0;
   let youAreOwed = 0;
@@ -55,12 +79,16 @@ const getDashboardData = async (userId) => {
   expenses.forEach((expense) => {
     if (expense.status === "Settled") return;
 
-    // paidBy can be null if that user was later deleted — guard against it
-    // instead of letting `.toString()` throw and silently blanking the
-    // whole dashboard for this user.
-    if (!expense.paidBy) return;
+    // paidBy can be null if paidByModel is "Companion" (not populated) or
+    // that user was later deleted — guard against it instead of letting
+    // `.toString()` throw and silently blanking the whole dashboard for
+    // this user.
+    if (expense.paidByModel !== "User" || !expense.paidBy) return;
 
-    const participants = expense.participants || [];
+    const allParticipants = expense.participants || [];
+    // Companions can't owe/be owed in-app (no account), so only real users
+    // count toward the split here.
+    const participants = allParticipants.filter(isUserParticipant);
 
     if (participants.length === 0) return;
 
@@ -70,7 +98,7 @@ const getDashboardData = async (userId) => {
     // payer's own share back to them in full — payer paid the amount but
     // got reimbursed for the whole thing, not just the others' shares.
     const payerIsParticipant = participants.some(
-      (participant) => participant._id.toString() === userId.toString()
+      (participant) => participant.id._id.toString() === userId.toString()
     );
     const shareCount = payerIsParticipant
       ? participants.length
@@ -82,14 +110,14 @@ const getDashboardData = async (userId) => {
     if (paidByMe) {
       // Others owe me their share each
       participants.forEach((participant) => {
-        if (participant._id.toString() !== userId.toString()) {
+        if (participant.id._id.toString() !== userId.toString()) {
           youAreOwed += share;
         }
       });
     } else {
       // I owe the payer my share, if I'm one of the participants
       const iAmParticipant = participants.some(
-        (participant) => participant._id.toString() === userId.toString()
+        (participant) => participant.id._id.toString() === userId.toString()
       );
 
       if (iAmParticipant) {

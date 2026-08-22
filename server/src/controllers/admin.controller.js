@@ -246,7 +246,7 @@ const getUserById = async (req, res, next) => {
     const [tripCount, reviewCount, expenseCount] = await Promise.all([
       Trip.countDocuments({ createdBy: user._id }),
       Review.countDocuments({ user: user._id }),
-      Expense.countDocuments({ paidBy: user._id }),
+      Expense.countDocuments({ paidBy: user._id, paidByModel: "User" }),
     ]);
 
     res.status(200).json({
@@ -527,10 +527,19 @@ const getAllExpenses = async (req, res, next) => {
     const limitNumber = parseInt(limit) || 20;
     const skip = (pageNumber - 1) * limitNumber;
 
+    // participants can be a real User or a name-only trip companion (see
+    // Trip.companions) — populate() only resolves the User side via
+    // refPath; a companion entry is left as the raw { id, model } and
+    // shown as "Companion" below rather than crashing on a plain
+    // populate("participants", ...) against a mixed-ref array.
     const [expenses, total] = await Promise.all([
       Expense.find(filter)
         .populate("paidBy", "name email")
-        .populate("participants", "name email")
+        .populate({
+          path: "participants.id",
+          select: "name email",
+          strictPopulate: false,
+        })
         .populate("trip", "title")
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -538,13 +547,50 @@ const getAllExpenses = async (req, res, next) => {
       Expense.countDocuments(filter),
     ]);
 
+    // Companion names live on the trip, not the expense, so resolve them
+    // in one batched lookup per page rather than per-row.
+    const tripIdsNeedingCompanions = [
+      ...new Set(
+        expenses
+          .filter((e) => (e.participants || []).some((p) => p.model === "Companion"))
+          .map((e) => (e.trip?._id || e.trip)?.toString())
+          .filter(Boolean)
+      ),
+    ];
+    const tripsWithCompanions = tripIdsNeedingCompanions.length
+      ? await Trip.find(
+          { _id: { $in: tripIdsNeedingCompanions } },
+          "companions"
+        )
+      : [];
+    const companionNameById = {};
+    tripsWithCompanions.forEach((trip) => {
+      (trip.companions || []).forEach((c) => {
+        companionNameById[c._id.toString()] = c.name;
+      });
+    });
+
+    const expensesForAdmin = expenses.map((expense) => {
+      const doc = expense.toObject();
+      doc.participants = (doc.participants || []).map((p) =>
+        p.model === "Companion"
+          ? {
+              _id: p.id,
+              name: companionNameById[p.id?.toString()] || "Unknown companion",
+              isCompanion: true,
+            }
+          : { _id: p.id?._id, name: p.id?.name, email: p.id?.email, isCompanion: false }
+      );
+      return doc;
+    });
+
     res.status(200).json({
       success: true,
       currentPage: pageNumber,
       totalPages: Math.ceil(total / limitNumber),
       totalExpenses: total,
-      count: expenses.length,
-      data: expenses,
+      count: expensesForAdmin.length,
+      data: expensesForAdmin,
     });
   } catch (error) {
     next(error);
