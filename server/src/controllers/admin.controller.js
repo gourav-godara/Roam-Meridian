@@ -556,7 +556,17 @@ const getAllExpenses = async (req, res, next) => {
         userIds.add(expense.paidBy.toString());
       }
       (expense.participants || []).forEach((p) => {
-        if (!p.id) return;
+        // Expenses saved before the companion migration still have
+        // participants as a bare array of ObjectIds, not { id, model }
+        // subdocuments. A raw Mongoose ObjectId happens to carry its own
+        // internal .id property (the object's raw byte buffer) — so
+        // `!p.id` never catches these old entries, and calling
+        // .toString() on that buffer for a User lookup throws a
+        // CastError (invalid _id), which is what was crashing this
+        // endpoint. Checking for a string `model` field (only ever
+        // present on the new subdocument shape) is what actually tells
+        // old and new apart.
+        if (typeof p?.model !== "string" || !p.id) return;
         if (p.model === "Companion") {
           companionIds.add(p.id.toString());
         } else {
@@ -614,9 +624,19 @@ const getAllExpenses = async (req, res, next) => {
     const expensesForAdmin = expenses.map((doc) => ({
       ...doc,
       paidBy: doc.paidBy ? resolvePerson(doc.paidBy, doc.paidByModel) : null,
-      participants: (doc.participants || []).map((p) =>
-        resolvePerson(p.id, p.model)
-      ),
+      participants: (doc.participants || [])
+        .map((p) => {
+          // Old-shape data (pre-companion migration): participants was a
+          // bare array of User ObjectIds, not { id, model } subdocuments.
+          // Treat those as plain User ids rather than reading .id/.model
+          // off the ObjectId itself (see the note above on why that's
+          // unsafe).
+          if (typeof p?.model !== "string") {
+            return resolvePerson(p, "User");
+          }
+          return resolvePerson(p.id, p.model);
+        })
+        .filter(Boolean),
     }));
 
     res.status(200).json({
@@ -645,5 +665,8 @@ module.exports = {
   deleteReview,
   getAllExpenses,
 };
+
+
+
 
 

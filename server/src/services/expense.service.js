@@ -28,6 +28,18 @@ const resolvePeople = async (expenses) => {
       userIds.add(doc.paidBy.toString());
     }
     (doc.participants || []).forEach((p) => {
+      // Expenses saved before the companion migration still have
+      // participants as a bare array of ObjectIds, not { id, model }
+      // subdocuments. A raw Mongoose ObjectId happens to carry its own
+      // internal .id property (the object's raw byte buffer), so relying
+      // on "does p.id exist" can't tell old shape from new — it's always
+      // truthy either way. A string `model` field only ever exists on the
+      // new subdocument shape, so that's the real signal.
+      if (typeof p?.model !== "string") {
+        const rawId = p?._id || p;
+        if (rawId) userIds.add(rawId.toString());
+        return;
+      }
       const id = p.id?._id || p.id;
       if (!id) return;
       if (p.model === "Companion") {
@@ -81,9 +93,17 @@ const resolvePeople = async (expenses) => {
   const resolved = docs.map((doc) => ({
     ...doc,
     paidBy: doc.paidBy ? resolvePerson(doc.paidBy, doc.paidByModel) : null,
-    participants: (doc.participants || []).map((p) =>
-      resolvePerson(p.id?._id || p.id, p.model)
-    ),
+    participants: (doc.participants || [])
+      .map((p) => {
+        // Old-shape data: participants was a bare array of User
+        // ObjectIds. Treat those as plain User ids instead of reading
+        // .id/.model off the ObjectId itself (see note above).
+        if (typeof p?.model !== "string") {
+          return resolvePerson(p?._id || p, "User");
+        }
+        return resolvePerson(p.id?._id || p.id, p.model);
+      })
+      .filter(Boolean),
   }));
 
   return Array.isArray(expenses) ? resolved : resolved[0];
