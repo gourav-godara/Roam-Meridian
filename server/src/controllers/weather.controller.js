@@ -3,7 +3,7 @@ const { getOrSet } = require("../utils/cache");
 
 const fetchWeather = async (city) => {
     return getOrSet(
-        `weather:${city.toLowerCase()}`,
+        `weather:en:${city.toLowerCase()}`,
         10 * 60 * 1000, // 10 minutes — weather doesn't change second to second
         async () => {
             const response = await axios.get(
@@ -13,6 +13,7 @@ const fetchWeather = async (city) => {
                         q: city,
                         appid: process.env.WEATHER_API_KEY,
                         units: "metric",
+                        lang: "en",
                     },
                 }
             );

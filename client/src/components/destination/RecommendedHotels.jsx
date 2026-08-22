@@ -48,11 +48,15 @@ function RecommendedHotels({ items = [], onPlaceRoute }) {
               <div className="mt-auto pt-5">
                 <Button
                   onClick={() => {
-                    console.log(hotel);
-                    onPlaceRoute?.(hotel)}}
+                    if (hotel.latitude && hotel.longitude) {
+                      const url = `https://www.google.com/maps/search/?api=1&query=${hotel.latitude},${hotel.longitude}`;
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    }
+                    onPlaceRoute?.(hotel);
+                  }}
                   className="w-full"
                 >
-                  Show Route
+                  Open in Google Maps
                 </Button>
               </div>
             </div>
