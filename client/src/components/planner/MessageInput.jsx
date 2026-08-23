@@ -1,14 +1,9 @@
 import { useEffect, useRef } from "react";
-import { FiMapPin, FiSend } from "react-icons/fi";
+import { FiSend } from "react-icons/fi";
+
 import Button from "../common/Button";
 
-function MessageInput({
-  value,
-  onChange,
-  onSend,
-  disabled,
-  tripParams,
-}) {
+function MessageInput({ value, onChange, onSend, disabled }) {
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -34,8 +29,8 @@ function MessageInput({
   };
 
   return (
-    <div className="border-t border-border bg-white px-4 py-5 sm:px-6 ">
-      <div className="flex items-end gap-2 rounded-2xl border border-border bg-bg px-3 py-2 transition-all focus-within:border-forest/40 focus-within:ring-4 focus-within:ring-forest/5">
+    <div className="shrink-0 border-t border-border bg-white px-3 py-3 sm:px-6 sm:py-4">
+      <div className="flex min-w-0 items-end gap-2 rounded-xl border border-border bg-bg px-3 py-1.5 transition-all focus-within:border-forest/40 focus-within:ring-4 focus-within:ring-forest/5">
         <textarea
           ref={textareaRef}
           value={value}
@@ -43,16 +38,17 @@ function MessageInput({
           onKeyDown={handleKeyDown}
           placeholder="Ask me to plan a trip, refine an idea, or find inspiration..."
           rows={1}
-          className="max-h-36 flex-1 resize-none bg-transparent py-1.5 text-sm outline-none placeholder:text-gray-400"
+          disabled={disabled}
+          className="min-w-0 max-h-36 flex-1 resize-none overflow-y-auto bg-transparent py-1 text-sm outline-none placeholder:text-gray-400"
         />
 
         <Button
           variant="primary"
           onClick={handleSend}
           disabled={disabled || !value.trim()}
-          className="!h-9 !w-9 !rounded-full !p-0 shrink-0"
+          className="!flex !h-10 !w-10 !shrink-0 !items-center !justify-center !rounded-full !p-0"
         >
-          <FiSend size={14} />
+          <FiSend size={15} />
         </Button>
       </div>
     </div>

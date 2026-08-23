@@ -18,11 +18,12 @@ function ChatBubble({
 
   if (isUser) {
     return (
-      <div className="flex flex-col items-end gap-1">
-        <div className="bg-forest text-white rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-md text-sm">
+      <div className="flex min-w-0 flex-col items-end gap-1">
+        <div className="max-w-[85%] break-words whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-forest px-3 py-2.5 text-sm text-white sm:max-w-md">
           {message.text}
         </div>
-        <span className="text-xs text-gray-400 pr-1">
+
+        <span className="pr-1 text-xs text-gray-400">
           {formatTime(message.timestamp)}
         </span>
       </div>
@@ -31,11 +32,12 @@ function ChatBubble({
 
   if (message.error) {
     return (
-      <div className="flex flex-col items-start gap-1">
-        <div className="bg-red-50 border border-red-100 text-red-600 rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-md text-sm">
+      <div className="flex min-w-0 flex-col items-start gap-1">
+        <div className="max-w-[85%] break-words rounded-2xl rounded-tl-sm border border-red-100 bg-red-50 px-3 py-2.5 text-sm text-red-600 sm:max-w-md">
           Something went wrong generating this plan. Please try again.
         </div>
-        <span className="text-xs text-gray-400 pl-1">
+
+        <span className="pl-1 text-xs text-gray-400">
           {formatTime(message.timestamp)}
         </span>
       </div>
@@ -43,7 +45,7 @@ function ChatBubble({
   }
 
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex min-w-0 w-full flex-col items-start gap-1">
       {message.plan ? (
         <ItineraryCard
           plan={message.plan}
@@ -53,12 +55,12 @@ function ChatBubble({
           onDuplicate={onDuplicate}
         />
       ) : (
-        <div className="bg-white border border-border rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-md text-sm text-ink">
+        <div className="max-w-[85%] break-words whitespace-pre-wrap rounded-2xl rounded-tl-sm border border-border bg-white px-3 py-2.5 text-sm text-ink sm:max-w-md">
           {message.text}
         </div>
       )}
 
-      <span className="text-xs text-gray-400 pl-1">
+      <span className="pl-1 text-xs text-gray-400">
         {formatTime(message.timestamp)}
       </span>
     </div>
