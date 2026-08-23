@@ -173,13 +173,13 @@ function DayCard({ day, index, onChange, onRemove, canRemove }) {
 
         <div>
           <label className="block text-sm font-medium text-ink mb-1.5">
-            Day Image URL
+            Day Image URL (optional)
           </label>
           <input
             type="text"
             value={day.image}
             onChange={(e) => update("image", e.target.value)}
-            placeholder="https://..."
+            placeholder="Leave blank to auto-fetch from Pexels"
             className="w-full border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-forest/40 bg-white"
           />
         </div>
@@ -396,6 +396,13 @@ function AdminItineraryForm() {
         <h1 className="font-display text-2xl text-ink">
           {isEdit ? "Edit Itinerary" : "New Itinerary"}
         </h1>
+        {!isEdit && (
+          <p className="text-sm text-muted mt-1">
+            Cover and day photos are pulled automatically from Pexels based
+            on the destination and day title — no need to add images
+            yourself unless you want to override one.
+          </p>
+        )}
       </div>
 
       {formError && (
@@ -462,13 +469,13 @@ function AdminItineraryForm() {
 
           <div>
             <label className="block text-sm font-medium text-ink mb-1.5">
-              Cover Image URL
+              Cover Image URL (optional)
             </label>
             <input
               type="text"
               value={form.coverImage}
               onChange={(e) => handleChange("coverImage", e.target.value)}
-              placeholder="https://..."
+              placeholder="Leave blank to auto-fetch from Pexels"
               className="w-full border border-border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-forest/40"
             />
           </div>
