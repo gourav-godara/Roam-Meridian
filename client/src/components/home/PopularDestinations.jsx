@@ -24,25 +24,54 @@ function PopularDestinations() {
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const response = await getAllDestinations();
+        // The backend defaults to limit=10 when no limit is passed, so a
+        // plain getAllDestinations() call only ever sees the first page of
+        // the catalog — "Popular" was effectively sorting whatever 10
+        // destinations happened to come back in insertion order, not the
+        // full set. Ask for a high limit so the ranking below actually
+        // considers every destination.
+        const response = await getAllDestinations({ limit: 100 });
 
-        const mapped = (response.data || [])
-          .map((destination) => ({
-            id: destination._id,
-            name: destination.name,
-            location: [destination.city, destination.state, destination.country]
-              .filter(Boolean)
-              .join(", "),
-            category: destination.category,
-            rating: destination.rating?.average ?? 0,
-            reviews: destination.rating?.count ?? 0,
-            price: destination.budget?.min ?? 0,
-            image: destination.images?.[0] || "",
-          }))
-          .sort((a, b) => b.rating - a.rating)
-          .slice(0, 4);
+        const mapped = (response.data || []).map((destination) => ({
+          id: destination._id,
+          name: destination.name,
+          location: [destination.city, destination.state, destination.country]
+            .filter(Boolean)
+            .join(", "),
+          category: destination.category,
+          rating: destination.rating?.average ?? 0,
+          reviews: destination.rating?.count ?? 0,
+          price: destination.budget?.min ?? 0,
+          image: destination.images?.[0] || "",
+        }));
 
-        setDestinations(mapped);
+        // "Popular" should mean destinations people have actually rated —
+        // a 0.0 average with 0 reviews isn't popular, it's just unreviewed.
+        // Sorting by rating alone doesn't remove these; a 0-rated
+        // destination just sorts last, but still gets padded into the
+        // top-4 slice whenever fewer than 4 destinations have real
+        // reviews. Filter those out before ranking.
+        const reviewed = mapped
+          .filter((destination) => destination.reviews > 0)
+          .sort((a, b) => b.rating - a.rating);
+
+        // Fallback: if fewer than 4 destinations have any reviews yet
+        // (e.g. early on, or a fresh seed), fill remaining slots with the
+        // highest-rated of the rest rather than showing an empty/short
+        // section — but reviewed destinations always take priority.
+        let popular = reviewed.slice(0, 4);
+
+        if (popular.length < 4) {
+          const reviewedIds = new Set(popular.map((d) => d.id));
+          const remainder = mapped
+            .filter((destination) => !reviewedIds.has(destination.id))
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, 4 - popular.length);
+
+          popular = [...popular, ...remainder];
+        }
+
+        setDestinations(popular);
       } catch (error) {
         console.error("Failed to fetch popular destinations:", error);
         setDestinations([]);

@@ -172,7 +172,7 @@ function CreateTripForm({ plannerData = null }) {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            placeholder="My Goa Trip"
+            placeholder="Add Title"
             className="w-full border rounded-lg px-4 py-2"
             required
           />

@@ -191,7 +191,7 @@ const AddExpenseModal = ({
               </label>
               <input
                 type="text"
-                placeholder="Hotel Booking"
+                placeholder="Add Title"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
