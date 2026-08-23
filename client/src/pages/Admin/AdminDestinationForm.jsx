@@ -23,7 +23,7 @@ const EMPTY_FORM = {
   duration: "",
   entryRequirements: "",
   category: "Beach",
-  images: [""],
+  images: [],
   budgetMin: "",
   budgetMax: "",
   currency: "INR",
@@ -61,7 +61,7 @@ function AdminDestinationForm() {
             duration: d.duration || "",
             entryRequirements: d.entryRequirements || "",
             category: d.category || "Beach",
-            images: d.images?.length ? d.images : [""],
+            images: d.images?.length ? d.images : [],
             budgetMin: d.budget?.min ?? "",
             budgetMax: d.budget?.max ?? "",
             currency: d.budget?.currency || "INR",
@@ -194,8 +194,9 @@ function AdminDestinationForm() {
         </h1>
         {!isEdit && (
           <p className="text-sm text-muted mt-1">
-            City/state/country are geocoded automatically on save to place
-            this destination correctly on the map.
+            City/state/country are geocoded automatically on save, and cover
+            photos are pulled automatically from Pexels based on the
+            destination name — no need to add images yourself.
           </p>
         )}
       </div>
@@ -361,9 +362,14 @@ function AdminDestinationForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-ink mb-2">
-            Image URLs
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-ink">
+              Image URLs (optional)
+            </label>
+          </div>
+          <p className="text-xs text-muted mb-2">
+            Leave blank to auto-fetch photos from Pexels{isEdit ? " — clearing all image fields and saving will re-fetch new ones" : ""}. Add a URL below only if you want to override that.
+          </p>
           <div className="flex flex-col gap-2">
             {form.images.map((url, index) => (
               <div key={index} className="flex gap-2">
@@ -374,16 +380,14 @@ function AdminDestinationForm() {
                   placeholder="https://..."
                   className="flex-1 border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:border-forest/40"
                 />
-                {form.images.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeImageField(index)}
-                    className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-red-600 hover:bg-red-50 shrink-0"
-                    aria-label="Remove image"
-                  >
-                    <FiX size={16} />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => removeImageField(index)}
+                  className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-red-600 hover:bg-red-50 shrink-0"
+                  aria-label="Remove image"
+                >
+                  <FiX size={16} />
+                </button>
               </div>
             ))}
           </div>
@@ -392,7 +396,7 @@ function AdminDestinationForm() {
             onClick={addImageField}
             className="flex items-center gap-1.5 text-sm text-forest font-medium mt-2 hover:text-forest-hover"
           >
-            <FiPlus size={14} /> Add another image
+            <FiPlus size={14} /> {form.images.length ? "Add another image" : "Add a manual image override"}
           </button>
         </div>
 
