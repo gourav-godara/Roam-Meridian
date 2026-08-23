@@ -1,148 +1,149 @@
-import { useState } from "react";
 import { FiRefreshCw } from "react-icons/fi";
+
 import DayAccordion from "./DayAccordion";
 
 function ItineraryCard({
   plan,
   onRegenerateDay,
 }) {
-  const [regeneratingDay, setRegeneratingDay] = useState(null);
-
-  const handleRegenerateDay = async (dayNumber) => {
-    setRegeneratingDay(dayNumber);
-
-    await onRegenerateDay(plan._id, dayNumber);
-
-    setRegeneratingDay(null);
-  };
-
-  const handleCopy = async () => {
-    const itineraryText = [
-      plan.response.title,
-      `${plan.days} days · ₹${plan.budget.toLocaleString("en-IN")}`,
-      "",
-      ...plan.response.days.map((day) => `Day ${day.day}: ${day.title}`),
-    ].join("\n");
-
-    try {
-      await navigator.clipboard.writeText(itineraryText);
-    } catch {
-      // Copy may be unavailable in some browsers.
-    }
-  };
+  const response = plan?.response || {};
+  const days = Array.isArray(response.days) ? response.days : [];
 
   return (
-    <article className="max-w-3xl overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
-      <header className="bg-forest p-5 text-white sm:p-7">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
-              Your curated journey
-            </p>
+    <article className="w-full min-w-0 max-w-full overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
+      {/* Trip summary */}
+      <header className="min-w-0 overflow-hidden bg-forest p-4 text-white sm:p-7">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/65 sm:text-[11px] sm:tracking-[0.18em]">
+            Your curated journey
+          </p>
 
-            <h3 className="mt-1 font-display text-2xl sm:text-3xl">
-              {plan.response.title}
-            </h3>
+          <h3 className="mt-1 max-w-full break-words font-display text-xl leading-tight sm:text-3xl">
+            {response.title || plan.title || "Your Trip"}
+          </h3>
 
-            <p className="mt-2 text-sm text-white/75">
-              {plan.destination} · {plan.days} days · {plan.travelers} traveler
-              {plan.travelers > 1 ? "s" : ""}
-            </p>
-          </div>
-
+          <p className="mt-2 break-words text-xs leading-relaxed text-white/75 sm:text-sm">
+            {plan.destination ||
+              response.destination ||
+              "Your destination"}
+            {" · "}
+            {plan.days || days.length}{" "}
+            {Number(plan.days || days.length) === 1 ? "day" : "days"}
+            {" · "}
+            {plan.travelers || response.travelers || 1}{" "}
+            {Number(plan.travelers || response.travelers || 1) === 1
+              ? "traveler"
+              : "travelers"}
+          </p>
         </div>
 
-        <div className="mt-6 grid grid-cols-3 gap-2">
-          <div className="rounded-xl bg-white/10 px-3 py-2.5">
-            <p className="text-[10px] uppercase tracking-wide text-white/60">
+        {/* Trip statistics */}
+        <div className="mt-4 grid min-w-0 grid-cols-3 gap-2 sm:mt-6">
+          <div className="min-w-0 rounded-xl bg-white/10 px-2.5 py-2 sm:px-3 sm:py-2.5">
+            <p className="text-[9px] uppercase tracking-wide text-white/60 sm:text-[10px]">
               Budget
             </p>
-            <p className="mt-0.5 text-sm font-semibold">
-              ₹{plan.budget.toLocaleString("en-IN")}
+
+            <p className="mt-0.5 truncate text-xs font-semibold sm:text-sm">
+              ₹{Number(plan.budget || 0).toLocaleString("en-IN")}
             </p>
           </div>
 
-          <div className="rounded-xl bg-white/10 px-3 py-2.5">
-            <p className="text-[10px] uppercase tracking-wide text-white/60">
+          <div className="min-w-0 rounded-xl bg-white/10 px-2.5 py-2 sm:px-3 sm:py-2.5">
+            <p className="text-[9px] uppercase tracking-wide text-white/60 sm:text-[10px]">
               Weather
             </p>
-            <p className="mt-0.5 truncate text-sm font-semibold">
-              {plan.response.weather || "—"}
+
+            <p className="mt-0.5 truncate text-xs font-semibold sm:text-sm">
+              {response.weather || "—"}
             </p>
           </div>
 
-          <div className="rounded-xl bg-white/10 px-3 py-2.5">
-            <p className="text-[10px] uppercase tracking-wide text-white/60">
+          <div className="min-w-0 rounded-xl bg-white/10 px-2.5 py-2 sm:px-3 sm:py-2.5">
+            <p className="text-[9px] uppercase tracking-wide text-white/60 sm:text-[10px]">
               Best time
             </p>
-            <p className="mt-0.5 truncate text-sm font-semibold">
-              {plan.response.bestTime || "—"}
+
+            <p className="mt-0.5 truncate text-xs font-semibold sm:text-sm">
+              {response.bestTime || "—"}
             </p>
           </div>
         </div>
       </header>
 
-      <div className="p-5 sm:p-7">
-
-        <div className="flex flex-col gap-2">
-          {plan.response.days.map((day) => (
+      {/* Days */}
+      <div className="min-w-0 overflow-hidden p-3 sm:p-7">
+        <div className="flex min-w-0 flex-col gap-2">
+          {days.map((day) => (
             <DayAccordion
               key={day.day}
               day={day}
-              onRegenerate={handleRegenerateDay}
-              regenerating={regeneratingDay === day.day}
             />
           ))}
         </div>
 
-        <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2">
-          <div className="rounded-2xl bg-bg p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+        {/* Budget breakdown + local wisdom */}
+        <div className="mt-5 grid min-w-0 gap-3 border-t border-border pt-4 sm:mt-6 sm:grid-cols-2 sm:pt-5">
+          <div className="min-w-0 rounded-2xl bg-bg p-3 sm:p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-[11px]">
               Budget breakdown
             </p>
 
             <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink">
-              <span>Stay: ₹{plan.response.budgetBreakdown?.stay || 0}</span>
-              <span>Food: ₹{plan.response.budgetBreakdown?.food || 0}</span>
-              <span>
-                Transport: ₹{plan.response.budgetBreakdown?.transport || 0}
+              <span className="min-w-0 break-words">
+                Stay: ₹{response.budgetBreakdown?.stay || 0}
               </span>
-              <span>
-                Activities: ₹{plan.response.budgetBreakdown?.activities || 0}
+
+              <span className="min-w-0 break-words">
+                Food: ₹{response.budgetBreakdown?.food || 0}
+              </span>
+
+              <span className="min-w-0 break-words">
+                Transport: ₹
+                {response.budgetBreakdown?.transport || 0}
+              </span>
+
+              <span className="min-w-0 break-words">
+                Activities: ₹
+                {response.budgetBreakdown?.activities || 0}
               </span>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-forest/5 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-forest">
+          <div className="min-w-0 rounded-2xl bg-forest/5 p-3 sm:p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-forest sm:text-[11px]">
               Local wisdom
             </p>
 
             <ul className="mt-3 space-y-2">
-              {plan.response.localTips?.slice(0, 3).map((tip) => (
+              {response.localTips?.slice(0, 3).map((tip) => (
                 <li
                   key={tip}
-                  className="flex gap-2 text-xs leading-relaxed text-ink"
+                  className="flex min-w-0 gap-2 text-xs leading-relaxed text-ink"
                 >
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-forest" />
-                  {tip}
+
+                  <span className="min-w-0 break-words">
+                    {tip}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {plan.response.packingChecklist?.length > 0 && (
-          <section className="mt-5">
+        {/* Packing checklist */}
+        {response.packingChecklist?.length > 0 && (
+          <section className="mt-5 min-w-0">
             <p className="text-xs font-semibold text-ink">
               Pack for the journey
             </p>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {plan.response.packingChecklist.map((item) => (
+            <div className="mt-3 flex min-w-0 flex-wrap gap-2">
+              {response.packingChecklist.map((item) => (
                 <span
                   key={item}
-                  className="rounded-full border border-border bg-white px-3 py-1.5 text-xs text-muted"
+                  className="max-w-full break-words rounded-full border border-border bg-white px-3 py-1.5 text-xs text-muted"
                 >
                   {item}
                 </span>
@@ -151,17 +152,18 @@ function ItineraryCard({
           </section>
         )}
 
-        {plan.response.nearbyAttractions?.length > 0 && (
-          <section className="mt-5 rounded-2xl bg-mist/50 p-4">
+        {/* Nearby attractions */}
+        {response.nearbyAttractions?.length > 0 && (
+          <section className="mt-5 min-w-0 overflow-hidden rounded-2xl bg-mist/50 p-3 sm:p-4">
             <p className="text-xs font-semibold text-ink">
               Worth adding nearby
             </p>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {plan.response.nearbyAttractions.map((place) => (
+            <div className="mt-3 flex min-w-0 flex-wrap gap-2">
+              {response.nearbyAttractions.map((place) => (
                 <span
                   key={place}
-                  className="rounded-full bg-white px-3 py-1.5 text-xs text-forest shadow-sm"
+                  className="max-w-full break-words rounded-full bg-white px-3 py-1.5 text-xs text-forest shadow-sm"
                 >
                   {place}
                 </span>
@@ -170,10 +172,19 @@ function ItineraryCard({
           </section>
         )}
 
-        <div className="mt-6 flex items-center gap-2 border-t border-border pt-4 text-xs text-gray-400">
-          <FiRefreshCw size={13} />
-          Open a day to regenerate it with a different idea.
-        </div>
+        {/* Regeneration hint */}
+        {onRegenerateDay && (
+          <div className="mt-5 flex min-w-0 items-center gap-2 border-t border-border pt-4 text-[11px] text-gray-400 sm:mt-6 sm:text-xs">
+            <FiRefreshCw
+              className="shrink-0"
+              size={13}
+            />
+
+            <span className="min-w-0 break-words">
+              Open a day to regenerate it with a different idea.
+            </span>
+          </div>
+        )}
       </div>
     </article>
   );

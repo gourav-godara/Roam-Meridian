@@ -13,29 +13,112 @@ const NEW_TRIP_PATTERNS = [
   /\bdon'?t want to go to\b/i,
   /\bnot .{0,20}anymore\b/i,
   /\bplan a (new )?trip to\b/i,
-  /\bi want to (go to|visit)\b.{0,40}\binstead\b/i,
+  /\bi want to (go to|visit|travel to)\b.+\binstead\b/i,
 ];
+
+const TRAVEL_KEYWORDS =
+  /\b(trip|travel|vacation|holiday|itinerary|destination|visit|tour|tourism|explore|adventure|backpack|honeymoon|getaway|journey|flight|hotel|stay|accommodation|budget|beach|mountain|sightseeing|weekend|plan|places?|days?)\b/i;
+
+const GREETING_PATTERN =
+  /^\s*(hi+|hello+|hey+|hola|yo|sup|good\s?(morning|evening|afternoon))[\s!.,]*$/i;
+
+const DAY_LIMIT = 2;
+
+const OFF_TOPIC_REPLY =
+  "I'm your travel planning assistant, so I can only help with trips, destinations, and travel advice. Ask me something about your next trip and I'll get started! 😊";
 
 function isExplicitNewTripRequest(message) {
   return NEW_TRIP_PATTERNS.some((pattern) => pattern.test(message));
 }
 
-const RECENT_MESSAGE_WINDOW = 6;
+function isTravelPlanningRequest(message) {
+  return (
+    /\b(plan|create|make|start|organize)\b.*\b(trip|itinerary|vacation|holiday|getaway)\b/i.test(
+      message,
+    ) ||
+    /\b(i want to|i'd like to|i would like to|let'?s)\b.*\b(visit|travel to|go to)\b/i.test(
+      message,
+    )
+  );
+}
+
+function isTravelRelated(message, conversation) {
+  if (conversation.tripContext?.destination) return true;
+  if (conversation.currentTrip) return true;
+  if (GREETING_PATTERN.test(message)) return true;
+
+  return TRAVEL_KEYWORDS.test(message);
+}
+
+function extractRequestedDays(message) {
+  const numericMatch = message.match(/\b(\d+)\s*[- ]?\s*days?\b/i);
+
+  if (numericMatch) {
+    return parseInt(numericMatch[1], 10);
+  }
+
+  const wordDays = {
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+  };
+
+  const wordMatch = message.match(
+    /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s*[- ]?\s*days?\b/i,
+  );
+
+  if (wordMatch) {
+    return wordDays[wordMatch[1].toLowerCase()];
+  }
+
+  return null;
+}
+
+function dayLimitReply(requestedDays) {
+  return `Sorry, I can only plan trips up to ${DAY_LIMIT} days for now. You asked for ${requestedDays} days. Would you like a ${DAY_LIMIT}-day itinerary instead?`;
+}
+
+async function pushCannedReply(conversation, content) {
+  conversation.messages.push({
+    role: "assistant",
+    content,
+    responseType: "chat",
+    tripSnapshot: null,
+  });
+
+  await conversation.save();
+
+  return Conversation.findById(conversation._id);
+}
 
 async function getOrCreateActiveConversation(userId) {
   let conversation = await Conversation.findOne({
     user: userId,
     status: "active",
   }).sort({ updatedAt: -1 });
+
   if (!conversation) {
-    conversation = await Conversation.create({ user: userId });
+    conversation = await Conversation.create({
+      user: userId,
+    });
   }
+
   return conversation;
 }
 
 function getRecentMessages(conversation) {
   return conversation.messages
-    .filter((m) => !m.content.includes("Sorry, I had trouble processing"))
+    .filter(
+      (m) =>
+        !m.content.includes("Sorry, I had trouble processing"),
+    )
     .slice(-3)
     .map((m) => ({
       role: m.role,
@@ -44,24 +127,38 @@ function getRecentMessages(conversation) {
 }
 
 function mergeUserTripParams(existing, tripParams) {
-  const base = existing.toObject?.() ?? existing;
+  const base = existing?.toObject?.() ?? existing ?? {};
+
   if (!tripParams) return base;
 
   const merged = { ...base };
-  if (tripParams.destination !== undefined)
+
+  if (tripParams.destination !== undefined) {
     merged.destination = tripParams.destination;
-  if (tripParams.days !== undefined) merged.duration = tripParams.days;
-  if (tripParams.budget !== undefined) merged.budget = tripParams.budget;
-  if (tripParams.travelers !== undefined)
+  }
+
+  if (tripParams.days !== undefined) {
+    merged.duration = tripParams.days;
+  }
+
+  if (tripParams.budget !== undefined) {
+    merged.budget = tripParams.budget;
+  }
+
+  if (tripParams.travelers !== undefined) {
     merged.travelers = tripParams.travelers;
-  if (tripParams.travelStyle !== undefined)
+  }
+
+  if (tripParams.travelStyle !== undefined) {
     merged.travelStyle = tripParams.travelStyle;
+  }
 
   return merged;
 }
 
 function mergeTripContext(existing, aiTrip) {
-  const base = existing.toObject?.() ?? existing;
+  const base = existing?.toObject?.() ?? existing ?? {};
+
   if (!aiTrip) return base;
 
   return {
@@ -69,27 +166,37 @@ function mergeTripContext(existing, aiTrip) {
     destination: aiTrip.destination ?? base.destination,
     duration: aiTrip.days?.length ?? base.duration,
     budget: aiTrip.budget ?? base.budget,
-    travelers: base.travelers,
-    travelStyle: base.travelStyle,
+    travelers: aiTrip.travelers ?? base.travelers,
+    travelStyle: aiTrip.travelStyle ?? base.travelStyle,
   };
 }
 
 function applyItineraryUpdate(currentTrip, dayNumber, newDay) {
-  if (!currentTrip || !currentTrip.days) return currentTrip;
-  const updatedDays = currentTrip.days.map((d) =>
-    d.dayNumber === dayNumber ? newDay : d,
+  if (!currentTrip || !currentTrip.days) {
+    return currentTrip;
+  }
+
+  const updatedDays = currentTrip.days.map((day) =>
+    day.dayNumber === dayNumber ? newDay : day,
   );
-  return { ...currentTrip, days: updatedDays };
+
+  return {
+    ...currentTrip,
+    days: updatedDays,
+  };
 }
 
 function nextPlanningStage(currentStage, responseType) {
   switch (responseType) {
     case "clarification":
       return "clarifying";
+
     case "generate":
       return "generated";
+
     case "edit":
       return "editing";
+
     case "chat":
     default:
       return currentStage === "idle" ? "idle" : currentStage;
@@ -111,14 +218,42 @@ async function handleUserMessage(
       })
     : await getOrCreateActiveConversation(userId);
 
-  console.log("Conversation loaded");
-
   if (!conversation) {
     const err = new Error("Active conversation not found");
     err.statusCode = 404;
     throw err;
   }
 
+  /*
+   * Determine whether this is a genuinely new planning request BEFORE
+   * modifying the existing trip context.
+   */
+  const forceNewTrip =
+    isExplicitNewTripRequest(message) ||
+    isTravelPlanningRequest(message);
+
+  /*
+   * A new trip must not inherit the previous trip's destination,
+   * budget, duration, travelers, etc.
+   *
+   * This is important for your requirement that every new trip
+   * collects its information dynamically.
+   */
+  if (forceNewTrip) {
+    console.log("Starting a NEW trip...");
+
+    conversation.currentTrip = null;
+    conversation.tripContext = {};
+    conversation.planningStage = "idle";
+  }
+
+  /*
+   * Apply explicitly supplied frontend parameters AFTER resetting
+   * the old trip context.
+   *
+   * This is important when AI Planner is opened from an Explore page
+   * with a destination already selected.
+   */
   if (tripParams) {
     conversation.tripContext = mergeUserTripParams(
       conversation.tripContext,
@@ -131,16 +266,58 @@ async function handleUserMessage(
     content: message,
   });
 
-  const forceNewTrip =
-    isExplicitNewTripRequest(message) ||
-    /\bplan\b/i.test(message) ||
-    /\bitinerary\b/i.test(message) ||
-    /\btrip\b/i.test(message) ||
-    /\bvisit\b/i.test(message);
+  /*
+   * Domain guard.
+   * This happens before OpenRouter, so unrelated requests do not
+   * consume API tokens.
+   */
+  if (!isTravelRelated(message, conversation)) {
+    console.log(
+      "Off-topic message detected. No AI API call.",
+    );
 
-  if (forceNewTrip) {
-    console.log("Starting a NEW trip...");
-    conversation.currentTrip = null;
+    return pushCannedReply(
+      conversation,
+      OFF_TOPIC_REPLY,
+    );
+  }
+
+  /*
+   * Day-limit guard.
+   * Check the user's actual message first.
+   */
+  const requestedDays = extractRequestedDays(message);
+
+  if (requestedDays !== null && requestedDays > DAY_LIMIT) {
+    console.log(
+      `Requested ${requestedDays} days. Limit is ${DAY_LIMIT}.`,
+    );
+
+    return pushCannedReply(
+      conversation,
+      dayLimitReply(requestedDays),
+    );
+  }
+
+  /*
+   * Also protect against frontend tripParams containing > 2 days.
+   */
+  const requestedContextDays = Number(
+    conversation.tripContext?.duration,
+  );
+
+  if (
+    Number.isFinite(requestedContextDays) &&
+    requestedContextDays > DAY_LIMIT
+  ) {
+    console.log(
+      `Trip context requested ${requestedContextDays} days. Limit is ${DAY_LIMIT}.`,
+    );
+
+    return pushCannedReply(
+      conversation,
+      dayLimitReply(requestedContextDays),
+    );
   }
 
   console.log("Building prompt...");
@@ -152,31 +329,21 @@ async function handleUserMessage(
     latestMessage: message,
   });
 
-  console.log("Calling Ai-Assistant...");
+  console.log("Calling AI assistant...");
 
-  console.log("========== SYSTEM PROMPT ==========");
-  console.log(systemPrompt);
-
-  console.log("========== USER PROMPT ==========");
-  console.log(userPrompt);
-
-  console.log("========== CURRENT TRIP ==========");
-  console.log(JSON.stringify(conversation.currentTrip, null, 2));
-
-  const aiResponse = await generateResponse(systemPrompt, userPrompt);
+  const aiResponse = await generateResponse(
+    systemPrompt,
+    userPrompt,
+  );
 
   console.log("========== AI RESPONSE ==========");
   console.dir(aiResponse, { depth: null });
 
-  console.log("TYPE:", aiResponse.type);
-  console.log("HAS TRIP:", !!aiResponse.trip);
-
-  if (aiResponse.type === "generate" && aiResponse.trip) {
-    console.log("Updating trip...");
+  if (
+    aiResponse.type === "generate" &&
+    aiResponse.trip
+  ) {
     conversation.currentTrip = aiResponse.trip;
-
-    console.log("CURRENT TRIP AFTER UPDATE:");
-    console.dir(conversation.currentTrip, { depth: null });
 
     conversation.tripContext = mergeTripContext(
       conversation.tripContext,
@@ -187,15 +354,12 @@ async function handleUserMessage(
     aiResponse.scope === "day" &&
     aiResponse.day
   ) {
-    console.log("Editing day...");
     conversation.currentTrip = applyItineraryUpdate(
       conversation.currentTrip,
       aiResponse.dayNumber,
       aiResponse.day,
     );
   }
-
-  console.log("Saving conversation...");
 
   conversation.planningStage = nextPlanningStage(
     conversation.planningStage,
@@ -207,30 +371,33 @@ async function handleUserMessage(
     content: aiResponse.message,
     responseType: aiResponse.type,
     tripSnapshot:
-      aiResponse.type === "generate" || aiResponse.type === "edit"
+      aiResponse.type === "generate" ||
+      aiResponse.type === "edit"
         ? conversation.currentTrip
         : null,
   });
 
   await conversation.save();
 
-  console.log("BEFORE SAVE:");
-  console.log("currentTrip =", conversation.currentTrip ? "EXISTS" : "NULL");
+  console.log(
+    "Conversation saved:",
+    conversation._id.toString(),
+  );
 
-  console.log("Conversation saved");
-  console.log("==========================");
-
-  const savedConversation = await Conversation.findById(conversation._id);
-
-  return savedConversation;
+  return Conversation.findById(conversation._id);
 }
 
-async function regenerate(userId, conversationId, { scope, dayNumber }) {
+async function regenerate(
+  userId,
+  conversationId,
+  { scope, dayNumber },
+) {
   const conversation = await Conversation.findOne({
     _id: conversationId,
     user: userId,
     status: "active",
   });
+
   if (!conversation) {
     const err = new Error("Active conversation not found");
     err.statusCode = 404;
@@ -240,7 +407,7 @@ async function regenerate(userId, conversationId, { scope, dayNumber }) {
   const instruction =
     scope === "day"
       ? `Regenerate day ${dayNumber} of the current trip with fresh alternatives.`
-      : "Regenerate the entire trip with fresh alternatives, keeping the same destination, budget, and duration.";
+      : "Regenerate the entire trip with fresh alternatives, keeping the same destination, budget, duration, travelers, and travel style.";
 
   return handleUserMessage(userId, {
     conversationId: conversation._id,
@@ -249,7 +416,10 @@ async function regenerate(userId, conversationId, { scope, dayNumber }) {
 }
 
 async function getActiveConversation(userId) {
-  return Conversation.findOne({ user: userId, status: "active" }).sort({
+  return Conversation.findOne({
+    user: userId,
+    status: "active",
+  }).sort({
     updatedAt: -1,
   });
 }

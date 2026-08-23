@@ -25,70 +25,214 @@ function EmptyState({ onPromptSelect = () => {} }) {
       <img
         src={image}
         alt="Hot air balloons floating over a landscape"
-        className="absolute inset-0 h-full  object-cover object-center"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-white/20" />
 
-      <div className="relative z-10 flex w-full flex-col justify-between px-6 py-5 sm:px-8 sm:py-6 lg:px-10">
+      <div className="relative z-10 flex w-full flex-col justify-between px-4 py-4 sm:px-8 sm:py-6 lg:px-10">
         <div className="max-w-xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-forest/15 bg-white/75 px-3 py-1.5 text-xs font-semibold text-forest backdrop-blur-sm">
-            <FiCompass size={14} />
+          <div
+            className="
+              inline-flex items-center gap-2 rounded-full
+              border border-forest/15 bg-white/75
+              px-2.5 py-1 text-[10px]
+              font-semibold text-forest
+              backdrop-blur-sm
+              sm:px-3 sm:py-1.5 sm:text-xs
+            "
+          >
+            <FiCompass size={13} />
             YOUR AI TRAVEL COMPANION
           </div>
 
-          <h2 className="mt-4 font-display text-3xl leading-[1.05] text-ink sm:text-4xl lg:text-5xl">
+          <h2
+            className="
+              mt-3 font-display
+              text-3xl leading-tight
+              text-ink
+              sm:mt-4 sm:text-5xl
+              lg:text-5xl
+            "
+          >
             Make the journey
-            <span className="block italic text-forest">yours.</span>
+            <span className="block italic text-forest">
+              yours.
+            </span>
           </h2>
 
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-            Tell Roam Meridian where your curiosity is taking you. We’ll shape
-            your ideas into a thoughtful trip, built around your time, budget,
-            and travel style.
+          <p
+            className="
+              mt-2 max-w-md
+              text-s leading-relaxed
+              text-muted
+              sm:mt-3 sm:text-sm
+            "
+          >
+            Tell Roam Meridian where your curiosity is taking you.
+            We’ll shape your ideas into a thoughtful trip, built around
+            your time, budget, and travel style.
           </p>
 
           <button
             type="button"
-            onClick={() => onPromptSelect("Help me plan an unforgettable trip")}
-            className="mt-4 rounded-2xl bg-forest px-5 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-forest-hover hover:shadow-lg"
+            onClick={() =>
+              onPromptSelect("Help me plan an unforgettable trip")
+            }
+            className="
+              mt-3 rounded-xl
+              bg-forest
+              px-4 py-2.5
+              text-s font-semibold
+              text-white
+              shadow-md
+              transition-all
+              hover:bg-forest-hover
+              hover:shadow-lg
+
+              sm:mt-4
+              sm:rounded-2xl
+              sm:px-5
+              sm:py-3
+              sm:text-sm
+            "
           >
             Start planning with AI
           </button>
         </div>
 
-        <div className="mt-6">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-forest">
+
+        {/* Reduced mobile gap here */}
+        <div className="mt-2">
+
+          <p
+            className="
+              mb-2
+              text-[13px]
+              font-semibold
+              uppercase
+              tracking-[0.16em]
+              text-forest
+
+              sm:mb-2
+              sm:text-xs
+            "
+          >
             Choose your travel mood
           </p>
 
-          <div className="grid max-w-3xl gap-3 sm:grid-cols-3">
+
+          <div
+            className="
+              grid
+              grid-cols-3
+              gap-2
+
+              sm:max-w-3xl
+              sm:gap-3
+            "
+          >
             {TRAVEL_MOODS.map((mood) => (
               <button
                 key={mood.title}
                 type="button"
                 onClick={() => onPromptSelect(mood.prompt)}
-                className="group rounded-2xl border border-white/60 bg-white/80 p-4 text-left shadow-sm backdrop-blur-md transition-all hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                className="
+                  group
+                  rounded-xl
+                  border
+                  border-white/60
+                  bg-white/80
+
+                  p-2
+
+                  text-left
+                  shadow-sm
+                  backdrop-blur-md
+
+                  transition-all
+
+                  hover:-translate-y-1
+                  hover:bg-white
+                  hover:shadow-lg
+
+
+                  sm:rounded-2xl
+                  sm:p-4
+                "
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-forest/10 text-forest">
-                  <FiCompass size={17} />
+                <div
+                  className="
+                    flex
+                    h-7
+                    w-7
+                    items-center
+                    justify-center
+                    rounded-lg
+                    bg-forest/10
+                    text-forest
+
+                    sm:h-9
+                    sm:w-9
+                    sm:rounded-xl
+                  "
+                >
+                  <FiCompass size={14} />
                 </div>
 
-                <h3 className="mt-5 text-sm font-semibold text-ink">
+
+                <h3
+                  className="
+                    mt-2
+                    text-[11px]
+                    font-semibold
+                    leading-tight
+                    text-ink
+
+                    sm:mt-5
+                    sm:text-sm
+                  "
+                >
                   {mood.title}
                 </h3>
 
-                <p className="mt-1 text-xs leading-relaxed text-muted">
+
+                <p
+                  className="
+                    mt-1
+                    hidden
+                    text-xs
+                    leading-relaxed
+                    text-muted
+
+                    sm:block
+                  "
+                >
                   {mood.description}
                 </p>
 
-                <span className="mt-4 inline-block text-xs font-semibold text-forest">
-                  Explore this mood →
+
+                <span
+                  className="
+                    mt-2
+                    inline-block
+                    text-[10px]
+                    font-semibold
+                    text-forest
+
+                    sm:mt-4
+                    sm:text-xs
+                  "
+                >
+                  Explore →
                 </span>
+
               </button>
             ))}
           </div>
+
         </div>
+
       </div>
     </div>
   );
