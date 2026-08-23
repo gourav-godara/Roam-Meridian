@@ -1,62 +1,73 @@
 import { useEffect, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiTrash2 } from "react-icons/fi";
 import { useDebounce } from "../../hooks/useDebounce";
-import { getAllExpensesAdmin } from "../../services/adminApi";
+import { useToast } from "../../context/ToastContext";
+import { getAllExpensesAdmin, deleteExpenseAdmin } from "../../services/adminApi";
 import Pagination from "../../components/admin/Pagination";
+import ConfirmDialog from "../../components/admin/ConfirmDialog";
 
 function AdminExpenses() {
+  const { showToast } = useToast();
+
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [busyId, setBusyId] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null);
 
   const debouncedSearch = useDebounce(search, 400);
 
+  const fetchExpenses = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllExpensesAdmin({
+        search: debouncedSearch || undefined,
+        page,
+        limit: 15,
+      });
+      setExpenses(res.data);
+      setTotalPages(res.totalPages);
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Unable to load expenses.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let ignore = false;
-
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await getAllExpensesAdmin({
-          search: debouncedSearch || undefined,
-          page,
-          limit: 15,
-        });
-        if (!ignore) {
-          setExpenses(res.data);
-          setTotalPages(res.totalPages);
-          setError("");
-        }
-      } catch (err) {
-        if (!ignore) {
-          setError(err.response?.data?.message || "Unable to load expenses.");
-        }
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    };
-
-    load();
-
-    return () => {
-      ignore = true;
-    };
+    fetchExpenses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, page]);
 
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch]);
 
+  const handleDelete = async () => {
+    if (!confirmTarget) return;
+    setBusyId(confirmTarget._id);
+    try {
+      await deleteExpenseAdmin(confirmTarget._id);
+      showToast("Expense deleted.", "success");
+      setConfirmTarget(null);
+      await fetchExpenses();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Unable to delete expense.", "error");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-display text-2xl text-ink">Expenses</h1>
         <p className="text-sm text-muted mt-1">
-          Read-only view across all trips — useful for support and dispute
-          lookups.
+          Across all trips — useful for support and dispute lookups.
         </p>
       </div>
 
@@ -92,6 +103,7 @@ function AdminExpenses() {
                   <th className="px-4 py-3 font-medium">Paid By</th>
                   <th className="px-4 py-3 font-medium">Participants</th>
                   <th className="px-4 py-3 font-medium">Amount</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +125,18 @@ function AdminExpenses() {
                     <td className="px-4 py-3 text-ink font-medium">
                       ₹{expense.amount?.toLocaleString()}
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setConfirmTarget(expense)}
+                          disabled={busyId === expense._id}
+                          title="Delete expense"
+                          className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-red-600 hover:bg-red-50 disabled:opacity-40"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -122,8 +146,19 @@ function AdminExpenses() {
 
         <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
       </div>
+
+      <ConfirmDialog
+        open={!!confirmTarget}
+        title={`Delete "${confirmTarget?.title}"?`}
+        message="This permanently deletes the expense. This can't be undone."
+        confirmLabel="Delete Expense"
+        loading={!!busyId}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmTarget(null)}
+      />
     </div>
   );
 }
 
 export default AdminExpenses;
+

@@ -67,11 +67,16 @@ export const deleteReviewAdmin = async (id) => {
 };
 
 // ============================================================
-// EXPENSES (read-only)
+// EXPENSES
 // ============================================================
 
 export const getAllExpensesAdmin = async (params = {}) => {
   const { data } = await api.get("/admin/expenses", { params });
+  return data;
+};
+
+export const deleteExpenseAdmin = async (id) => {
+  const { data } = await api.delete(`/admin/expenses/${id}`);
   return data;
 };
 

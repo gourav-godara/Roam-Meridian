@@ -652,6 +652,21 @@ const getAllExpenses = async (req, res, next) => {
   }
 };
 
+// DELETE /api/admin/expenses/:id
+const deleteExpense = async (req, res, next) => {
+  try {
+    const expense = await Expense.findByIdAndDelete(req.params.id);
+
+    if (!expense) {
+      return res.status(404).json({ success: false, message: "Expense not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Expense deleted." });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getStats,
   getAllUsers,
@@ -664,7 +679,9 @@ module.exports = {
   getAllReviews,
   deleteReview,
   getAllExpenses,
+  deleteExpense,
 };
+
 
 
 
