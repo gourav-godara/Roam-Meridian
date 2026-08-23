@@ -1,6 +1,17 @@
 const mongoose = require("mongoose");
 const Itinerary = require("../models/itinerary.model");
 const Destination = require("../models/Destination");
+const { getDestinationImages } = require("../services/pexels.service");
+
+// Fetches one relevant photo for a given search query, or "" if Pexels
+// has nothing (missing API key, no results, or a request error) — mirrors
+// destination.controller.js's fallback-to-empty behavior so a Pexels
+// hiccup never blocks saving the itinerary, it just leaves that one image
+// blank the same as if the admin hadn't filled it in themselves.
+const fetchOneImage = async (query) => {
+    const [image] = await getDestinationImages(query, 1);
+    return image || "";
+};
 
 // GET /api/itineraries
 // Public. Same filter/pagination shape as getAllDestinations so the
@@ -131,8 +142,30 @@ const createItinerary = async (req, res) => {
             });
         }
 
+        // Cover image and each day's image are pulled from Pexels
+        // automatically when the admin leaves that field blank — same
+        // "optional override" behavior as destination.controller.js.
+        // Fetched in parallel rather than one-by-one so an itinerary with
+        // many days doesn't add a multi-second delay per day.
+        const coverImage = (req.body.coverImage || "").trim()
+            || await fetchOneImage(`${destinationDoc.name} travel`);
+
+        const days = await Promise.all(
+            (req.body.days || []).map(async (day) => {
+                const existingImage = (day.image || "").trim();
+                if (existingImage) return { ...day, image: existingImage };
+
+                const query = day.title
+                    ? `${destinationDoc.name} ${day.title}`
+                    : `${destinationDoc.name} travel`;
+                return { ...day, image: await fetchOneImage(query) };
+            })
+        );
+
         const itinerary = await Itinerary.create({
             ...req.body,
+            coverImage,
+            days,
             destinationName: destinationDoc.name,
             createdBy: req.user.id,
         });
@@ -188,6 +221,39 @@ const updateItinerary = async (req, res) => {
                 });
             }
             updates.destinationName = destinationDoc.name;
+        }
+
+        // Only re-fetch an image if the admin explicitly cleared that
+        // field and saved — mirrors destination.controller.js's edit
+        // behavior. Not touching coverImage/days at all, or saving them
+        // with their existing URLs, leaves those images untouched.
+        const needsNameForFetch =
+            (typeof updates.coverImage === "string" && !updates.coverImage.trim()) ||
+            (Array.isArray(updates.days) &&
+                updates.days.some((day) => !(day.image || "").trim()));
+
+        let destinationNameForFetch = updates.destinationName;
+        if (needsNameForFetch && !destinationNameForFetch) {
+            const current = await Itinerary.findById(req.params.id, "destinationName");
+            destinationNameForFetch = current?.destinationName;
+        }
+
+        if (typeof updates.coverImage === "string" && !updates.coverImage.trim() && destinationNameForFetch) {
+            updates.coverImage = await fetchOneImage(`${destinationNameForFetch} travel`);
+        }
+
+        if (Array.isArray(updates.days) && destinationNameForFetch) {
+            updates.days = await Promise.all(
+                updates.days.map(async (day) => {
+                    const existingImage = (day.image || "").trim();
+                    if (existingImage) return { ...day, image: existingImage };
+
+                    const query = day.title
+                        ? `${destinationNameForFetch} ${day.title}`
+                        : `${destinationNameForFetch} travel`;
+                    return { ...day, image: await fetchOneImage(query) };
+                })
+            );
         }
 
         const itinerary = await Itinerary.findByIdAndUpdate(
