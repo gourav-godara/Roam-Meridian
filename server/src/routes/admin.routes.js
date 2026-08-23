@@ -29,7 +29,8 @@ router.delete("/trips/:id", adminController.deleteTrip);
 router.get("/reviews", adminController.getAllReviews);
 router.delete("/reviews/:id", adminController.deleteReview);
 
-// Expenses (read-only, for support/dispute lookup)
+// Expenses (support/dispute lookup, and moderation delete)
 router.get("/expenses", adminController.getAllExpenses);
+router.delete("/expenses/:id", adminController.deleteExpense);
 
 module.exports = router;

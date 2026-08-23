@@ -53,16 +53,6 @@ const ExpenseCard = ({ summary }) => {
                     ₹{expense.amount}
                   </p>
                 </div>
-
-                <span
-                  className={
-                    expense.status === "Settled"
-                      ? "text-green-600"
-                      : "text-orange-500"
-                  }
-                >
-                  {expense.status}
-                </span>
               </div>
             ))}
           </div>
