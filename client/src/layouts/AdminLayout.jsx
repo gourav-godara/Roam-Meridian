@@ -9,6 +9,7 @@ import {
   FiDollarSign,
   FiMenu,
   FiX,
+  FiCompass,
 } from "react-icons/fi";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { to: "/admin", label: "Overview", icon: FiGrid, end: true },
   { to: "/admin/users", label: "Users", icon: FiUsers },
   { to: "/admin/destinations", label: "Destinations", icon: FiMapPin },
+  { to: "/admin/itineraries", label: "Itineraries", icon: FiCompass },
   { to: "/admin/trips", label: "Trips", icon: FiBriefcase },
   { to: "/admin/reviews", label: "Reviews", icon: FiStar },
   { to: "/admin/expenses", label: "Expenses", icon: FiDollarSign },

@@ -2,6 +2,7 @@ const Destination = require("../models/Destination");
 const mongoose = require("mongoose");
 const { fetchWeather } = require("./weather.controller");
 const { fetchLocation } = require("./maps.controller");
+const { getDestinationImages } = require("../services/pexels.service");
 
 
 const getAllDestinations = async (req, res) => {
@@ -180,7 +181,7 @@ const getDestinationById = async (req, res) => {
 const createDestination = async (req, res) => {
     try {
 
-        const { city, state, country } = req.body;
+        const { city, state, country, name, images } = req.body;
 
         const location = await fetchLocation(
             city,
@@ -188,8 +189,22 @@ const createDestination = async (req, res) => {
             country
         );
 
+        // Admins previously had to paste image URLs by hand. Now the admin
+        // form leaves this blank by default and images are pulled from
+        // Pexels automatically, using the destination name/city as the
+        // search query — the manual field still exists as an optional
+        // override for the rare place Pexels doesn't have good photos for.
+        const providedImages = (images || [])
+            .map((url) => (url || "").trim())
+            .filter(Boolean);
+
+        const resolvedImages = providedImages.length
+            ? providedImages
+            : await getDestinationImages(`${name || city} ${country || ""}`.trim());
+
         const destinationData = {
             ...req.body,
+            images: resolvedImages,
 
             location: {
                 latitude: Number(location.latitude),
@@ -225,9 +240,31 @@ const updateDestination = async (req, res) => {
             });
         }
 
+        const updateData = { ...req.body };
+
+        // If the admin cleared the image list on an edit (rather than
+        // simply not touching it), treat that as "fetch fresh photos"
+        // instead of saving an empty gallery — mirrors the auto-fetch on
+        // create. Leaving `images` out of the request entirely, or
+        // sending existing URLs, leaves the current images untouched.
+        if (Array.isArray(updateData.images)) {
+            const providedImages = updateData.images
+                .map((url) => (url || "").trim())
+                .filter(Boolean);
+
+            if (providedImages.length === 0) {
+                const query = `${updateData.name || updateData.city || ""} ${updateData.country || ""}`.trim();
+                updateData.images = query
+                    ? await getDestinationImages(query)
+                    : [];
+            } else {
+                updateData.images = providedImages;
+            }
+        }
+
         const destination = await Destination.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateData,
             {
                 new: true,
                 runValidators: true,
