@@ -187,11 +187,7 @@ const ReviewPage = () => {
       <div className="relative min-h-screen flex items-center justify-center">
         <ReviewBackdrop />
         <div className="flex flex-col items-center gap-3">
-          <motion.div
-            className="w-9 h-9 border-2 border-forest/20 border-t-forest rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-          />
+          <div className="w-9 h-9 border-2 border-forest/20 border-t-forest rounded-full" />
           <motion.p
             className="text-sm text-muted"
             animate={{ opacity: [0.5, 1, 0.5] }}
